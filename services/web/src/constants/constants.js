@@ -23,4 +23,4 @@ export const PASSWORD_VALIDATION =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,16}$/;
 export const NAME_VALIDATION = /^[a-zA-Z ]+$/;
 export const PIN_CODE_VALIDATION = /^[0-9]{4}$/;
-export const VIN_VALIDATION = /^[0-9][A-Z]{4}[0-9]{2}[A-Z]{4}[0-9]{6}$/;
+export const VIN_VALIDATION = /^[A-HJ-NPR-Z0-9]{17}$/;

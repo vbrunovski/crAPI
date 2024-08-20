@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class GenerateVIN {
 
-  static String charsequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  static String charsequence = "ABCDEFGHJKLMNPRSTUVWXYZ"; // I, O, Q are excluded
   static String num = "0123456789";
   String vin = "";
   String pincode = "";
@@ -38,10 +38,17 @@ public class GenerateVIN {
     return pincode;
   }
 
-  /** @return rendom generate VIN for vehicle */
+  /** @return randomly generated VIN */
   public String generateVIN() {
-    vin += getNum(0) + getChar(3) + getNum(1) + getChar(3) + getNum(5);
-    return vin;
+    StringBuilder vin = new StringBuilder();
+    for (int i = 0; i < 17; i++) {
+      if (random.nextBoolean()) {
+        vin.append(randomCharacter());
+      } else {
+        vin.append(randomNumber());
+      }
+    }
+    return vin.toString();
   }
 
   public String getChar(int num) {
