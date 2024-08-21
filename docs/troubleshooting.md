@@ -110,3 +110,16 @@ systemctl cat docker.service
 It will tell you where the docker service file is located. Then edit `/lib/systemd/system/docker.service` with your favorite text editor: append `NetworkManager-wait-online.service` to line 4 (that line should start with the word `After=`)
 
 Then run `systemctl daemon-reload` to update your changes to the service file.
+
+---
+
+**5. Problem:** Issues while using hostPath to manually mount the data:
+
+ERROR: 0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling
+
+To fix this issue, delete the existing persistent volumes, and start clean. 
+```Shell
+❯ kubectl get pv
+
+❯ kubectl delete pv {pv_names}
+```

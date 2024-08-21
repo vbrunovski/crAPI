@@ -34,4 +34,5 @@ spec:
       volumes:
         - name: mongodb-data
           persistentVolumeClaim:
-            claimName: {{ .Values.mongodb.pvc.name }}
+            claimName: {{ .Values.mongodb.storage.pvc.name }}
+            

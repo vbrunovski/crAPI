@@ -37,4 +37,4 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: {{ .Values.postgresdb.pvc.name }}
+            claimName: {{ .Values.postgresdb.storage.pvc.name }}
