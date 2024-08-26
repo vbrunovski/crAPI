@@ -25,6 +25,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTParser;
+import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.*;
 import java.io.ByteArrayInputStream;
@@ -194,7 +195,12 @@ public class JwtProvider {
       }
 
     } catch (ParseException e) {
-      log.error("Could not parse JWT Token -> Message: %d", e);
+      try {
+        PlainJWT jwt = PlainJWT.parse(authToken);
+        return true;
+      } catch (ParseException parseException) {
+        log.error("Could not parse JWT Token -> Message: %d", parseException);
+      }
     } catch (JOSEException e) {
       log.error("RSA JWK Extraction failed -> Message: %d", e);
     }
