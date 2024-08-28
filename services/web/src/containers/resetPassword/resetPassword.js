@@ -27,7 +27,7 @@ import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
 
 const ResetPasswordContainer = (props) => {
-  const { history, logOutUser, resetPassword, accessToken } = props;
+  const { logOutUser, resetPassword, accessToken } = props;
 
   const [hasErrored, setHasErrored] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -65,7 +65,6 @@ const ResetPasswordContainer = (props) => {
     <ResetPassword
       hasErrored={hasErrored}
       errorMessage={errorMessage}
-      history={history}
       onFinish={onFinish}
     />
   );
@@ -86,7 +85,6 @@ ResetPasswordContainer.propTypes = {
   resetPassword: PropTypes.func,
   logOutUser: PropTypes.func,
   accessToken: PropTypes.string,
-  history: PropTypes.object,
 };
 
 export default connect(

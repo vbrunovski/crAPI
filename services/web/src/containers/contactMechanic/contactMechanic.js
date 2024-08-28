@@ -19,6 +19,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Modal } from "antd";
 import ContactMechanic from "../../components/contactMechanic/contactMechanic";
+import { useNavigate } from "react-router-dom";
 import {
   getMechanicsAction,
   contactMechanicAction,
@@ -27,7 +28,8 @@ import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
 
 const ContactMechanicContainer = (props) => {
-  const { history, accessToken, getMechanics } = props;
+  const { accessToken, getMechanics } = props;
+  const navigate = useNavigate();
 
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -48,7 +50,7 @@ const ContactMechanicContainer = (props) => {
         Modal.success({
           title: SUCCESS_MESSAGE,
           content: data,
-          onOk: () => history.push("/mechanic-dashboard"),
+          onOk: () => navigate("/mechanic-dashboard"),
         });
       } else {
         setHasErrored(true);
@@ -64,7 +66,6 @@ const ContactMechanicContainer = (props) => {
 
   return (
     <ContactMechanic
-      history={history}
       onFinish={onFinish}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
@@ -85,7 +86,6 @@ ContactMechanicContainer.propTypes = {
   accessToken: PropTypes.string,
   getMechanics: PropTypes.func,
   contactMechanic: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(

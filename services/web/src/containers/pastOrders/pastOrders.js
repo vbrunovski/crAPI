@@ -22,9 +22,11 @@ import { getOrdersAction, returnOrderAction } from "../../actions/shopActions";
 import PastOrders from "../../components/pastOrders/pastOrders";
 import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE } from "../../constants/messages";
-const PastOrdersContainer = (props) => {
-  const { history, accessToken, getOrders, returnOrder } = props;
+import { useNavigate } from "react-router-dom";
 
+const PastOrdersContainer = (props) => {
+  const { accessToken, getOrders, returnOrder } = props;
+  const navigate = useNavigate();
   useEffect(() => {
     const callback = (res, data) => {
       if (res !== responseTypes.SUCCESS) {
@@ -62,7 +64,7 @@ const PastOrdersContainer = (props) => {
               size={200}
             />
           ),
-          onOk: () => history.push("/past-orders"),
+          onOk: () => navigate("/past-orders"),
         });
       } else {
         Modal.error({
@@ -76,7 +78,6 @@ const PastOrdersContainer = (props) => {
 
   return (
     <PastOrders
-      history={history}
       returnOrder={handleReturnOrder}
       handleOffsetChange={handleOffsetChange}
     />
@@ -96,7 +97,6 @@ PastOrdersContainer.propTypes = {
   accessToken: PropTypes.string,
   getOrders: PropTypes.func,
   returnOrder: PropTypes.func,
-  history: PropTypes.object,
   prevOffset: PropTypes.number,
   nextOffset: PropTypes.number,
   handleOffsetChange: PropTypes.func,

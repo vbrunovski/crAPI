@@ -37,7 +37,7 @@ class MechanicSerializer(serializers.ModelSerializer):
         fields = ("id", "mechanic_code", "user")
 
 
-class ServiceRequestSerializer(serializers.ModelSerializer):
+class MechanicServiceRequestSerializer(serializers.ModelSerializer):
     """
     Serializer for Mechanic model
     """
@@ -48,7 +48,7 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         """
-        Meta class for ServiceRequestSerializer
+        Meta class for MechanicServiceRequestSerializer
         """
 
         model = ServiceRequest

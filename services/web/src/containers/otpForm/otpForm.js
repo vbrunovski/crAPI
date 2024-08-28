@@ -21,8 +21,10 @@ import { verifyOTPAction } from "../../actions/userActions";
 import OTPForm from "../../components/otpForm/otpForm";
 import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE } from "../../constants/messages";
+import { useNavigate } from "react-router-dom";
 
 const OtpFormContainer = (props) => {
+  const navigate = useNavigate();
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -31,14 +33,14 @@ const OtpFormContainer = (props) => {
       Modal.success({
         title: SUCCESS_MESSAGE,
         content: data,
-        onOk: () => props.history.push("/login"),
+        onOk: () => navigate("/login"),
       });
     } else if (res === responseTypes.REDIRECT) {
       Modal.error({
         title: FAILURE_MESSAGE,
         content: data,
-        onOk: () => props.history.push("/login"),
-        onCancel: () => props.history.push("/login"),
+        onOk: () => navigate("/login"),
+        onCancel: () => navigate("/login"),
       });
     } else {
       setHasErrored(true);
@@ -66,7 +68,6 @@ const mapDispatchToProps = {
 OtpFormContainer.propTypes = {
   verifyOTP: PropTypes.func,
   email: PropTypes.string,
-  history: PropTypes.object,
 };
 
 export default connect(null, mapDispatchToProps)(OtpFormContainer);

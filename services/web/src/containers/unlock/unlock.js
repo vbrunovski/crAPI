@@ -19,16 +19,18 @@ import PropTypes from "prop-types";
 import Unlock from "../../components/unlock/unlock";
 import { unlockUserAction } from "../../actions/userActions";
 import responseTypes from "../../constants/responseTypes";
+import { useNavigate } from "react-router-dom";
 
 const UnlockContainer = (props) => {
-  const { history, unlockUser } = props;
+  const navigate = useNavigate();
+  const { unlockUser } = props;
 
   const [hasErrored, setHasErrored] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const callback = (res, data) => {
     if (res === responseTypes.SUCCESS) {
-      history.push("/dashboard");
+      navigate("/dashboard");
     } else {
       setHasErrored(true);
       setErrorMessage(data);
@@ -47,7 +49,6 @@ const UnlockContainer = (props) => {
       hasErrored={hasErrored}
       errorMessage={errorMessage}
       onFinish={onFinish}
-      history={history}
     />
   );
 };
@@ -61,7 +62,6 @@ const mapDispatchToProps = {
 
 UnlockContainer.propTypes = {
   unlockUser: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UnlockContainer);

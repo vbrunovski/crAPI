@@ -19,6 +19,7 @@ from utils.mock_methods import (
     mock_jwt_auth_required,
     get_sample_user_data,
 )
+from crapi.mechanic.models import ServiceRequest, Mechanic
 
 patch("utils.jwt.jwt_auth_required", mock_jwt_auth_required).start()
 
@@ -213,3 +214,124 @@ class MerchantTestCase(TestCase):
         self.assertEqual(
             service_requests.json()["service_requests"][0], report_res.json()
         )
+
+
+class UserServiceRequestsViewTestCase(TestCase):
+    """
+    contains all the test cases related to user service requests
+    """
+
+    def setUp(self):
+        """
+        stores a sample request body for mechanic signup
+        creates a dummy mechanic, a dummy user, a dummy vehicle and corresponding auth tokens
+        :return: None
+        """
+        self.client = Client()
+        mechanic = get_sample_mechanic_data()
+        self.client.post(
+            "/workshop/api/mechanic/signup",
+            mechanic,
+            content_type="application/json",
+        )
+        self.mechanic = Mechanic.objects.get(user__email=mechanic["email"])
+
+        user_data = get_sample_user_data()
+        self.user = User.objects.create(
+            id=2,
+            email=user_data["email"],
+            number=user_data["number"],
+            password=bcrypt.hashpw(
+                user_data["password"].encode("utf-8"), bcrypt.gensalt()
+            ).decode(),
+            role=User.ROLE_CHOICES.USER,
+            created_on=timezone.now(),
+        )
+        self.user_auth_headers = {"HTTP_AUTHORIZATION": "Bearer " + user_data["email"]}
+
+        self.mechanic_auth_headers = {
+            "HTTP_AUTHORIZATION": "Bearer " + mechanic["email"]
+        }
+
+        self.vehicle_company = VehicleCompany.objects.create(name="RandomCompany")
+
+        self.vehicle_model = VehicleModel.objects.create(
+            fuel_type="1",
+            model="NewModel",
+            vehicle_img="Image",
+            vehiclecompany=self.vehicle_company,
+        )
+
+        self.vehicle = Vehicle.objects.create(
+            pincode="1234",
+            vin="9NFXO86WBWA082766",
+            year="2020",
+            status="ACTIVE",
+            owner=self.user,
+            vehicle_model=self.vehicle_model,
+        )
+        self.contact_mechanic_request_body = {
+            "mechanic_api": "https://www.google.com",
+            "repeat_request_if_failed": True,
+            "number_of_repeats": 5,
+            "mechanic_code": mechanic["mechanic_code"],
+            "vin": self.vehicle.vin,
+            "problem_details": "My Car is not working",
+        }
+
+        self.service_request = ServiceRequest.objects.create(
+            mechanic=self.mechanic,
+            vehicle=self.vehicle,
+            problem_details="My Car is not working",
+            status="PENDING",
+            created_on=timezone.now(),
+        )
+        self.service_request.save()
+
+    def test_user_service_requests(self):
+        """
+        tests the user service requests
+        should get a valid response
+        :return: None
+        """
+        vin = self.vehicle.vin
+
+        res = self.client.get(
+            "/workshop/api/merchant/service_requests/%s" % vin,
+            **self.user_auth_headers,
+            content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 200)
+        service_request_count = len(res.json()["service_requests"])
+        self.assertEqual(
+            res.json()["service_requests"][0]["id"], self.service_request.id
+        )
+
+        self.service_request.status = "COMPLETED"
+        self.service_request.save()
+
+        res = self.client.get(
+            "/workshop/api/merchant/service_requests/%s" % vin,
+            **self.user_auth_headers,
+            content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()["service_requests"]), service_request_count)
+
+        self.service_request2 = ServiceRequest.objects.create(
+            mechanic=self.mechanic,
+            vehicle=self.vehicle,
+            problem_details="My Car is not working again",
+            status="PENDING",
+            created_on=timezone.now(),
+        )
+        self.service_request2.save()
+        res = self.client.get(
+            "/workshop/api/merchant/service_requests/%s" % vin,
+            **self.user_auth_headers,
+            content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()["service_requests"]), service_request_count + 1)
+        self.assertEqual(res.json()["service_requests"][0]["status"], "PENDING")
+        self.assertEqual(res.json()["service_requests"][1]["status"], "COMPLETED")

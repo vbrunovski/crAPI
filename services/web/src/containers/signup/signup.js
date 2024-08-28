@@ -17,6 +17,7 @@ import React, { useState } from "react";
 import { Modal } from "antd";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Signup from "../../components/signup/signup";
 
 import { signUpUserAction } from "../../actions/userActions";
@@ -24,7 +25,8 @@ import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
 
 const SignupContainer = (props) => {
-  const { history, signUpUser } = props;
+  const { signUpUser } = props;
+  const navigate = useNavigate();
 
   const [hasErrored, setHasErrored] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -34,7 +36,7 @@ const SignupContainer = (props) => {
       Modal.success({
         title: SUCCESS_MESSAGE,
         content: data,
-        onOk: () => history.push("/login"),
+        onOk: () => navigate("/login"),
       });
     } else {
       setHasErrored(true);
@@ -48,7 +50,6 @@ const SignupContainer = (props) => {
 
   return (
     <Signup
-      history={history}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
       onFinish={onFinish}
@@ -62,7 +63,6 @@ const mapDispatchToProps = {
 
 SignupContainer.propTypes = {
   signUpUser: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(null, mapDispatchToProps)(SignupContainer);

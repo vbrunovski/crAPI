@@ -31,7 +31,7 @@ from utils.logging import log_error
 from .models import Mechanic, ServiceRequest
 from .serializers import (
     MechanicSerializer,
-    ServiceRequestSerializer,
+    MechanicServiceRequestSerializer,
     ReceiveReportSerializer,
     SignUpSerializer,
 )
@@ -230,18 +230,18 @@ class GetReportView(APIView):
                 {"message": messages.REPORT_DOES_NOT_EXIST},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        serializer = ServiceRequestSerializer(service_request)
+        serializer = MechanicServiceRequestSerializer(service_request)
         response_data = dict(serializer.data)
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ServiceRequestsView(APIView, LimitOffsetPagination):
+class MechanicServiceRequestsView(APIView, LimitOffsetPagination):
     """
     View to return all the service requests
     """
 
     def __init__(self):
-        super(ServiceRequestsView, self).__init__()
+        super(MechanicServiceRequestsView, self).__init__()
         self.default_limit = settings.DEFAULT_LIMIT
 
     @jwt_auth_required
@@ -266,7 +266,7 @@ class ServiceRequestsView(APIView, LimitOffsetPagination):
                 {"message": messages.NO_OBJECT_FOUND},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        serializer = ServiceRequestSerializer(service_requests, many=True)
+        serializer = MechanicServiceRequestSerializer(service_requests, many=True)
         response_data = dict(
             service_requests=serializer.data,
             next_offset=(

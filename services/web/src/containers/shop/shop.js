@@ -24,11 +24,13 @@ import {
   applyCouponAction,
 } from "../../actions/shopActions";
 import Shop from "../../components/shop/shop";
+import { useNavigate } from "react-router-dom";
 import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE } from "../../constants/messages";
 
 const ShopContainer = (props) => {
-  const { history, accessToken, getProducts, buyProduct } = props;
+  const { accessToken, getProducts, buyProduct } = props;
+  const navigate = useNavigate();
 
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -52,7 +54,7 @@ const ShopContainer = (props) => {
         Modal.success({
           title: SUCCESS_MESSAGE,
           content: data,
-          onOk: () => history.push("/past-orders"),
+          onOk: () => navigate("/past-orders"),
         });
       } else {
         Modal.error({
@@ -98,7 +100,6 @@ const ShopContainer = (props) => {
 
   return (
     <Shop
-      history={history}
       onBuyProduct={handleBuyProduct}
       isCouponFormOpen={isCouponFormOpen}
       setIsCouponFormOpen={setIsCouponFormOpen}
@@ -128,7 +129,6 @@ ShopContainer.propTypes = {
   getProducts: PropTypes.func,
   buyProduct: PropTypes.func,
   applyCoupon: PropTypes.func,
-  history: PropTypes.object,
   nextOffset: PropTypes.number,
   prevOffset: PropTypes.number,
   onOffsetChange: PropTypes.func,

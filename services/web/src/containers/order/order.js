@@ -17,7 +17,7 @@ import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Modal, Avatar } from "antd";
+import { Modal } from "antd";
 import Order from "../../components/order/order";
 import {
   getOrderByIdAction,
@@ -27,7 +27,7 @@ import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 
 const OrderContainer = (props) => {
-  const { history, accessToken, getOrderById } = props;
+  const { accessToken, getOrderById } = props;
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get("order_id");
 
@@ -43,7 +43,7 @@ const OrderContainer = (props) => {
     getOrderById({ callback, accessToken, orderId });
   }, [accessToken, orderId, getOrderById]);
 
-  return <Order orderId={orderId} history={history} />;
+  return <Order orderId={orderId} />;
 };
 
 const mapStateToProps = ({ userReducer: { accessToken } }) => {
@@ -57,7 +57,6 @@ const mapDispatchToProps = {
 OrderContainer.propTypes = {
   accessToken: PropTypes.string,
   getOrderById: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderContainer);

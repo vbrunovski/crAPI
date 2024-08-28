@@ -22,4 +22,8 @@ import crapi.merchant.views as merchant_views
 
 urlpatterns = [
     re_path(r"contact_mechanic$", merchant_views.ContactMechanicView.as_view()),
+    re_path(
+        r"service_requests/(?P<vin>[^/]+)$",
+        merchant_views.UserServiceRequestsView.as_view(),
+    ),
 ]

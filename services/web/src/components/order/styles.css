@@ -1,5 +1,5 @@
 .order-desc {
-  padding: 0 10%;
+  padding: 0 2%;
 }
 
 .order-desc .ant-descriptions-item-label,
@@ -13,5 +13,5 @@
 }
 
 .order-card {
-  padding: 24px;
+  padding: 10px;
 }

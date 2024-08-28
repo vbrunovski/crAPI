@@ -22,9 +22,11 @@ import NewPost from "../../components/newPost/newPost";
 import { addPostAction } from "../../actions/communityActions";
 import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
+import { useNavigate } from "react-router-dom";
 
 const NewPostContainer = (props) => {
-  const { history, accessToken } = props;
+  const navigate = useNavigate();
+  const { accessToken } = props;
 
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -35,7 +37,7 @@ const NewPostContainer = (props) => {
         Modal.success({
           title: SUCCESS_MESSAGE,
           content: data,
-          onOk: () => history.push("/forum"),
+          onOk: () => navigate("/forum"),
         });
       } else {
         setHasErrored(true);
@@ -53,7 +55,6 @@ const NewPostContainer = (props) => {
 
   return (
     <NewPost
-      history={history}
       onFinish={onFinish}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
@@ -72,7 +73,6 @@ const mapDispatchToProps = {
 NewPostContainer.propTypes = {
   accessToken: PropTypes.string,
   addPost: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewPostContainer);

@@ -13,16 +13,15 @@
 
 
 # Node build
-FROM node:16 as build
+FROM node:16 AS build
 RUN mkdir /app
 WORKDIR /app
-COPY ./package.json /app/package.json
-COPY ./package-lock.json /app/package-lock.json
+COPY ./*.json /app/
 RUN npm install --silent
 COPY ./src /app/src
 COPY ./public /app/public
-RUN cp /app/src/config.js.template /app/src/config.js
-RUN NODE_OPTIONS=--max_old_space_size=768 npm run build
+COPY ./src/config.ts.template /app/src/config.ts
+RUN NODE_OPTIONS=--max-old-space-size=1536 npm run build
 RUN ls /app/build
 
 # Main Image
@@ -40,4 +39,4 @@ RUN echo "daemon off;" >> /usr/local/openresty/nginx/conf/nginx.conf
 EXPOSE 80
 EXPOSE 443
 
-CMD /etc/nginx/nginx-wrapper.sh
+CMD [ "/etc/nginx/nginx-wrapper.sh" ]

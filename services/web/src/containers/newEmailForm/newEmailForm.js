@@ -76,7 +76,6 @@ NewEmailFormContainer.propTypes = {
   currentStep: PropTypes.number,
   setCurrentStep: PropTypes.func,
   onMailChange: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(

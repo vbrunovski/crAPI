@@ -30,7 +30,6 @@ import { SUCCESS_MESSAGE, FAILURE_MESSAGE } from "../../constants/messages";
 
 const ProfileContainer = (props) => {
   const {
-    history,
     accessToken,
     videoId,
     uploadProfilePic,
@@ -110,7 +109,6 @@ const ProfileContainer = (props) => {
 
   return (
     <Profile
-      history={history}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
       uploadProfilePic={handleUploadProfilePic}
@@ -140,7 +138,6 @@ const mapDispatchToProps = {
 ProfileContainer.propTypes = {
   accessToken: PropTypes.string,
   videoId: PropTypes.number,
-  history: PropTypes.object,
   uploadProfilePic: PropTypes.func,
   uploadVideo: PropTypes.func,
   changeVideoName: PropTypes.func,

@@ -9,23 +9,17 @@
 .vehicle-desc {
   /* text-align: center; */
   background-color: #f0f0f0;
-  height: 400px;
-  padding: 20px;
 }
 
 .vehicle-desc .ant-descriptions-view {
-  margin: 50px 15%;
   width: auto;
 }
 
 .vehicle-desc .ant-descriptions-item-label {
   background: none;
-  font-size: 20px;
+  width: 30%;
 }
 
-.vehicle-desc .ant-descriptions-item-content {
-  font-size: 20px;
-}
 
 .dashboard-header {
   padding-left: 0;

@@ -28,6 +28,6 @@ urlpatterns = [
         mechanic_views.GetReportView.as_view(),
         name="get-mechanic-report",
     ),
-    re_path(r"service_requests$", mechanic_views.ServiceRequestsView.as_view()),
+    re_path(r"service_requests$", mechanic_views.MechanicServiceRequestsView.as_view()),
     re_path(r"$", mechanic_views.MechanicView.as_view()),
 ]

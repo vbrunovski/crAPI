@@ -22,9 +22,11 @@ import { verifyVehicleAction } from "../../actions/vehicleActions";
 import VerifyVehicle from "../../components/verifyVehicle/verifyVehicle";
 import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
+import { useNavigate } from "react-router-dom";
 
 const VerifyVehicleContainer = (props) => {
-  const { history, verifyVehicle } = props;
+  const navigate = useNavigate();
+  const { verifyVehicle } = props;
 
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -37,7 +39,7 @@ const VerifyVehicleContainer = (props) => {
         Modal.success({
           title: SUCCESS_MESSAGE,
           content: data,
-          onOk: () => history.push("/dashboard"),
+          onOk: () => navigate("/dashboard"),
         });
       } else {
         setHasErrored(true);
@@ -53,7 +55,6 @@ const VerifyVehicleContainer = (props) => {
 
   return (
     <VerifyVehicle
-      history={history}
       onFinish={onFinish}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
@@ -72,7 +73,6 @@ const mapDispatchToProps = {
 VerifyVehicleContainer.propTypes = {
   accessToken: PropTypes.string,
   verifyVehicle: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(

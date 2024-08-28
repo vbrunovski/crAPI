@@ -27,7 +27,7 @@ import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE } from "../../constants/messages";
 
 const PostContainer = (props) => {
-  const { history, accessToken, getPostById, addComment } = props;
+  const { accessToken, getPostById, addComment } = props;
 
   const [isCommentFormOpen, setIsCommentFormOpen] = useState(false);
 
@@ -72,7 +72,6 @@ const PostContainer = (props) => {
 
   return (
     <Post
-      history={history}
       onFinish={onFinish}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
@@ -95,7 +94,6 @@ PostContainer.propTypes = {
   accessToken: PropTypes.string,
   getPostById: PropTypes.func,
   addComment: PropTypes.func,
-  history: PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostContainer);

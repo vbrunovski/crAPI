@@ -21,8 +21,10 @@ import { verifyTokenAction, logOutUserAction } from "../../actions/userActions";
 import TokenForm from "../../components/tokenForm/tokenForm";
 import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
+import { useNavigate } from "react-router-dom";
 
 const TokenFormContainer = (props) => {
+  const navigate = useNavigate();
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -35,7 +37,7 @@ const TokenFormContainer = (props) => {
           props.logOutUser({
             callback: () => {
               localStorage.clear();
-              if (!localStorage.getItem("token")) props.history.push("/login");
+              if (!localStorage.getItem("token")) navigate("/login");
             },
           });
         },
@@ -78,7 +80,6 @@ TokenFormContainer.propTypes = {
   accessToken: PropTypes.string,
   verifyToken: PropTypes.func,
   email: PropTypes.string,
-  history: PropTypes.object,
   logOutUser: PropTypes.func,
 };
 
