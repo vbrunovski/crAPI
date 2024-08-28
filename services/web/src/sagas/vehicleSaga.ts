@@ -349,6 +349,7 @@ export function* getVehicleServices(action: MyAction): Generator<any, void, any>
   try {
     yield put({ type: actionTypes.FETCHING_DATA });
     const getUrl = APIService.WORKSHOP_SERVICE + requestURLS.GET_VEHICLE_SERVICES.replace("<vehicleVIN>", VIN);
+    console.log("Get URL", getUrl);
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
@@ -379,6 +380,45 @@ export function* getVehicleServices(action: MyAction): Generator<any, void, any>
   }
 }
 
+/**
+ * Request for getting service report
+
+ * @payload {string} payload.accessToken - Access token of the user
+ * @payload {string} payload.reportId - Report id of the service
+ * @payload {Function} payload.callback - Callback method
+ */
+export function* getServiceReport(action: MyAction): Generator<any, void, any> {
+  const { accessToken, reportId, callback } = action.payload;
+  let receivedResponse: Partial<Response> = {};
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    const getUrl = APIService.WORKSHOP_SERVICE + requestURLS.GET_SERVICE_REPORT + "?report_id=" + reportId;
+    console.log("Get URL", getUrl);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const responseJSON = yield fetch(getUrl, {
+      headers,
+      method: "GET",
+    }).then((response: Response) => {
+      receivedResponse = response;
+      return response.json();
+    });
+
+    if (!receivedResponse.ok) {
+      throw responseJSON;
+    }
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: responseJSON });
+    callback(responseTypes.SUCCESS, responseJSON);
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: receivedResponse });
+    callback(responseTypes.FAILURE, e);
+  }
+}
+
 export function* vehicleActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.RESEND_MAIL, resendMail);
   yield takeLatest(actionTypes.VERIFY_VEHICLE, verifyVehicle);
@@ -388,4 +428,5 @@ export function* vehicleActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.REFRESH_LOCATION, refreshLocation);
   yield takeLatest(actionTypes.GET_MECHANIC_SERVICES, getMechanicServices);
   yield takeLatest(actionTypes.GET_VEHICLE_SERVICES, getVehicleServices);
+  yield takeLatest(actionTypes.GET_SERVICE_REPORT, getServiceReport);
 }

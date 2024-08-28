@@ -30,10 +30,8 @@ import {
   TOKEN_NOT_SENT,
   EMAIL_CHANGED,
   EMAIL_NOT_CHANGED,
-  NO_SERVICES,
 } from "../constants/messages";
 import MyAction from "../types/action";
-import { getMechanicServices, getVehicleServices } from "./vehicleSaga";
 
 interface Response {
   ok: boolean;
@@ -465,6 +463,4 @@ export function* userActionWatcher() {
   yield takeLatest(actionTypes.RESET_PASSWORD, resetPassword);
   yield takeLatest(actionTypes.CHANGE_EMAIL, changeEmail);
   yield takeLatest(actionTypes.VERIFY_TOKEN, verifyToken);
-  yield takeLatest(actionTypes.GET_MECHANIC_SERVICES, getMechanicServices);
-  yield takeLatest(actionTypes.GET_VEHICLE_SERVICES, getVehicleServices);
 }

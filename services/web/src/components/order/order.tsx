@@ -65,7 +65,7 @@ const Order: React.FC<PropsFromRedux> = ({ order }) => {
   );
 
   return (
-    <Layout>
+    <Layout className="page-container">
       <PageHeader
         title="Order Details"
         className="page-header"

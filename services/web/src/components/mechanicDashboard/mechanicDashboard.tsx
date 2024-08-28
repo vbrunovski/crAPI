@@ -14,7 +14,7 @@
  */
 
 import React from "react";
-import { Card, Row, Col } from "antd";
+import { Card, Row, Col, Layout } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 
 const { Meta } = Card;
@@ -41,7 +41,7 @@ interface MechanicDashboardProps {
 
 const MechanicDashboard: React.FC<MechanicDashboardProps> = ({ services }) => {
   return (
-    <>
+    <Layout className="page-container">
       <PageHeader title="Pending Services" />
       <Row gutter={[16, 24]}>
         {services.map((service) => (
@@ -63,7 +63,7 @@ const MechanicDashboard: React.FC<MechanicDashboardProps> = ({ services }) => {
           </Col>
         ))}
       </Row>
-    </>
+    </Layout>
   );
 };
 

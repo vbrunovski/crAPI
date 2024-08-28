@@ -17,8 +17,8 @@ import React, { useState, useEffect } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import { Modal } from "antd";
-import { getVehicleServicesAction } from "../../actions/userActions";
-import VehicleServiceDashboard from "../../components/vehicleServiceDashboard/vehicleServiceDashboard";
+import { getServiceReportAction } from "../../actions/userActions";
+import ServiceReport from "../../components/serviceReport/serviceReport";
 import responseTypes from "../../constants/responseTypes";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 
@@ -41,6 +41,13 @@ interface Service {
     vin: string;
   };
   status: string;
+  mechanic: {
+    mechanic_code: string;
+    user: {
+      email: string;
+      number: string;
+    };
+  };
 }
 
 const mapStateToProps = (state: RootState) => ({
@@ -48,24 +55,24 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = {
-  getVehicleServiceHistory: getVehicleServicesAction,
+  getServiceReport: getServiceReportAction,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({ accessToken, getVehicleServiceHistory }) => {
-  const [services, setServices] = useState<Service[]>([]);
+const ServiceReportContainer: React.FC<PropsFromRedux> = ({ accessToken, getServiceReport }) => {
+  const [service, setService] = useState<Service>();
   const urlParams = new URLSearchParams(window.location.search);
-  const VIN = urlParams.get("VIN");
-  console.log("VIN", VIN);
+  const reportId = urlParams.get("id");
+  console.log("reportId", reportId);
 
   useEffect(() => {
-    const callback = (res: string, data: Service[] | string) => {
+    const callback = (res: string, data: Service | string) => {
       console.log("Callback", res, data);
       if (res === responseTypes.SUCCESS) {
-        setServices(data as Service[]);
+        setService(data as Service);
       } else {
         Modal.error({
           title: FAILURE_MESSAGE,
@@ -73,15 +80,13 @@ const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({ accessToke
         });
       }
     };
-    getVehicleServiceHistory({ accessToken, VIN, callback});
-  }, [accessToken, getVehicleServiceHistory, VIN]);
+    getServiceReport({ accessToken, reportId, callback});
+  }, [accessToken, getServiceReport, reportId]);
 
   // Ensure that the Service type in the component matches the one from the API
   // Ensure that the Service type in the component matches the one from the API
   // Ensure that the Service type in the component matches the one from the API
-  const typedServices: Service[] = services;
-
-  return <VehicleServiceDashboard services={typedServices} />;
+  return <ServiceReport service={service as Service} />;
 };
 
-export default connector(VehicleServiceDashboardContainer);
+export default connector(ServiceReportContainer);

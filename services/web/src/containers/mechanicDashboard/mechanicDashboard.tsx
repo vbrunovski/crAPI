@@ -68,7 +68,6 @@ const MechanicDashboardContainer: React.FC<PropsFromRedux> = ({ accessToken, get
     };
     getServices({ accessToken, callback });
   }, [accessToken, getServices]);
-  const typedServices: Service[] = services;
 
   return <MechanicDashboard services={services} />;
 };

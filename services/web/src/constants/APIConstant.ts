@@ -56,6 +56,7 @@ export const requestURLS: RequestURLSType = {
   GET_PRODUCTS: "api/shop/products",
   GET_MECHANIC_SERVICES: "api/mechanic/service_requests",
   GET_VEHICLE_SERVICES: "api/merchant/service_requests/<vehicleVIN>",
+  GET_SERVICE_REPORT: "api/mechanic/mechanic_report",
   BUY_PRODUCT: "api/shop/orders",
   GET_ORDERS: "api/shop/orders/all",
   GET_ORDER_BY_ID: "api/shop/orders/<orderId>",

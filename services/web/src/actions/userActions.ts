@@ -156,6 +156,13 @@ export const getVehicleServicesAction = ({ accessToken, VIN, callback, ...data }
   };
 };
 
+export const getServiceReportAction = ({ accessToken, reportId, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+  return {
+    type: actionTypes.GET_SERVICE_REPORT,
+    payload: { accessToken, reportId, callback, ...data },
+  };
+};
+
 export const changeEmailAction = ({ accessToken, callback, ...data }: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.CHANGE_EMAIL,

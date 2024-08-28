@@ -40,11 +40,11 @@ import UnlockContainer from "../../containers/unlock/unlock";
 import NewPostContainer from "../../containers/newPost/newPost";
 import PostContainer from "../../containers/post/post";
 import VehicleServiceDashboardContainer from "../../containers/vehicleServiceDashboard/vehicleServiceDashboard";
+import ServiceReportContiner from "../../containers/serviceReport/serviceReport";
 import {
   logOutUserAction,
   validateAccessTokenAction,
 } from "../../actions/userActions";
-import { validateAccessToken } from "../../sagas/userSaga";
 import { isAccessTokenValid } from "../../utils";
 
 const { Content } = Layout;
@@ -158,12 +158,19 @@ const StyledComp: React.FC<PropsFromRedux> = (props) => {
     setWindowHeight(window.innerHeight);
   }
 
+  const isLoggedIn = props.isLoggedIn;
+  const accessToken = props.accessToken;
+  const validateAccessToken = props.validateAccessToken;
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
+      if (isLoggedIn) {
+        validateAccessToken({ accessToken: accessToken });
+      }
     };
-  }, []);
+  }, [isLoggedIn, validateAccessToken, accessToken]);
 
   return (
     <Spin spinning={props.fetchingData} className="spinner">
@@ -287,6 +294,19 @@ const StyledComp: React.FC<PropsFromRedux> = (props) => {
               element={
                 <AfterLogin
                   component={ContactMechanicContainer}
+                  isLoggedIn={props.isLoggedIn}
+                  componentRole={roleTypes.ROLE_USER}
+                  userRole={props.role}
+                  accessToken={props.accessToken}
+                  logOutUser={props.logOutUser}
+                />
+              }
+            />
+            <Route
+              path="/service-report"
+              element={
+                <AfterLogin
+                  component={ServiceReportContiner}
                   isLoggedIn={props.isLoggedIn}
                   componentRole={roleTypes.ROLE_USER}
                   userRole={props.role}

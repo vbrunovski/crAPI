@@ -78,7 +78,7 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
           <Button
             type="primary"
             shape="round"
-            size="large"
+            size="middle"
             key="order-details"
             onClick={() => navigate(`/orders?order_id=${order.id}`)}
           >
@@ -90,7 +90,7 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
             type="primary"
             shape="round"
             icon={order.status === "delivered" && <RollbackOutlined />}
-            size="large"
+            size="middle"
             key="return-order"
             disabled={order.status !== "delivered"}
             onClick={() => props.returnOrder(order.id)}
@@ -103,7 +103,7 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
   );
 
   return (
-    <Layout>
+    <Layout className="page-container">
       <PageHeader
         title="Past Orders"
         className="page-header"

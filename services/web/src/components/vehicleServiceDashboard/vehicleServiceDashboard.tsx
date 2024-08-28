@@ -14,7 +14,7 @@
  */
 
 import React from "react";
-import { Card, Row, Col } from "antd";
+import { Card, Row, Col, Layout } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 
 const { Meta } = Card;
@@ -46,7 +46,7 @@ const VehicleServiceDashboard: React.FC<VehicleServiceDashboardProps> = ({ servi
   const urlParams = new URLSearchParams(window.location.search);
   const VIN = urlParams.get("VIN");
   return (
-    <>
+    <Layout className="page-container">
       <PageHeader title={`Service History for VIN: ${VIN}`} />
       <Row gutter={[16, 24]}>
         {services.map((service: Service) => (
@@ -69,12 +69,12 @@ const VehicleServiceDashboard: React.FC<VehicleServiceDashboardProps> = ({ servi
               </p>
 
               {/* If status is completed, show report link */}
-              <a href={`/service-report?reportId=${service.id}`}>View Report</a>
+              <a href={`/service-report?id=${service.id}`}>View Report</a>
             </Card>
           </Col>
         ))}
       </Row>
-    </>
+    </Layout>
   );
 };
 

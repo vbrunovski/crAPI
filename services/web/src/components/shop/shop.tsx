@@ -107,7 +107,7 @@ const Shop: React.FC<ShopProps> = (props) => {
   } = props;
 
   return (
-    <Layout>
+    <Layout className="page-container">
       <PageHeader
         className="page-header"
         title="Shop"
