@@ -546,13 +546,13 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return new CRAPIResponse(UserMessage.NUMBER_CHANGE_SUCCESSFUL, 200);
           }
-          return new CRAPIResponse(UserMessage.NEW_NUMBER_DOES_NOT_BELONG, 500);
+          return new CRAPIResponse(UserMessage.NEW_NUMBER_DOES_NOT_BELONG, 403);
         }
-        return new CRAPIResponse(UserMessage.OLD_NUMBER_DOES_NOT_BELONG, 500);
+        return new CRAPIResponse(UserMessage.OLD_NUMBER_DOES_NOT_BELONG, 403);
       }
-      return new CRAPIResponse(UserMessage.INVALID_OTP, 500);
+      return new CRAPIResponse(UserMessage.INVALID_OTP, 400);
     }
 
-    return new CRAPIResponse(UserMessage.INVALID_CREDENTIALS, 500);
+    return new CRAPIResponse(UserMessage.INVALID_CHANGE_REQUEST, 400);
   }
 }

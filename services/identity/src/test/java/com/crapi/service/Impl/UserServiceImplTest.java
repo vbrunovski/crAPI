@@ -563,13 +563,13 @@ public class UserServiceImplTest {
   @Test
   public void verifyOTPFailWhenChangePhoneRequestIsNull() {
     User user = getDummyUser();
-    String expectedMessage = UserMessage.INVALID_CREDENTIALS;
+    String expectedMessage = UserMessage.INVALID_CHANGE_REQUEST;
     ChangePhoneForm changePhoneForm = getDummyChangePhoneForm();
     Mockito.doReturn(user).when(userService).getUserFromToken(Mockito.any());
     Mockito.when(changePhoneRepository.findByUser(user)).thenReturn(null);
     CRAPIResponse crapiResponse = userService.verifyPhoneOTP(getMockHttpRequest(), changePhoneForm);
     Assertions.assertEquals(expectedMessage, crapiResponse.getMessage());
-    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), crapiResponse.getStatus());
+    Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), crapiResponse.getStatus());
   }
 
   @Test
@@ -583,7 +583,7 @@ public class UserServiceImplTest {
     Mockito.when(changePhoneRepository.findByUser(user)).thenReturn(changePhoneRequest);
     CRAPIResponse crapiResponse = userService.verifyPhoneOTP(getMockHttpRequest(), changePhoneForm);
     Assertions.assertEquals(expectedMessage, crapiResponse.getMessage());
-    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), crapiResponse.getStatus());
+    Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), crapiResponse.getStatus());
   }
 
   @Test
@@ -597,7 +597,7 @@ public class UserServiceImplTest {
     Mockito.when(changePhoneRepository.findByUser(user)).thenReturn(changePhoneRequest);
     CRAPIResponse crapiResponse = userService.verifyPhoneOTP(getMockHttpRequest(), changePhoneForm);
     Assertions.assertEquals(expectedMessage, crapiResponse.getMessage());
-    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), crapiResponse.getStatus());
+    Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), crapiResponse.getStatus());
   }
 
   @Test
@@ -611,7 +611,7 @@ public class UserServiceImplTest {
     Mockito.when(changePhoneRepository.findByUser(user)).thenReturn(changePhoneRequest);
     CRAPIResponse crapiResponse = userService.verifyPhoneOTP(getMockHttpRequest(), changePhoneForm);
     Assertions.assertEquals(expectedMessage, crapiResponse.getMessage());
-    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), crapiResponse.getStatus());
+    Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), crapiResponse.getStatus());
   }
 
   @Test
@@ -626,7 +626,7 @@ public class UserServiceImplTest {
     Mockito.when(changePhoneRepository.findByUser(user)).thenReturn(changePhoneRequest);
     CRAPIResponse crapiResponse = userService.verifyPhoneOTP(getMockHttpRequest(), changePhoneForm);
     Assertions.assertEquals(expectedMessage, crapiResponse.getMessage());
-    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), crapiResponse.getStatus());
+    Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), crapiResponse.getStatus());
   }
 
   private LoginWithEmailToken getDummyLoginWithEmailToken() {
