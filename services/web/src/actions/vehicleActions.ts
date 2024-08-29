@@ -25,7 +25,11 @@ interface GetVehiclesPayload extends ActionPayload {
   email?: string;
 }
 
-export const verifyVehicleAction = ({ callback, accessToken, ...data }: ActionPayload) => {
+export const verifyVehicleAction = ({
+  callback,
+  accessToken,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.VERIFY_VEHICLE,
     payload: {
@@ -36,7 +40,11 @@ export const verifyVehicleAction = ({ callback, accessToken, ...data }: ActionPa
   };
 };
 
-export const getMechanicsAction = ({ callback, accessToken, ...data }: ActionPayload) => {
+export const getMechanicsAction = ({
+  callback,
+  accessToken,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.GET_MECHANICS,
     payload: {
@@ -73,7 +81,11 @@ export const resendMailAction = ({ callback, accessToken }: ActionPayload) => {
   };
 };
 
-export const contactMechanicAction = ({ callback, accessToken, ...data }: ActionPayload) => {
+export const contactMechanicAction = ({
+  callback,
+  accessToken,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.CONTACT_MECHANIC,
     payload: {
@@ -84,7 +96,11 @@ export const contactMechanicAction = ({ callback, accessToken, ...data }: Action
   };
 };
 
-export const refreshLocationAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const refreshLocationAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.REFRESH_LOCATION,
     payload: {

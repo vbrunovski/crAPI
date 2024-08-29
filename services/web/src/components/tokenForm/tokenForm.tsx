@@ -23,7 +23,11 @@ interface TokenFormProps {
   hasErrored?: boolean;
 }
 
-const TokenForm: React.FC<TokenFormProps> = ({ onFinish, errorMessage, hasErrored }) => {
+const TokenForm: React.FC<TokenFormProps> = ({
+  onFinish,
+  errorMessage,
+  hasErrored,
+}) => {
   return (
     <Form
       name="password"

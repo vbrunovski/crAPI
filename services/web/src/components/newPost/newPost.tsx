@@ -26,7 +26,11 @@ interface NewPostProps {
   onFinish: (values: any) => void;
 }
 
-const NewPost: React.FC<NewPostProps> = ({ hasErrored, errorMessage, onFinish }) => {
+const NewPost: React.FC<NewPostProps> = ({
+  hasErrored,
+  errorMessage,
+  onFinish,
+}) => {
   const urlParams = new URLSearchParams(window.location.search);
   const postContent = urlParams.get("content");
 

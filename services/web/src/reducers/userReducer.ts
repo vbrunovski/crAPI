@@ -124,6 +124,11 @@ const userReducer = (
         ...state,
         available_credit: maction.payload.availableCredit,
       };
+    case actionTypes.PHONE_NUMBER_VERIFIED:
+      return {
+        ...state,
+        number: maction.payload.new_number,
+      };
     default:
       return state;
   }

@@ -30,7 +30,11 @@ interface ResetPasswordProps {
   onFinish: (values: any) => void;
 }
 
-const ResetPassword: React.FC<ResetPasswordProps> = ({ hasErrored, errorMessage, onFinish }) => {
+const ResetPassword: React.FC<ResetPasswordProps> = ({
+  hasErrored,
+  errorMessage,
+  onFinish,
+}) => {
   return (
     <div className="container">
       <Card title="Reset Password" bordered={false} className="form-card">

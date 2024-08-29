@@ -40,8 +40,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "prettier --check src/**/*.{js,jsx}",
-    "lint:fix": "prettier --write src/**/*.{js,jsx}"
+    "lint": "prettier --check src/**/*.{js,jsx,ts,tsx}",
+    "lint:fix": "prettier --write src/**/*.{js,jsx,ts,tsx}"
   },
   "eslintConfig": {
     "extends": [

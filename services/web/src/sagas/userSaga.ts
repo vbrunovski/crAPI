@@ -335,6 +335,54 @@ export function* verifyOTP(action: MyAction): Generator<any, void, any> {
 }
 
 /**
+ * Verify OTP for change Phone Number
+
+ * @payload {string} payload.old_number - User number
+ * @payload {string} payload.new_number - User new number
+ * @payload {string} payload.otp - OTP received through mail
+ */
+export function* verifyPhoneNumberOTP(
+  action: MyAction,
+): Generator<any, void, any> {
+  const { accessToken, old_number, new_number, otp, callback } = action.payload;
+
+  let receivedResponse: Partial<Response> = {};
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    const postUrl =
+      APIService.IDENTITY_SERVICE + requestURLS.VERIFY_PHONE_NUMBER_OTP;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const responseJSON = yield fetch(postUrl, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({ old_number, new_number, otp }),
+    }).then((response: Response) => {
+      receivedResponse = response;
+      if (receivedResponse.ok) return response;
+      return response.json();
+    });
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: receivedResponse });
+    if (receivedResponse.ok) {
+      callback(responseTypes.SUCCESS, OTP_VERIFIED);
+      yield put({
+        type: actionTypes.PHONE_NUMBER_VERIFIED,
+        payload: { new_number },
+      });
+    } else if (receivedResponse.status === 503)
+      callback(responseTypes.REDIRECT, responseJSON.message);
+    else callback(responseTypes.FAILURE, responseJSON.message);
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: receivedResponse });
+    callback(responseTypes.FAILURE, OTP_NOT_VERIFIED);
+  }
+}
+
+/**
  * Change user password
 
  * @payload {string} payload.accessToken - Access token of the user
@@ -412,6 +460,48 @@ export function* changeEmail(action: MyAction): Generator<any, void, any> {
     callback(responseTypes.FAILURE, TOKEN_NOT_SENT);
   }
 }
+/**
+ * Request for changing email
+
+ * @payload {string} payload.accessToken - Access token of the user
+ * @payload {string} payload.old_email - Old Phone Number of the user
+ * @payload {string} payload.new_email - New Phone Number entered by the user
+ * @payload {Function} payload.callback - Callback method
+ */
+export function* changePhoneNumber(
+  action: MyAction,
+): Generator<any, void, any> {
+  const { accessToken, old_number, new_number, callback } = action.payload;
+  let receivedResponse: Partial<Response> = {};
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    const postUrl =
+      APIService.IDENTITY_SERVICE + requestURLS.CHANGE_PHONE_NUMBER;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const responseJSON = yield fetch(postUrl, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({ old_number, new_number }),
+    }).then((response: Response) => {
+      receivedResponse = response;
+      return response.json();
+    });
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: receivedResponse });
+    if (receivedResponse.ok) {
+      callback(responseTypes.SUCCESS, responseJSON.message);
+    } else {
+      callback(responseTypes.FAILURE, responseJSON.message);
+    }
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: receivedResponse });
+    callback(responseTypes.FAILURE, TOKEN_NOT_SENT);
+  }
+}
 
 /**
  * Verify token and change email
@@ -463,4 +553,6 @@ export function* userActionWatcher() {
   yield takeLatest(actionTypes.RESET_PASSWORD, resetPassword);
   yield takeLatest(actionTypes.CHANGE_EMAIL, changeEmail);
   yield takeLatest(actionTypes.VERIFY_TOKEN, verifyToken);
+  yield takeLatest(actionTypes.CHANGE_PHONE_NUMBER, changePhoneNumber);
+  yield takeLatest(actionTypes.VERIFY_PHONE_NUMBER_OTP, verifyPhoneNumberOTP);
 }

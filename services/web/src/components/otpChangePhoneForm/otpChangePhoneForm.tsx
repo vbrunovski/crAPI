@@ -15,22 +15,15 @@
 
 import React from "react";
 import { Button, Form, Input } from "antd";
-import {
-  OTP_REQUIRED,
-  PASSWORD_REQUIRED,
-  CONFIRM_PASSWORD,
-  PASSWORD_DO_NOT_MATCH,
-  INVALID_PASSWORD,
-} from "../../constants/messages";
-import { PASSWORD_VALIDATION } from "../../constants/constants";
+import { OTP_REQUIRED } from "../../constants/messages";
 
-interface OtpFormProps {
+interface OTPChangePhoneFormProps {
   onFinish: (values: any) => void;
   errorMessage: string;
   hasErrored: boolean;
 }
 
-const OtpForm: React.FC<OtpFormProps> = ({
+const OTPChangePhoneForm: React.FC<OTPChangePhoneFormProps> = ({
   onFinish,
   errorMessage,
   hasErrored,
@@ -54,52 +47,14 @@ const OtpForm: React.FC<OtpFormProps> = ({
       >
         <Input className="input-style" placeholder="OTP" />
       </Form.Item>
-      <Form.Item
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: PASSWORD_REQUIRED,
-          },
-          {
-            pattern: PASSWORD_VALIDATION,
-            message: INVALID_PASSWORD,
-          },
-        ]}
-      >
-        <Input.Password className="input-style" placeholder="Password" />
-      </Form.Item>
-      <Form.Item
-        name="againPassword"
-        dependencies={["password"]}
-        rules={[
-          {
-            required: true,
-            message: CONFIRM_PASSWORD,
-          },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
-              if (!value || getFieldValue("password") === value) {
-                return Promise.resolve();
-              }
-              return Promise.reject(PASSWORD_DO_NOT_MATCH);
-            },
-          }),
-        ]}
-      >
-        <Input.Password
-          className="input-style"
-          placeholder="Re-enter Password"
-        />
-      </Form.Item>
       <Form.Item>
         {hasErrored && <div className="error-message">{errorMessage}</div>}
         <Button type="primary" htmlType="submit" className="form-button">
-          Set Password
+          Set Phone Number
         </Button>
       </Form.Item>
     </Form>
   );
 };
 
-export default OtpForm;
+export default OTPChangePhoneForm;

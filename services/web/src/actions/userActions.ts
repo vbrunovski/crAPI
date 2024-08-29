@@ -52,13 +52,23 @@ interface VerifyOTPPayload extends ActionPayload {
   password: string;
 }
 
+interface VerifyPhoneChangeOTPPayload extends ActionPayload {
+  otp: string;
+  old_number: string;
+  new_number: string;
+}
+
 interface ResetPasswordPayload extends ActionPayload {
   email: string;
   accessToken: string;
   password: string;
 }
 
-export const logInUserAction = ({ email, password, callback }: LoginPayload) => {
+export const logInUserAction = ({
+  email,
+  password,
+  callback,
+}: LoginPayload) => {
   return {
     type: actionTypes.LOG_IN,
     payload: { email, password, callback },
@@ -73,7 +83,11 @@ export const unlockUserAction = ({ email, code, callback }: UnlockPayload) => {
   };
 };
 
-export const unlockRedirectUserAction = ({ email, message, callback }: UnlockRedirectPayload) => {
+export const unlockRedirectUserAction = ({
+  email,
+  message,
+  callback,
+}: UnlockRedirectPayload) => {
   console.log("unlockRedirectUserAction", email, message, callback);
   return {
     type: actionTypes.UNLOCK_USER_REDIRECT,
@@ -102,7 +116,9 @@ export const logOutUserAction = ({ callback }: ActionPayload) => {
   };
 };
 
-export const validateAccessTokenAction = ({ accessToken }: AccessTokenPayload) => {
+export const validateAccessTokenAction = ({
+  accessToken,
+}: AccessTokenPayload) => {
   console.log("validateAccessTokenAction action");
   return {
     type: actionTypes.VALIDATE_ACCESS_TOKEN,
@@ -123,10 +139,28 @@ export const forgotPasswordAction = ({ email, callback }: LoginPayload) => {
   };
 };
 
-export const verifyOTPAction = ({ otp, email, password, callback }: VerifyOTPPayload) => {
+export const verifyOTPAction = ({
+  otp,
+  email,
+  password,
+  callback,
+}: VerifyOTPPayload) => {
   return {
     type: actionTypes.VERIFY_OTP,
     payload: { otp, email, password, callback },
+  };
+};
+
+export const verifyPhoneChangeOTPAction = ({
+  accessToken,
+  otp,
+  old_number,
+  new_number,
+  callback,
+}: VerifyPhoneChangeOTPPayload) => {
+  return {
+    type: actionTypes.VERIFY_PHONE_NUMBER_OTP,
+    payload: { accessToken, otp, old_number, new_number, callback },
   };
 };
 
@@ -142,35 +176,68 @@ export const resetPasswordAction = ({
   };
 };
 
-export const getMechanicServicesAction = ({ accessToken, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+export const getMechanicServicesAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.GET_MECHANIC_SERVICES,
     payload: { accessToken, callback, ...data },
   };
 };
 
-export const getVehicleServicesAction = ({ accessToken, VIN, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+export const getVehicleServicesAction = ({
+  accessToken,
+  VIN,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.GET_VEHICLE_SERVICES,
     payload: { accessToken, VIN, callback, ...data },
   };
 };
 
-export const getServiceReportAction = ({ accessToken, reportId, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+export const getServiceReportAction = ({
+  accessToken,
+  reportId,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.GET_SERVICE_REPORT,
     payload: { accessToken, reportId, callback, ...data },
   };
 };
 
-export const changeEmailAction = ({ accessToken, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+export const changeEmailAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.CHANGE_EMAIL,
     payload: { accessToken, callback, ...data },
   };
 };
 
-export const verifyTokenAction = ({ accessToken, callback, ...data }: ActionPayload & AccessTokenPayload) => {
+export const changePhoneNumberAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
+  return {
+    type: actionTypes.CHANGE_PHONE_NUMBER,
+    payload: { accessToken, callback, ...data },
+  };
+};
+
+export const verifyTokenAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
   return {
     type: actionTypes.VERIFY_TOKEN,
     payload: { accessToken, callback, ...data },

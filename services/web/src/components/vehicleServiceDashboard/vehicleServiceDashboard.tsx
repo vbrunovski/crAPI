@@ -42,7 +42,9 @@ interface VehicleServiceDashboardProps {
   services: Service[];
 }
 
-const VehicleServiceDashboard: React.FC<VehicleServiceDashboardProps> = ({ services }) => {
+const VehicleServiceDashboard: React.FC<VehicleServiceDashboardProps> = ({
+  services,
+}) => {
   const urlParams = new URLSearchParams(window.location.search);
   const VIN = urlParams.get("VIN");
   return (
@@ -51,14 +53,13 @@ const VehicleServiceDashboard: React.FC<VehicleServiceDashboardProps> = ({ servi
       <Row gutter={[16, 24]}>
         {services.map((service: Service) => (
           <Col span={8} key={service.id}>
-            <Card hoverable className="dashboard-card" title={service.problem_details}>
-              <Meta
-                title={service.status}
-                description={service.created_on}
-              />
-              <p>
-                Vehicle VIN: {service.vehicle.vin}
-              </p>
+            <Card
+              hoverable
+              className="dashboard-card"
+              title={service.problem_details}
+            >
+              <Meta title={service.status} description={service.created_on} />
+              <p>Vehicle VIN: {service.vehicle.vin}</p>
               <p>
                 Owner email-id:
                 {service.vehicle.owner.email}

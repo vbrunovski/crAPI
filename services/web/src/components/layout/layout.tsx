@@ -46,6 +46,7 @@ import {
   validateAccessTokenAction,
 } from "../../actions/userActions";
 import { isAccessTokenValid } from "../../utils";
+import ChangePhoneNumber from "../changePhoneNumber/changePhoneNumber";
 
 const { Content } = Layout;
 
@@ -269,6 +270,18 @@ const StyledComp: React.FC<PropsFromRedux> = (props) => {
               element={
                 <AfterLogin
                   component={ChangeEmail}
+                  isLoggedIn={props.isLoggedIn}
+                  userRole={props.role}
+                  accessToken={props.accessToken}
+                  logOutUser={props.logOutUser}
+                />
+              }
+            />
+            <Route
+              path="/change-phone-number"
+              element={
+                <AfterLogin
+                  component={ChangePhoneNumber}
                   isLoggedIn={props.isLoggedIn}
                   userRole={props.role}
                   accessToken={props.accessToken}

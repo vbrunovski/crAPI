@@ -18,7 +18,8 @@ export const NUMBERSVALIDATION: RegExp = /^\d+$/;
 export const MATCH_ANYTHING: RegExp = /.*?/;
 export const EMAIL_VALIDATION: RegExp =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-export const PHONE_VALIDATION: RegExp = /^(\+\d{1,2}\s?)?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+export const PHONE_VALIDATION: RegExp =
+  /^(\+\d{1,2}\s?)?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 export const PASSWORD_VALIDATION: RegExp =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,16}$/;
 export const NAME_VALIDATION: RegExp = /^[a-zA-Z ]+$/;

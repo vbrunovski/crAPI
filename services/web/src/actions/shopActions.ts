@@ -25,7 +25,11 @@ interface OrderByIdPayload extends ActionPayload {
   orderId: string;
 }
 
-export const getProductsAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const getProductsAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.GET_PRODUCTS,
     payload: {
@@ -36,7 +40,11 @@ export const getProductsAction = ({ accessToken, callback, ...data }: ActionPayl
   };
 };
 
-export const buyProductAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const buyProductAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.BUY_PRODUCT,
     payload: {
@@ -47,7 +55,11 @@ export const buyProductAction = ({ accessToken, callback, ...data }: ActionPaylo
   };
 };
 
-export const getOrdersAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const getOrdersAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.GET_ORDERS,
     payload: {
@@ -58,7 +70,11 @@ export const getOrdersAction = ({ accessToken, callback, ...data }: ActionPayloa
   };
 };
 
-export const getOrderByIdAction = ({ accessToken, orderId, callback }: OrderByIdPayload) => {
+export const getOrderByIdAction = ({
+  accessToken,
+  orderId,
+  callback,
+}: OrderByIdPayload) => {
   return {
     type: actionTypes.GET_ORDER_BY_ID,
     payload: {
@@ -69,7 +85,11 @@ export const getOrderByIdAction = ({ accessToken, orderId, callback }: OrderById
   };
 };
 
-export const returnOrderAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const returnOrderAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.RETURN_ORDER,
     payload: {
@@ -80,7 +100,11 @@ export const returnOrderAction = ({ accessToken, callback, ...data }: ActionPayl
   };
 };
 
-export const applyCouponAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const applyCouponAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.APPLY_COUPON,
     payload: {

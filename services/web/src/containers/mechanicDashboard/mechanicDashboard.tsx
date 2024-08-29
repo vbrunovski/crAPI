@@ -52,7 +52,10 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const MechanicDashboardContainer: React.FC<PropsFromRedux> = ({ accessToken, getServices }) => {
+const MechanicDashboardContainer: React.FC<PropsFromRedux> = ({
+  accessToken,
+  getServices,
+}) => {
   const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {

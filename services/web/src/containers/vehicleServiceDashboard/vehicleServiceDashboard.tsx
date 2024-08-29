@@ -55,7 +55,10 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({ accessToken, getVehicleServiceHistory }) => {
+const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({
+  accessToken,
+  getVehicleServiceHistory,
+}) => {
   const [services, setServices] = useState<Service[]>([]);
   const urlParams = new URLSearchParams(window.location.search);
   const VIN = urlParams.get("VIN");
@@ -73,7 +76,7 @@ const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({ accessToke
         });
       }
     };
-    getVehicleServiceHistory({ accessToken, VIN, callback});
+    getVehicleServiceHistory({ accessToken, VIN, callback });
   }, [accessToken, getVehicleServiceHistory, VIN]);
 
   // Ensure that the Service type in the component matches the one from the API

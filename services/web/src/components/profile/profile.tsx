@@ -86,7 +86,8 @@ const Profile: React.FC<ProfileProps> = (props) => {
   const videoInputRef = useRef<HTMLInputElement>(null);
 
   const takeVideoAction = (input: { key: string }) => {
-    if (input.key === "1" && videoInputRef.current) videoInputRef.current.click();
+    if (input.key === "1" && videoInputRef.current)
+      videoInputRef.current.click();
     if (input.key === "2") setIsVideoModalOpen(true);
     if (input.key === "3") shareVideoWithCommunity();
   };
@@ -156,6 +157,15 @@ const Profile: React.FC<ProfileProps> = (props) => {
           </Descriptions.Item>
           <Descriptions.Item label="Phone No.">
             {userData.number}
+            <Button
+              type="primary"
+              shape="round"
+              className="change-phone-number-btn"
+              icon={<EditOutlined />}
+              onClick={() => navigate("/change-phone-number")}
+            >
+              Change phone number
+            </Button>
           </Descriptions.Item>
         </Descriptions>
       </Col>
@@ -238,7 +248,13 @@ const Profile: React.FC<ProfileProps> = (props) => {
   );
 };
 
-const mapStateToProps = ({ userReducer, profileReducer }: { userReducer: UserData; profileReducer: ProfileData }) => {
+const mapStateToProps = ({
+  userReducer,
+  profileReducer,
+}: {
+  userReducer: UserData;
+  profileReducer: ProfileData;
+}) => {
   return { userData: userReducer, profileData: profileReducer };
 };
 

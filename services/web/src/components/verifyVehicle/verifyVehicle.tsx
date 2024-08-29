@@ -29,7 +29,11 @@ interface VerifyVehicleProps {
   onFinish: (values: any) => void;
 }
 
-const VerifyVehicle: React.FC<VerifyVehicleProps> = ({ hasErrored, errorMessage, onFinish }) => {
+const VerifyVehicle: React.FC<VerifyVehicleProps> = ({
+  hasErrored,
+  errorMessage,
+  onFinish,
+}) => {
   return (
     <div className="container">
       <Card

@@ -144,9 +144,17 @@ const Shop: React.FC<ShopProps> = (props) => {
         <Row gutter={[40, 40]}>
           {products.map((product) => (
             <Col span={8} key={product.id}>
-              <Card className="product-card" cover={<ProductAvatar image_url={product.image_url} />}>
+              <Card
+                className="product-card"
+                cover={<ProductAvatar image_url={product.image_url} />}
+              >
                 <Meta
-                  description={<ProductDescription product={product} onBuyProduct={onBuyProduct} />}
+                  description={
+                    <ProductDescription
+                      product={product}
+                      onBuyProduct={onBuyProduct}
+                    />
+                  }
                 />
               </Card>
             </Col>
@@ -217,7 +225,8 @@ interface RootState {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const { accessToken, availableCredit, products, prevOffset, nextOffset } = state.shopReducer;
+  const { accessToken, availableCredit, products, prevOffset, nextOffset } =
+    state.shopReducer;
   return { accessToken, availableCredit, products, prevOffset, nextOffset };
 };
 

@@ -306,12 +306,15 @@ export function* refreshLocation(action: MyAction): Generator<any, void, any> {
  * @payload {string} payload.accessToken - Access token of the user
  * @payload {Function} payload.callback - Callback method
  */
-export function* getMechanicServices(action: MyAction): Generator<any, void, any> {
+export function* getMechanicServices(
+  action: MyAction,
+): Generator<any, void, any> {
   const { accessToken, callback } = action.payload;
   let receivedResponse: Partial<Response> = {};
   try {
     yield put({ type: actionTypes.FETCHING_DATA });
-    const getUrl = APIService.WORKSHOP_SERVICE + requestURLS.GET_MECHANIC_SERVICES;
+    const getUrl =
+      APIService.WORKSHOP_SERVICE + requestURLS.GET_MECHANIC_SERVICES;
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
@@ -342,13 +345,17 @@ export function* getMechanicServices(action: MyAction): Generator<any, void, any
   }
 }
 
-export function* getVehicleServices(action: MyAction): Generator<any, void, any> {
+export function* getVehicleServices(
+  action: MyAction,
+): Generator<any, void, any> {
   console.log("Vehicle Services", action.payload);
   const { accessToken, VIN, callback } = action.payload;
   let receivedResponse: Partial<Response> = {};
   try {
     yield put({ type: actionTypes.FETCHING_DATA });
-    const getUrl = APIService.WORKSHOP_SERVICE + requestURLS.GET_VEHICLE_SERVICES.replace("<vehicleVIN>", VIN);
+    const getUrl =
+      APIService.WORKSHOP_SERVICE +
+      requestURLS.GET_VEHICLE_SERVICES.replace("<vehicleVIN>", VIN);
     console.log("Get URL", getUrl);
     const headers = {
       "Content-Type": "application/json",
@@ -392,7 +399,11 @@ export function* getServiceReport(action: MyAction): Generator<any, void, any> {
   let receivedResponse: Partial<Response> = {};
   try {
     yield put({ type: actionTypes.FETCHING_DATA });
-    const getUrl = APIService.WORKSHOP_SERVICE + requestURLS.GET_SERVICE_REPORT + "?report_id=" + reportId;
+    const getUrl =
+      APIService.WORKSHOP_SERVICE +
+      requestURLS.GET_SERVICE_REPORT +
+      "?report_id=" +
+      reportId;
     console.log("Get URL", getUrl);
     const headers = {
       "Content-Type": "application/json",

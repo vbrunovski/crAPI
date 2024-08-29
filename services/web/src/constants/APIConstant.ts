@@ -44,6 +44,8 @@ export const requestURLS: RequestURLSType = {
   GET_VEHICLES: "api/v2/vehicle/vehicles",
   RESEND_MAIL: "api/v2/vehicle/resend_email",
   CHANGE_EMAIL: "api/v2/user/change-email",
+  CHANGE_PHONE_NUMBER: "api/v2/user/change-phone-number",
+  VERIFY_PHONE_NUMBER_OTP: "api/v2/user/verify-phone-otp",
   VERIFY_TOKEN: "api/v2/user/verify-email-token",
   UPLOAD_PROFILE_PIC: "api/v2/user/pictures",
   UPLOAD_VIDEO: "api/v2/user/videos",

@@ -65,7 +65,11 @@ interface RootState {
   };
 }
 
-const vehicleCardHeader = (vehicle: Vehicle, handleVehicleServiceClick: (vin: string) => void, handleContactMechanic: (vin: string) => void) => {
+const vehicleCardHeader = (
+  vehicle: Vehicle,
+  handleVehicleServiceClick: (vin: string) => void,
+  handleContactMechanic: (vin: string) => void,
+) => {
   return (
     <PageHeader
       className="dashboard-header"
@@ -96,11 +100,9 @@ const vehicleCardHeader = (vehicle: Vehicle, handleVehicleServiceClick: (vin: st
   );
 };
 
-const connector = connect(
-  (state: RootState) => ({
-    vehicles: state.vehicleReducer.vehicles,
-  })
-);
+const connector = connect((state: RootState) => ({
+  vehicles: state.vehicleReducer.vehicles,
+}));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -109,7 +111,11 @@ interface DashboardProps extends PropsFromRedux {
   resendMail: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ vehicles, refreshLocation, resendMail }) => {
+const Dashboard: React.FC<DashboardProps> = ({
+  vehicles,
+  refreshLocation,
+  resendMail,
+}) => {
   const navigate = useNavigate();
   const vehicleCardContent = (vehicle: Vehicle) => (
     <>
@@ -217,7 +223,11 @@ const Dashboard: React.FC<DashboardProps> = ({ vehicles, refreshLocation, resend
             <Col span={24} key={vehicle.vin}>
               <Card className="vehicle-card">
                 <Meta
-                  title={vehicleCardHeader(vehicle, handleVehicleServiceClick, handleContactMechanic)}
+                  title={vehicleCardHeader(
+                    vehicle,
+                    handleVehicleServiceClick,
+                    handleContactMechanic,
+                  )}
                   description={vehicleCardContent(vehicle)}
                 />
               </Card>

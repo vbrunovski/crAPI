@@ -29,21 +29,33 @@ interface AddCommentPayload extends PostByIdPayload {
   comment: string;
 }
 
-export const getPostsAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const getPostsAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.GET_POSTS,
     payload: { accessToken, ...data, callback },
   };
 };
 
-export const addPostAction = ({ accessToken, callback, ...data }: ActionPayload) => {
+export const addPostAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
   return {
     type: actionTypes.ADD_POST,
     payload: { accessToken, ...data, callback },
   };
 };
 
-export const getPostByIdAction = ({ accessToken, callback, postId }: PostByIdPayload) => {
+export const getPostByIdAction = ({
+  accessToken,
+  callback,
+  postId,
+}: PostByIdPayload) => {
   return {
     type: actionTypes.GET_POST_BY_ID,
     payload: { accessToken, postId, callback },

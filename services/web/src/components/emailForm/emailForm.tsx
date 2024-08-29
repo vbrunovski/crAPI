@@ -55,7 +55,9 @@ const EmailForm: React.FC<EmailFormProps> = ({
         <Input
           className="input-style"
           placeholder="Email ID"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMailChange(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            onMailChange(event.target.value)
+          }
         />
       </Form.Item>
       <Form.Item>

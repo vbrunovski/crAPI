@@ -62,7 +62,10 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const ServiceReportContainer: React.FC<PropsFromRedux> = ({ accessToken, getServiceReport }) => {
+const ServiceReportContainer: React.FC<PropsFromRedux> = ({
+  accessToken,
+  getServiceReport,
+}) => {
   const [service, setService] = useState<Service>();
   const urlParams = new URLSearchParams(window.location.search);
   const reportId = urlParams.get("id");
@@ -80,7 +83,7 @@ const ServiceReportContainer: React.FC<PropsFromRedux> = ({ accessToken, getServ
         });
       }
     };
-    getServiceReport({ accessToken, reportId, callback});
+    getServiceReport({ accessToken, reportId, callback });
   }, [accessToken, getServiceReport, reportId]);
 
   // Ensure that the Service type in the component matches the one from the API
