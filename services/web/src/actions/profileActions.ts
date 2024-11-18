@@ -17,7 +17,7 @@ import actionTypes from "../constants/actionTypes";
 
 interface ActionPayload {
   accessToken: string;
-  callback: () => void;
+  callback: (status: string, data: any) => void;
   [key: string]: any;
 }
 
@@ -69,7 +69,7 @@ export const changeVideoNameAction = ({
 interface ConvertVideoPayload {
   accessToken: string;
   videoId: string;
-  callback: () => void;
+  callback: (res: string, data: any) => void;
 }
 
 export const convertVideoAction = ({
@@ -79,6 +79,21 @@ export const convertVideoAction = ({
 }: ConvertVideoPayload) => {
   return {
     type: actionTypes.CONVERT_VIDEO,
+    payload: {
+      accessToken,
+      videoId,
+      callback,
+    },
+  };
+};
+
+export const getVideoAction = ({
+  accessToken,
+  videoId,
+  callback,
+}: ActionPayload) => {
+  return {
+    type: actionTypes.GET_VIDEO,
     payload: {
       accessToken,
       videoId,

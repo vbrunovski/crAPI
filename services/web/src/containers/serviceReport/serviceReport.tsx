@@ -48,6 +48,10 @@ interface Service {
       number: string;
     };
   };
+  comments: {
+    comment: string;
+    created_on: string;
+  }[];
 }
 
 const mapStateToProps = (state: RootState) => ({
@@ -83,6 +87,7 @@ const ServiceReportContainer: React.FC<PropsFromRedux> = ({
         });
       }
     };
+    console.log("getServiceReport", accessToken, reportId, callback);
     getServiceReport({ accessToken, reportId, callback });
   }, [accessToken, getServiceReport, reportId]);
 

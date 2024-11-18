@@ -41,6 +41,7 @@ import NewPostContainer from "../../containers/newPost/newPost";
 import PostContainer from "../../containers/post/post";
 import VehicleServiceDashboardContainer from "../../containers/vehicleServiceDashboard/vehicleServiceDashboard";
 import ServiceReportContiner from "../../containers/serviceReport/serviceReport";
+import MechanicServiceRequestContainer from "../../containers/mechanicServiceRequest/mechanicServiceRequest";
 import {
   logOutUserAction,
   validateAccessTokenAction,
@@ -233,6 +234,19 @@ const StyledComp: React.FC<PropsFromRedux> = (props) => {
               element={
                 <AfterLogin
                   component={MechanicDashboardContainer}
+                  isLoggedIn={props.isLoggedIn}
+                  componentRole={roleTypes.ROLE_MECHANIC}
+                  userRole={props.role}
+                  accessToken={props.accessToken}
+                  logOutUser={props.logOutUser}
+                />
+              }
+            />
+            <Route
+              path="/mechanic-service"
+              element={
+                <AfterLogin
+                  component={MechanicServiceRequestContainer}
                   isLoggedIn={props.isLoggedIn}
                   componentRole={roleTypes.ROLE_MECHANIC}
                   userRole={props.role}

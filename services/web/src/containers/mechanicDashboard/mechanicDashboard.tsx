@@ -32,12 +32,16 @@ interface Service {
   id: string;
   problem_details: string;
   created_on: string;
+  updated_on: string;
   vehicle: {
+    id: string;
+    vin: string;
     owner: {
       email: string;
       number: string;
     };
   };
+  status: string;
 }
 
 const mapStateToProps = (state: RootState) => ({

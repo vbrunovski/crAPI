@@ -65,9 +65,9 @@ const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({
   console.log("VIN", VIN);
 
   useEffect(() => {
-    const callback = (res: string, data: Service[] | string) => {
-      console.log("Callback", res, data);
-      if (res === responseTypes.SUCCESS) {
+    const callback = (status: string, data: Service[] | string) => {
+      console.log("Callback", status, data);
+      if (status === responseTypes.SUCCESS) {
         setServices(data as Service[]);
       } else {
         Modal.error({
@@ -76,6 +76,7 @@ const VehicleServiceDashboardContainer: React.FC<PropsFromRedux> = ({
         });
       }
     };
+    console.log("getVehicleServiceHistory", accessToken, VIN, callback);
     getVehicleServiceHistory({ accessToken, VIN, callback });
   }, [accessToken, getVehicleServiceHistory, VIN]);
 

@@ -15,8 +15,7 @@
 
 import React, { useEffect } from "react";
 
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { Modal } from "antd";
 import ContactMechanic from "../../components/contactMechanic/contactMechanic";
 import { useNavigate } from "react-router-dom";
@@ -26,27 +25,29 @@ import {
 } from "../../actions/vehicleActions";
 import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
+import { RootState } from "../../reducers/rootReducer";
 
-const ContactMechanicContainer = (props) => {
-  const { accessToken, getMechanics } = props;
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+const ContactMechanicContainer: React.FC<PropsFromRedux> = (props) => {
   const navigate = useNavigate();
-
+  const { accessToken, getMechanics, contactMechanic } = props;
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
-
   useEffect(() => {
-    const callback = (res, data) => {
-      if (res !== responseTypes.SUCCESS) {
+    const callback = (status: string, data: any) => {
+      if (status !== responseTypes.SUCCESS) {
         setHasErrored(true);
         setErrorMessage(data);
+        return;
       }
     };
-    getMechanics({ callback, accessToken });
+    getMechanics({ accessToken, callback });
   }, [accessToken, getMechanics]);
 
-  const onFinish = (values) => {
-    const callback = (res, data) => {
-      if (res === responseTypes.SUCCESS) {
+  const onFinish = (values: any) => {
+    const callback = (status: string, data: any) => {
+      if (status === responseTypes.SUCCESS) {
         Modal.success({
           title: SUCCESS_MESSAGE,
           content: data,
@@ -73,7 +74,7 @@ const ContactMechanicContainer = (props) => {
   );
 };
 
-const mapStateToProps = ({ userReducer: { accessToken } }) => {
+const mapStateToProps = ({ userReducer: { accessToken } }: RootState) => {
   return { accessToken };
 };
 
@@ -82,13 +83,6 @@ const mapDispatchToProps = {
   contactMechanic: contactMechanicAction,
 };
 
-ContactMechanicContainer.propTypes = {
-  accessToken: PropTypes.string,
-  getMechanics: PropTypes.func,
-  contactMechanic: PropTypes.func,
-};
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ContactMechanicContainer);
+export default connector(ContactMechanicContainer);

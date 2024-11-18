@@ -1,7 +1,6 @@
 #
 # MailHog Dockerfile
 #
-
 FROM golang:alpine AS builder
 
 # Install MailHog:

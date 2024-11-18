@@ -16,8 +16,8 @@
 contains serializers for Merchant APIs
 """
 from rest_framework import serializers
-from crapi.mechanic.models import Mechanic, ServiceRequest
-from crapi.mechanic.serializers import VehicleSerializer
+from crapi.mechanic.models import Mechanic, ServiceRequest, ServiceComment
+from crapi.mechanic.serializers import VehicleSerializer, ServiceCommentViewSerializer
 
 
 class ContactMechanicSerializer(serializers.Serializer):
@@ -46,12 +46,19 @@ class MechanicPublicSerializer(serializers.ModelSerializer):
 
 class UserServiceRequestSerializer(serializers.ModelSerializer):
     """
-    Serializer for Mechanic model
+    Serializer for ServiceRequest model
     """
+
+    comments = serializers.SerializerMethodField()
 
     mechanic = MechanicPublicSerializer()
     vehicle = VehicleSerializer()
     created_on = serializers.DateTimeField(format="%d %B, %Y, %H:%M:%S")
+    updated_on = serializers.DateTimeField(format="%d %B, %Y, %H:%M:%S")
+
+    def get_comments(self, obj):
+        service_comments = ServiceComment.objects.filter(service_request_id=obj.id)
+        return ServiceCommentViewSerializer(service_comments, many=True).data
 
     class Meta:
         """
@@ -66,4 +73,6 @@ class UserServiceRequestSerializer(serializers.ModelSerializer):
             "problem_details",
             "status",
             "created_on",
+            "updated_on",
+            "comments",
         )

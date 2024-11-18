@@ -17,7 +17,7 @@ contains all the serializers for mechanic APIs
 """
 from rest_framework import serializers
 
-from crapi.mechanic.models import Mechanic, ServiceRequest
+from crapi.mechanic.models import Mechanic, ServiceRequest, ServiceComment
 from crapi.user.serializers import UserSerializer, VehicleSerializer
 
 
@@ -42,9 +42,17 @@ class MechanicServiceRequestSerializer(serializers.ModelSerializer):
     Serializer for Mechanic model
     """
 
+    def get_comments(self, obj):
+        comments = ServiceComment.objects.filter(service_request=obj).order_by(
+            "-created_on"
+        )
+        return ServiceCommentViewSerializer(comments, many=True).data
+
+    comments = serializers.SerializerMethodField()
     mechanic = MechanicSerializer()
     vehicle = VehicleSerializer()
     created_on = serializers.DateTimeField(format="%d %B, %Y, %H:%M:%S")
+    updated_on = serializers.DateTimeField(format="%d %B, %Y, %H:%M:%S")
 
     class Meta:
         """
@@ -59,6 +67,8 @@ class MechanicServiceRequestSerializer(serializers.ModelSerializer):
             "problem_details",
             "status",
             "created_on",
+            "updated_on",
+            "comments",
         )
 
 
@@ -83,3 +93,45 @@ class SignUpSerializer(serializers.Serializer):
     number = serializers.CharField()
     password = serializers.CharField()
     mechanic_code = serializers.CharField()
+
+
+class ServiceCommentViewSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ServiceComment model
+    """
+
+    class Meta:
+        """
+        Meta class for ServiceCommentViewSerializer
+        """
+
+        model = ServiceComment
+        fields = ("id", "comment", "created_on")
+
+
+class ServiceCommentCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ServiceComment creation model
+    """
+
+    class Meta:
+        """
+        Meta class for ServiceCommentCreateSerializer
+        """
+
+        model = ServiceComment
+        fields = ["comment"]
+
+
+class ServiceRequestStatusUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ServiceRequest to update the status
+    """
+
+    class Meta:
+        """
+        Meta class for ServiceRequestStatusUpdateSerializer
+        """
+
+        model = ServiceRequest
+        fields = ["status"]

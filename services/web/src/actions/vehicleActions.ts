@@ -17,7 +17,7 @@ import actionTypes from "../constants/actionTypes";
 
 interface ActionPayload {
   accessToken: string;
-  callback: () => void;
+  callback: (res: string, data: any) => void;
   [key: string]: any;
 }
 
@@ -41,8 +41,8 @@ export const verifyVehicleAction = ({
 };
 
 export const getMechanicsAction = ({
-  callback,
   accessToken,
+  callback,
   ...data
 }: ActionPayload) => {
   return {

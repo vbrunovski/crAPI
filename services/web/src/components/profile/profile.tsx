@@ -16,8 +16,9 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import "./profile.css";
 
-import React, { useRef } from "react";
-import { connect } from "react-redux";
+import React, { useEffect, useRef } from "react";
+import type { MenuProps } from "antd";
+import { connect, ConnectedProps } from "react-redux";
 import {
   Row,
   Col,
@@ -28,16 +29,35 @@ import {
   Badge,
   Avatar,
   Dropdown,
-  Menu,
   Modal,
   Form,
   Input,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
-import { EditOutlined, MoreOutlined, CameraOutlined } from "@ant-design/icons";
-import defaultProficPic from "../../assets/default_profile_pic.png";
-import { VIDEO_NAME_REQUIRED } from "../../constants/messages";
+import {
+  EditOutlined,
+  CameraOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
+import defaultProfilePic from "../../assets/default_profile_pic.png";
+import {
+  FAILURE_MESSAGE,
+  PROFILE_PIC_UPDATED,
+  SUCCESS_MESSAGE,
+  VIDEO_NAME_CHANGED,
+  VIDEO_NAME_REQUIRED,
+  VIDEO_UPDATED,
+} from "../../constants/messages";
 import { useNavigate } from "react-router-dom";
+import {
+  changeVideoNameAction,
+  convertVideoAction,
+  getVideoAction,
+  uploadProfilePicAction,
+  uploadVideoAction,
+} from "../../actions/profileActions";
+import responseTypes from "../../constants/responseTypes";
 
 const { Content } = Layout;
 const { Meta } = Card;
@@ -46,70 +66,174 @@ interface UserData {
   name: string;
   email: string;
   number: string;
+  accessToken: string;
 }
 
 interface ProfileData {
   profilePicData?: string;
-  videoData?: string;
   videoName?: string;
+  videoId?: string;
+  videoData?: string;
 }
 
 interface ProfileProps {
-  hasErrored: boolean;
-  errorMessage: string;
-  userData: UserData;
   profileData: ProfileData;
-  uploadProfilePic: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  uploadVideo: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isVideoModalOpen: boolean;
-  setIsVideoModalOpen: (isOpen: boolean) => void;
-  onVideoFormFinish: (values: { videoName: string }) => void;
-  shareVideoWithCommunity: () => void;
+  userData: UserData;
 }
 
-const Profile: React.FC<ProfileProps> = (props) => {
+type PropsFromRedux = ConnectedProps<typeof connector> & ProfileProps;
+
+const Profile: React.FC<PropsFromRedux> = (props) => {
   const navigate = useNavigate();
+  const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
+  const [hasErrored, setHasErrored] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
+
+  const picInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [videoData, setVideoData] = React.useState<string | null>(null);
+
   const {
-    hasErrored,
-    errorMessage,
     userData,
     profileData,
     uploadProfilePic,
     uploadVideo,
-    isVideoModalOpen,
-    setIsVideoModalOpen,
-    onVideoFormFinish,
-    shareVideoWithCommunity,
+    changeVideoName,
+    convertVideo,
+    getVideo,
   } = props;
 
-  const picInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const callback = (res: string, data: any) => {
+      if (res === responseTypes.SUCCESS) {
+        setVideoData(data.profileVideo);
+      } else {
+        console.log("Error getting video", data);
+      }
+    };
+    getVideo({
+      accessToken: userData.accessToken,
+      videoId: profileData.videoId,
+      callback,
+    });
+  }, [userData.accessToken, profileData.videoId, getVideo]);
 
-  const takeVideoAction = (input: { key: string }) => {
-    if (input.key === "1" && videoInputRef.current)
-      videoInputRef.current.click();
-    if (input.key === "2") setIsVideoModalOpen(true);
-    if (input.key === "3") shareVideoWithCommunity();
+  const menuItems = () => {
+    const items: Array<{
+      label: string;
+      key: string;
+      icon: React.JSX.Element;
+    }> = [];
+    if (videoData) {
+      items.push({
+        label: "Change Video",
+        key: "1",
+        icon: <UserOutlined />,
+      });
+      items.push({
+        label: "Change Video Name",
+        key: "2",
+        icon: <UserOutlined />,
+      });
+      items.push({
+        label: "Share Video with Community",
+        key: "3",
+        icon: <UserOutlined />,
+      });
+    }
+    return items;
   };
 
-  const videoSideBar = () => {
-    return profileData.videoData ? (
-      <Menu onClick={(key) => takeVideoAction(key)}>
-        <Menu.Item key="1">Change Video</Menu.Item>
-        <Menu.Item key="2">Change Video Name</Menu.Item>
-        <Menu.Item key="3">Share Video with Community</Menu.Item>
-      </Menu>
-    ) : (
-      <div className="upload-video-button">
-        <Button
-          className="button"
-          type="text"
-          onClick={() => videoInputRef.current?.click()}
-        >
-          Upload Video
-        </Button>
-      </div>
-    );
+  const handleUploadProfilePic = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const callback = (res: string, data: any) => {
+      if (res === responseTypes.SUCCESS) {
+        Modal.success({
+          title: SUCCESS_MESSAGE,
+          content: PROFILE_PIC_UPDATED,
+        });
+      } else {
+        Modal.error({
+          title: FAILURE_MESSAGE,
+          content: data,
+        });
+      }
+    };
+    uploadProfilePic({
+      callback,
+      accessToken: userData.accessToken,
+      file: event.target.files?.[0],
+    });
+  };
+
+  const handleUploadVideo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const callback = (res: string, data: any) => {
+      if (res === responseTypes.SUCCESS) {
+        Modal.success({
+          title: SUCCESS_MESSAGE,
+          content: VIDEO_UPDATED,
+        });
+      } else {
+        Modal.error({
+          title: FAILURE_MESSAGE,
+          content: data,
+        });
+      }
+    };
+    uploadVideo({
+      accessToken: userData.accessToken,
+      callback,
+      file: event.target.files?.[0],
+    });
+  };
+
+  const handleChangeVideoName = (values: any) => {
+    const callback = (res: string, data: any) => {
+      if (res === responseTypes.SUCCESS) {
+        setIsVideoModalOpen(false);
+        Modal.success({
+          title: SUCCESS_MESSAGE,
+          content: VIDEO_NAME_CHANGED,
+        });
+        setVideoData(data.profileVideo);
+      } else {
+        setHasErrored(true);
+        setErrorMessage(data);
+      }
+    };
+    changeVideoName({
+      accessToken: userData.accessToken,
+      callback,
+      videoId: profileData.videoId,
+      ...values,
+    });
+  };
+
+  const shareVideoWithCommunity = (videoId: string) => {
+    const callback = (res: any, data: any) => {
+      Modal.error({
+        title: FAILURE_MESSAGE,
+        content: data,
+      });
+    };
+    convertVideo({ accessToken: userData.accessToken, videoId, callback });
+  };
+
+  const takeVideoAction: MenuProps["onClick"] = (e) => {
+    console.log("Video Action", e);
+    if (e.key === "1" && videoInputRef.current) videoInputRef.current.click();
+    if (e.key === "2") setIsVideoModalOpen(true);
+    if (e.key === "3") shareVideoWithCommunity(profileData.videoId || "");
+  };
+
+  const handleUploadVideoAction = () => {
+    videoInputRef.current?.click();
+  };
+
+  const MenuProps = {
+    onClick: takeVideoAction,
+    items: menuItems(),
   };
 
   const renderChangePicButton = () => (
@@ -131,12 +255,12 @@ const Profile: React.FC<ProfileProps> = (props) => {
             hidden
             ref={picInputRef}
             accept="image/*"
-            onChange={uploadProfilePic}
+            onChange={handleUploadProfilePic}
           />
           <Avatar
             shape="square"
             size={{ xs: 200, sm: 229, md: 240, lg: 260, xl: 280, xxl: 300 }}
-            src={profileData.profilePicData || defaultProficPic}
+            src={profileData.profilePicData || defaultProfilePic}
           />
         </Badge>
       </Col>
@@ -176,8 +300,8 @@ const Profile: React.FC<ProfileProps> = (props) => {
     <Row gutter={[60, 20]}>
       <Col span={24}>
         <>
-          <video controls className="profile-video" key={profileData.videoData}>
-            <source src={profileData.videoData} type="video/mp4" />
+          <video controls className="profile-video" key={videoData || ""}>
+            <source src={videoData || ""} type="video/mp4" />
           </video>
         </>
       </Col>
@@ -196,11 +320,25 @@ const Profile: React.FC<ProfileProps> = (props) => {
           title="My Personal Video"
           subTitle="Max File Size: 10MB"
           extra={[
-            <Dropdown overlay={videoSideBar} key="drop-down">
-              <div>
-                <MoreOutlined className="more-icon" />
-              </div>
-            </Dropdown>,
+            videoData ? (
+              <Dropdown.Button
+                menu={MenuProps}
+                key="drop-down"
+                onClick={handleUploadVideoAction}
+              >
+                <VideoCameraOutlined />
+              </Dropdown.Button>
+            ) : (
+              <Button
+                type="primary"
+                shape="round"
+                icon={<VideoCameraOutlined />}
+                size="large"
+                onClick={() => videoInputRef.current?.click()}
+              >
+                Upload Video
+              </Button>
+            ),
           ]}
         />
         <input
@@ -208,9 +346,9 @@ const Profile: React.FC<ProfileProps> = (props) => {
           hidden
           ref={videoInputRef}
           accept="video/*"
-          onChange={uploadVideo}
+          onChange={handleUploadVideo}
         />
-        {profileData.videoData && (
+        {videoData && (
           <Card>
             <Meta description={renderVideo()} />
           </Card>
@@ -227,7 +365,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
           initialValues={{
             remember: true,
           }}
-          onFinish={onVideoFormFinish}
+          onFinish={handleChangeVideoName}
         >
           <Form.Item
             name="videoName"
@@ -248,6 +386,14 @@ const Profile: React.FC<ProfileProps> = (props) => {
   );
 };
 
+const mapDispatchToProps = {
+  uploadProfilePic: uploadProfilePicAction,
+  uploadVideo: uploadVideoAction,
+  changeVideoName: changeVideoNameAction,
+  convertVideo: convertVideoAction,
+  getVideo: getVideoAction,
+};
+
 const mapStateToProps = ({
   userReducer,
   profileReducer,
@@ -258,4 +404,6 @@ const mapStateToProps = ({
   return { userData: userReducer, profileData: profileReducer };
 };
 
-export default connect(mapStateToProps)(Profile);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+export default connector(Profile);

@@ -16,8 +16,15 @@
 import "./nav.css";
 
 import { Button, Dropdown, Menu, Avatar, Layout, Space } from "antd";
-import { LogoutOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  EditOutlined,
+  ProfileOutlined,
+  CaretDownOutlined,
+} from "@ant-design/icons";
 import React from "react";
+import roleTypes from "../../constants/roleTypes";
+import type { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 import { connect, ConnectedProps } from "react-redux";
 import { logOutUserAction } from "../../actions/userActions";
@@ -30,6 +37,7 @@ interface RootState {
     accessToken: string;
     name: string;
     isLoggedIn: boolean;
+    role: string;
   };
   profileReducer: {
     profilePicData: string;
@@ -48,7 +56,7 @@ interface NavbarProps extends PropsFromRedux {}
  * dropdown alos consists the logout button
  */
 const Navbar: React.FC<NavbarProps> = (props) => {
-  const { logOutUser, isLoggedIn, name, profilePicData } = props;
+  const { logOutUser, isLoggedIn, name, role, profilePicData } = props;
   const navigate = useNavigate();
 
   const logout = () => {
@@ -59,38 +67,50 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     });
   };
 
-  const takeMenuAction = (input: { key: string }) => {
-    if (input.key === "password") navigate(`/reset-password`);
-    else if (input.key === "profile") navigate(`/my-profile`);
-    else if (input.key === "logout") logout();
-  };
-
-  const menuSidebar = () => (
-    <Menu onClick={(key) => takeMenuAction(key)}>
-      <Menu.Item key="password">Change Password</Menu.Item>
-      <Menu.Item key="logout">
-        <LogoutOutlined /> Logout
-      </Menu.Item>
-    </Menu>
-  );
-
   const takeNavigationAction = (input: { key: string }) => {
     if (input.key === "dashboard") navigate(`/`);
     else if (input.key === "shop") navigate(`/shop`);
     else if (input.key === "forum") navigate(`/forum`);
   };
 
+  type MenuItem = Required<MenuProps>["items"][number];
+
+  const menuitems: MenuItem[] = [];
+  menuitems.push({ key: "dashboard", label: "Dashboard" });
+  if (role !== roleTypes.ROLE_MECHANIC) {
+    menuitems.push({ key: "shop", label: "Shop" });
+    menuitems.push({ key: "forum", label: "Community" });
+  }
+
   const menuNavigation = () => (
     <Menu
       onClick={(key) => takeNavigationAction(key)}
       mode="horizontal"
       theme="dark"
-    >
-      <Menu.Item key="dashboard">Dashboard</Menu.Item>
-      <Menu.Item key="shop">Shop</Menu.Item>
-      <Menu.Item key="forum">Community</Menu.Item>
-    </Menu>
+      items={menuitems}
+    />
   );
+
+  const sideMenuItems: MenuProps["items"] = [
+    {
+      key: "profile",
+      label: "My Profile",
+      onClick: () => navigate("/my-profile"),
+      icon: <ProfileOutlined />,
+    },
+    {
+      key: "password",
+      label: "Change Password",
+      onClick: () => navigate("/reset-password"),
+      icon: <EditOutlined />,
+    },
+    {
+      key: "logout",
+      label: "Logout",
+      onClick: logout,
+      icon: <LogoutOutlined />,
+    },
+  ];
 
   return (
     <Header>
@@ -111,9 +131,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
               onClick={() => navigate("/my-profile")}
             />
           </div>
-          <Dropdown overlay={menuSidebar()} placement="bottomRight">
+          <Dropdown menu={{ items: sideMenuItems }} placement="bottomRight">
             <div className="nav-items">
-              <DownOutlined />
+              <CaretDownOutlined />
             </div>
           </Dropdown>
         </Space>
@@ -146,6 +166,7 @@ const mapStateToProps = (state: RootState) => ({
   name: state.userReducer.name,
   isLoggedIn: state.userReducer.isLoggedIn,
   profilePicData: state.profileReducer.profilePicData,
+  role: state.userReducer.role,
 });
 
 const mapDispatchToProps = {

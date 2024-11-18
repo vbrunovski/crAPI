@@ -14,7 +14,7 @@
  */
 
 import React from "react";
-import { Card, Row, Col, Descriptions, Spin, Layout } from "antd";
+import { Card, Row, Col, Descriptions, Spin, Layout, Timeline } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 import { Content } from "antd/es/layout/layout";
 
@@ -41,6 +41,10 @@ interface Service {
   vehicle: Vehicle;
   status: string;
   mechanic: Mechanic;
+  comments: {
+    comment: string;
+    created_on: string;
+  }[];
 }
 
 interface ServiceReportProps {
@@ -94,6 +98,34 @@ const ServiceReport: React.FC<ServiceReportProps> = ({ service }) => {
                   style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                 >
                   {service.problem_details}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
+      <Card
+        className="service-report-comments"
+        style={{ margin: "auto", width: "80%" }}
+      >
+        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+          <Col>
+            <Card title="Comments" className="comments-card">
+              <Descriptions
+                title="Comments"
+                column={1}
+                style={{ width: "500px" }}
+              >
+                <Descriptions.Item label="Comments">
+                  <Timeline
+                    mode="left"
+                    style={{ marginTop: "16px" }}
+                    items={service?.comments.map((comment, index) => ({
+                      label: comment.created_on,
+                      children: comment.comment,
+                      color: index === 0 ? "green" : "gray",
+                    }))}
+                  ></Timeline>
                 </Descriptions.Item>
               </Descriptions>
             </Card>

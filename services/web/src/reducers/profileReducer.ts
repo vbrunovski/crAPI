@@ -18,14 +18,12 @@ import actionTypes from "../constants/actionTypes";
 
 interface ProfileState {
   videoId: string;
-  videoData: string;
   videoName: string;
   profilePicData: string;
 }
 
 const initialData: ProfileState = {
   videoId: "",
-  videoData: "",
   videoName: "",
   profilePicData: "",
 };
@@ -41,30 +39,29 @@ const profileReducer = (
 ): ProfileState => {
   const maction: MyAction = action as { type: string; payload: any };
   switch (maction.type) {
-    case actionTypes.LOGGED_IN:
     case actionTypes.FETCHED_USER:
       return {
         ...state,
         videoId: maction.payload.video_id,
-        videoData: maction.payload.video_url,
         videoName: maction.payload.video_name,
         profilePicData: maction.payload.picture_url,
       };
     case actionTypes.PROFILE_PIC_CHANGED:
       return {
         ...state,
-        profilePicData: maction.payload.profilePicData,
+        profilePicData: maction.payload.picture,
       };
     case actionTypes.VIDEO_CHANGED:
       return {
         ...state,
-        videoId: maction.payload.videoId,
-        videoData: maction.payload.videoData,
+        videoId: maction.payload.id,
+        videoName: maction.payload.video_name,
       };
     case actionTypes.VIDEO_NAME_CHANGED:
       return {
         ...state,
-        videoName: maction.payload.videoName,
+        videoId: maction.payload.id,
+        videoName: maction.payload.video_name,
       };
     case actionTypes.INVALID_SESSION:
       return initialData;

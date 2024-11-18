@@ -187,6 +187,18 @@ export const getMechanicServicesAction = ({
   };
 };
 
+export const getMechanicServiceAction = ({
+  accessToken,
+  serviceId,
+  callback,
+  ...data
+}: ActionPayload & AccessTokenPayload) => {
+  return {
+    type: actionTypes.GET_MECHANIC_SERVICE,
+    payload: { accessToken, serviceId, callback, ...data },
+  };
+};
+
 export const getVehicleServicesAction = ({
   accessToken,
   VIN,

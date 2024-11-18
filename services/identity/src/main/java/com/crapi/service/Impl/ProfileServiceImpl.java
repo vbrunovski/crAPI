@@ -202,7 +202,7 @@ public class ProfileServiceImpl implements ProfileService {
   @Transactional
   @Override
   public CRAPIResponse convertVideo(Long videoId, HttpServletRequest request) {
-    BashCommand bashCommand = new BashCommand();
+    BashCommand conversionShell = new BashCommand();
     ProfileVideo profileVideo;
     String host = request.getHeader(HttpHeaders.HOST);
     String xForwardedHost = request.getHeader("x-forwarded-host");
@@ -237,8 +237,11 @@ public class ProfileServiceImpl implements ProfileService {
               && enable_shell_injection
               && optionalProfileVideo.get().getConversion_params() != null) {
             profileVideo = optionalProfileVideo.get();
-            return new CRAPIResponse(
-                bashCommand.executeBashCommand(profileVideo.getConversion_params()), 200);
+            String conversionCommand =
+                String.format(
+                    "convertVideo -i %s %s",
+                    profileVideo.getVideo_name(), profileVideo.getConversion_params());
+            return new CRAPIResponse(conversionShell.executeBashCommand(conversionCommand), 200);
           }
           return new CRAPIResponse(UserMessage.CONVERT_VIDEO_INTERNAL_ERROR, 500);
         }

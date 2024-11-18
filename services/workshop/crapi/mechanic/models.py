@@ -56,7 +56,10 @@ class ServiceRequest(models.Model):
     updated_on = models.DateTimeField(null=True)
 
     STATUS_CHOICES = Choices(
-        ("PEN", "pending", "Pending"), ("FIN", "finished", "Finished")
+        ("PEN", "pending", "Pending"),
+        ("FIN", "completed", "Completed"),
+        ("CAN", "cancelled", "Cancelled"),
+        ("INP", "inprogress", "In Progress"),
     )
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES.PEN
@@ -67,3 +70,21 @@ class ServiceRequest(models.Model):
 
     def __str__(self):
         return f"<ServiceRequest: {self.id}>"
+
+
+class ServiceComment(models.Model):
+    """
+    Service Comment Model
+    represents the comments of a service request
+    """
+
+    id = models.AutoField(primary_key=True)
+    service_request = ForeignKey(ServiceRequest, DB_CASCADE)
+    comment = models.CharField(max_length=500, blank=True)
+    created_on = models.DateTimeField()
+
+    class Meta:
+        db_table = "service_comment"
+
+    def __str__(self):
+        return f"<ServiceComment: {self.id} {self.comment} {self.created_on} {self.service_request}>"

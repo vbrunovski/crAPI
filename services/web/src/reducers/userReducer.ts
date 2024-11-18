@@ -103,22 +103,6 @@ const userReducer = (
       return initialData;
     case actionTypes.INVALID_SESSION:
       return initialData;
-    case actionTypes.PROFILE_PIC_CHANGED:
-      return {
-        ...state,
-        picture_url: maction.payload.profilePicUrl,
-      };
-    case actionTypes.VIDEO_CHANGED:
-      return {
-        ...state,
-        video_url: maction.payload.videoUrl,
-        video_id: maction.payload.videoId,
-      };
-    case actionTypes.VIDEO_NAME_CHANGED:
-      return {
-        ...state,
-        video_name: maction.payload.videoName,
-      };
     case actionTypes.BALANCE_CHANGED:
       return {
         ...state,

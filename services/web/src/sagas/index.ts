@@ -19,6 +19,7 @@ import { shopActionWatcher } from "./shopSaga";
 import { profileActionWatcher } from "./profileSaga";
 import { communityActionWatcher } from "./communitySaga";
 import { vehicleActionWatcher } from "./vehicleSaga";
+import { mechanicActionWatcher } from "./mechanicSaga";
 
 /**
  * saga to yield all others
@@ -30,5 +31,6 @@ export default function* rootSaga(): Generator<Effect, void, unknown> {
     profileActionWatcher(),
     communityActionWatcher(),
     vehicleActionWatcher(),
+    mechanicActionWatcher(),
   ]);
 }

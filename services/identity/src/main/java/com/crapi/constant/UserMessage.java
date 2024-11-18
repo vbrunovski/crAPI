@@ -91,7 +91,7 @@ public class UserMessage {
   public static final String CONVERT_VIDEO_INTERNAL_ERROR = "Error occured while executing.";
   public static final String CONVERT_VIDEO_CLOSE_TO_WIN_THE_GAME = "You are very close.";
   public static final String CONVERT_VIDEO_BASH_COMMAND_TRIGGERED =
-      "Video conversion bash command triggered.";
+      "Video conversion command executed.";
   public static final String SORRY_DIDNT_GET_PROFILE =
       "Sorry, Didn't get any profile video name for the user.";
   public static final String THIS_IS_ADMIN_FUNCTION =

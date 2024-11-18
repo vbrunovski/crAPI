@@ -23,6 +23,8 @@ jobs:
       PLATFORMS: "linux/amd64,linux/arm64"
     permissions:
       pull-requests: write # Required to post comments
+      contents: read
+      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -177,6 +179,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: read
+      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

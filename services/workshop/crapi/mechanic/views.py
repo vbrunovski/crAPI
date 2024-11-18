@@ -28,12 +28,15 @@ from utils.jwt import jwt_auth_required
 from utils import messages
 from crapi.user.models import User, Vehicle, UserDetails
 from utils.logging import log_error
-from .models import Mechanic, ServiceRequest
+from .models import Mechanic, ServiceRequest, ServiceComment
 from .serializers import (
     MechanicSerializer,
     MechanicServiceRequestSerializer,
     ReceiveReportSerializer,
     SignUpSerializer,
+    ServiceRequestStatusUpdateSerializer,
+    ServiceCommentCreateSerializer,
+    ServiceCommentViewSerializer,
 )
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -258,7 +261,7 @@ class MechanicServiceRequestsView(APIView, LimitOffsetPagination):
         """
 
         service_requests = ServiceRequest.objects.filter(mechanic__user=user).order_by(
-            "id"
+            "-created_on"
         )
         paginated = self.paginate_queryset(service_requests, request)
         if paginated is None:
@@ -280,3 +283,86 @@ class MechanicServiceRequestsView(APIView, LimitOffsetPagination):
             count=self.get_count(paginated),
         )
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class ServiceCommentView(APIView):
+    """
+    View to add a comment to a service request
+    """
+
+    @jwt_auth_required
+    def post(self, request, user=None, service_request_id=None):
+        """
+        add a comment to a service request
+        """
+        if user.role != User.ROLE_CHOICES.MECH:
+            return Response(
+                {"message": messages.UNAUTHORIZED},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        serializer = ServiceCommentCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            log_error(
+                request.path,
+                request.data,
+                status.HTTP_400_BAD_REQUEST,
+                serializer.errors,
+            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        service_request = ServiceRequest.objects.get(id=service_request_id)
+        service_comment = ServiceComment(
+            comment=serializer.data["comment"],
+            service_request=service_request,
+            created_on=timezone.now(),
+        )
+        service_comment.save()
+        service_request.updated_on = timezone.now()
+        service_request.save()
+        serializer = ServiceCommentViewSerializer(service_comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @jwt_auth_required
+    def get(self, request, user=None, service_request_id=None):
+        """
+        get all comments for a service request
+        """
+        service_request = ServiceRequest.objects.get(id=service_request_id)
+        comments = ServiceComment.objects.filter(service_request=service_request)
+        serializer = ServiceCommentViewSerializer(comments, many=True)
+        response_data = dict(comments=serializer.data)
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+class ServiceRequestView(APIView):
+    """
+    View to update the status of a service request
+    """
+
+    @jwt_auth_required
+    def put(self, request, user=None, service_request_id=None):
+        """
+        update the status of a service request
+        """
+        serializer = ServiceRequestStatusUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            log_error(
+                request.path,
+                request.data,
+                status.HTTP_400_BAD_REQUEST,
+                serializer.errors,
+            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        service_request = ServiceRequest.objects.get(id=service_request_id)
+        service_request.status = request.data["status"]
+        service_request.updated_on = timezone.now()
+        service_request.save()
+        serializer = MechanicServiceRequestSerializer(service_request)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get(self, request, user=None, service_request_id=None):
+        """
+        get a service request
+        """
+        service_request = ServiceRequest.objects.get(id=service_request_id)
+        serializer = MechanicServiceRequestSerializer(service_request)
+        return Response(serializer.data, status=status.HTTP_200_OK)

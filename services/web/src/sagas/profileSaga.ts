@@ -18,13 +18,12 @@ import { APIService, requestURLS } from "../constants/APIConstant";
 import actionTypes from "../constants/actionTypes";
 import responseTypes from "../constants/responseTypes";
 import {
-  PROFILE_PIC_UPDATED,
   PROFILE_PIC_NOT_UPDATED,
-  VIDEO_UPDATED,
   VIDEO_NOT_UPDATED,
   VIDEO_NAME_CHANGED,
   VIDEO_NAME_NOT_CHANGED,
   VIDEO_NOT_CONVERTED,
+  FAILURE_MESSAGE,
 } from "../constants/messages";
 import MyAction from "../types/action";
 
@@ -64,9 +63,9 @@ export function* uploadProfilePic(action: MyAction): Generator<any, void, any> {
     if (recievedResponse.ok) {
       yield put({
         type: actionTypes.PROFILE_PIC_CHANGED,
-        payload: { profilePicData: responseJson.picture },
+        payload: responseJson,
       });
-      callback(responseTypes.SUCCESS, PROFILE_PIC_UPDATED);
+      callback(responseTypes.SUCCESS, responseJson);
     } else {
       callback(responseTypes.FAILURE, responseJson.message);
     }
@@ -107,12 +106,9 @@ export function* uploadVideo(action: MyAction): Generator<any, void, any> {
     if (recievedResponse.ok) {
       yield put({
         type: actionTypes.VIDEO_CHANGED,
-        payload: {
-          videoData: responseJson.profileVideo,
-          videoId: responseJson.id,
-        },
+        payload: responseJson,
       });
-      callback(responseTypes.SUCCESS, VIDEO_UPDATED);
+      callback(responseTypes.SUCCESS, responseJson);
     } else {
       callback(responseTypes.FAILURE, responseJson.message);
     }
@@ -154,9 +150,9 @@ export function* changeVideoName(action: MyAction): Generator<any, void, any> {
     if (recievedResponse.ok) {
       yield put({
         type: actionTypes.VIDEO_NAME_CHANGED,
-        payload: { videoName: responseJson.video_name },
+        payload: responseJson,
       });
-      callback(responseTypes.SUCCESS, VIDEO_NAME_CHANGED);
+      callback(responseTypes.SUCCESS, responseJson);
     } else {
       callback(responseTypes.FAILURE, responseJson.message);
     }
@@ -202,9 +198,46 @@ export function* convertVideo(action: MyAction): Generator<any, void, any> {
   }
 }
 
+export function* getVideo(action: MyAction): Generator<any, void, any> {
+  const { accessToken, videoId, callback } = action.payload;
+  let recievedResponse: ReceivedResponse = {} as ReceivedResponse;
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    const getUrl =
+      APIService.IDENTITY_SERVICE +
+      requestURLS.GET_VIDEO.replace("<videoId>", videoId);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+    const responseJson = yield fetch(getUrl, {
+      headers,
+      method: "GET",
+    }).then((response: Response) => {
+      recievedResponse = response as ReceivedResponse;
+      return response.json();
+    });
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    if (recievedResponse.ok) {
+      yield put({
+        type: actionTypes.VIDEO_CHANGED,
+        payload: responseJson,
+      });
+      callback(responseTypes.SUCCESS, responseJson);
+    } else {
+      callback(responseTypes.FAILURE, FAILURE_MESSAGE);
+    }
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    callback(responseTypes.FAILURE, VIDEO_NOT_CONVERTED);
+  }
+}
+
 export function* profileActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.UPLOAD_PROFILE_PIC, uploadProfilePic);
   yield takeLatest(actionTypes.UPLOAD_VIDEO, uploadVideo);
   yield takeLatest(actionTypes.CHANGE_VIDEO_NAME, changeVideoName);
   yield takeLatest(actionTypes.CONVERT_VIDEO, convertVideo);
+  yield takeLatest(actionTypes.GET_VIDEO, getVideo);
 }

@@ -26,13 +26,17 @@ interface Owner {
 
 interface Vehicle {
   owner: Owner;
+  id: string;
+  vin: string;
 }
 
 interface Service {
   id: string;
   problem_details: string;
   created_on: string;
+  updated_on: string;
   vehicle: Vehicle;
+  status: string;
 }
 
 interface MechanicDashboardProps {
@@ -47,10 +51,15 @@ const MechanicDashboard: React.FC<MechanicDashboardProps> = ({ services }) => {
         {services.map((service) => (
           <Col span={8} key={service.id}>
             <Card hoverable className="dashboard-card">
-              <Meta
-                title={service.problem_details}
-                description={service.created_on}
-              />
+              <Meta title={service.id} description={service.created_on} />
+              <p>
+                Problem Details:
+                {service.problem_details}
+              </p>
+              <p>
+                Vehicle VIN:
+                {service.vehicle.vin}
+              </p>
               <p>
                 Owner email-id:
                 {service.vehicle.owner.email}
@@ -58,6 +67,17 @@ const MechanicDashboard: React.FC<MechanicDashboardProps> = ({ services }) => {
               <p>
                 Owner Phone No.:
                 {service.vehicle.owner.number}
+              </p>
+              <p>
+                Status:
+                {service.status}
+              </p>
+              <p>
+                Updated On:
+                {service.updated_on}
+              </p>
+              <p>
+                <a href={`/mechanic-service?id=${service.id}`}>View Service</a>
               </p>
             </Card>
           </Col>

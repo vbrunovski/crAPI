@@ -21,14 +21,18 @@ from requests.exceptions import MissingSchema, InvalidURL
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from crapi.merchant.serializers import ContactMechanicSerializer
+from crapi.mechanic.serializers import (
+    ServiceCommentViewSerializer,
+    ServiceCommentCreateSerializer,
+)
 from utils.jwt import jwt_auth_required
 from utils import messages
 from rest_framework.pagination import LimitOffsetPagination
 from utils.logging import log_error
 from crapi_site import settings
-from crapi.mechanic.models import ServiceRequest
-from .serializers import UserServiceRequestSerializer
+from crapi.mechanic.models import ServiceRequest, ServiceComment
+from .serializers import ContactMechanicSerializer, UserServiceRequestSerializer
+
 
 logger = logging.getLogger()
 
@@ -122,6 +126,32 @@ class ContactMechanicView(APIView):
             },
             status=mechanic_response_status,
         )
+
+
+class UserServiceCommentView(APIView):
+    """
+    View to add a comment to a service request
+    """
+
+    @jwt_auth_required
+    def get(self, request, user=None, service_request_id=None):
+        """
+        get all comments for a service request
+        """
+        service_request = ServiceRequest.objects.get(id=service_request_id)
+        if not service_request:
+            return Response(
+                {"message": messages.NO_OBJECT_FOUND},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if service_request.vehicle.owner.id != user.id:
+            return Response(
+                {"message": messages.NO_OBJECT_FOUND},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        comments = ServiceComment.objects.filter(service_request=service_request)
+        serializer = ServiceCommentViewSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserServiceRequestsView(APIView, LimitOffsetPagination):
