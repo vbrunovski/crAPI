@@ -13,7 +13,7 @@
 
 
 # Node build
-FROM node:16 AS build
+FROM node:20 AS build
 RUN mkdir /app
 WORKDIR /app
 COPY ./*.json /app/
@@ -25,7 +25,7 @@ RUN NODE_OPTIONS=--max-old-space-size=1536 npm run build
 RUN ls /app/build
 
 # Main Image
-FROM openresty/openresty:1.25.3.1-alpine
+FROM openresty/openresty:alpine
 RUN apk add gettext curl
 # React
 RUN rm /etc/nginx/conf.d/default.conf

@@ -24,14 +24,15 @@ RUN gradle build
 RUN gradle bootJar
 
 # Main Image
-FROM openjdk:17.0-jdk-slim
+FROM eclipse-temurin:17-noble
 # #Java
-RUN apt-get -y update && apt-get -y install curl && apt-get -y clean
-# RUN apt-get -y update && apt-get -y install wget curl unzip && apt-get -y clean
+RUN apt -y update && apt -y install curl && apt -y clean
+# RUN apt -y update && apt -y install wget curl unzip && apt -y clean
 # RUN wget https://www.yourkit.com/download/docker/YourKit-JavaProfiler-2023.9-docker.zip -P /tmp/ && \
 #   unzip /tmp/YourKit-JavaProfiler-2023.9-docker.zip -d /usr/local && \
 #   rm /tmp/YourKit-JavaProfiler-2023.9-docker.zip
 RUN mkdir /app
+WORKDIR /app
 COPY --from=gradlebuild /app/build/libs/identity-service-1.0-SNAPSHOT.jar /app/identity-service-1.0-SNAPSHOT.jar
 
 ARG SERVER_PORT
