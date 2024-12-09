@@ -41,7 +41,7 @@ EXPOSE 10001
 
 ENV JAVA_TOOL_OPTIONS "-Xmx128m"
 
-COPY jwks.json default_jwks.json
+COPY jwks.json /app/default_jwks.json
 COPY entrypoint.sh /entrypoint.sh
 COPY health.sh /app/health.sh
 CMD [ "/entrypoint.sh"]
