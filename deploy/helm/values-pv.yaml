@@ -7,7 +7,7 @@ mongodb:
         app: mongodb
       resources:
         storage: 2Gi
-      hostPath: /mnt/test
+      hostPath: /mnt/mongodb
       accessModes: ReadWriteOnce
     pvc:
       name: mongodb-pv-claim
@@ -26,7 +26,7 @@ postgresdb:
         app: postgresdb
       resources:
         storage: 2Gi
-      hostPath: /mnt/test
+      hostPath: /mnt/postgresdb
     pvc:
       name: postgres-pv-claim
       labels:
