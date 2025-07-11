@@ -163,3 +163,5 @@ To know more about challenges in crAPI. Visit [challenges]
 
 ## Troubleshooting guide for general issues while installing and running crAPI
 If you need any help with installing and running crAPI you can check out this guide: [Troubleshooting guide crAPI](https://github.com/OWASP/crAPI/blob/main/docs/troubleshooting.md). If this doesn't solve your problem, please create an issue in Github Issues.
+
+

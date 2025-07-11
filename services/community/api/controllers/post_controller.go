@@ -17,6 +17,7 @@ package controllers
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -25,14 +26,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//AddNewPost add post in database,
-//@return HTTP Status
-//@params ResponseWriter, Request
-//Server have database connection
+// AddNewPost add post in database,
+// @return HTTP Status
+// @params ResponseWriter, Request
+// Server have database connection
 func (s *Server) AddNewPost(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println("Error closing request body:", err)
+		}
+	}()
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -54,10 +59,10 @@ func (s *Server) AddNewPost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, savedPost)
 }
 
-//GetPostByID fetch the post by ID,
-//@return HTTP Status
-//@params ResponseWriter, Request
-//Server have database connection
+// GetPostByID fetch the post by ID,
+// @return HTTP Status
+// @params ResponseWriter, Request
+// Server have database connection
 func (s *Server) GetPostByID(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -71,9 +76,7 @@ func (s *Server) GetPostByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-
-//GetPost Vulnerabilities
+// GetPost Vulnerabilities
 func (s *Server) GetPost(w http.ResponseWriter, r *http.Request) {
 	//post := models.Post{}
 	limit_param := r.URL.Query().Get("limit")
@@ -107,15 +110,19 @@ func (s *Server) GetPost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, posts)
 }
 
-//Comment will add comment in perticular post,
-//@return HTTP Post Object
-//@params ResponseWriter, Request
-//Server have database connection
+// Comment will add comment in perticular post,
+// @return HTTP Post Object
+// @params ResponseWriter, Request
+// Server have database connection
 func (s *Server) Comment(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println("Error closing request body:", err)
+		}
+	}()
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return

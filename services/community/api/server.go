@@ -59,7 +59,11 @@ func identityServiceHealthCheck() {
 			attempts++
 			continue
 		}
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				log.Println("Error closing response body:", err)
+			}
+		}()
 		if resp.StatusCode != http.StatusOK {
 			log.Printf("Identity service is not healthy: %v", resp.Status)
 			log.Printf("Retrying in 5 seconds...")

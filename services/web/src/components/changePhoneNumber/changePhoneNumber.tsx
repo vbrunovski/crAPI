@@ -17,8 +17,6 @@ import { Card, Steps } from "antd";
 
 import React, { useState } from "react";
 
-import PropTypes from "prop-types";
-
 import newPhoneNumberFormContainer from "../../containers/newPhoneNumberForm/newPhoneNumberForm";
 import otpPhoneChangeFormContainer from "../../containers/otpPhoneChangeForm/otpPhoneChangeForm";
 

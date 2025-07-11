@@ -35,6 +35,8 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v8
+        with:
+          strip_tag_prefix: 'v'
 
       - name: Current branch name
         run: |
@@ -46,7 +48,7 @@ jobs:
         if: steps.branch-name.outputs.is_tag == 'true'
         run: |
           echo "TAG_NAME=${{ steps.branch-name.outputs.tag }}" >> ${GITHUB_ENV}
-          echo "TAG_LATEST=latest" >> ${GITHUB_ENV}
+          echo "TAG_LATEST=${{ steps.branch-name.outputs.tag }}" >> ${GITHUB_ENV}
 
       - name: Running on a branch and merge.
         if: steps.branch-name.outputs.is_tag != 'true' && github.event_name == 'push' && steps.branch-name.outputs.current_branch != 'main'
@@ -95,6 +97,17 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha,scope=workshop-service
           cache-to: type=gha,mode=max,scope=workshop-service
+
+      - name: Build crapi-chatbot image
+        uses: docker/build-push-action@v3
+        with:
+            context: ./services/chatbot
+            tags: crapi/crapi-chatbot:${{ env.TAG_LATEST }},crapi/crapi-chatbot:${{ env.TAG_NAME }}
+            push: false
+            load: true
+            platforms: linux/amd64
+            cache-from: type=gha,scope==chatbot-service
+            cache-to: type=gha,mode=max,scope=chatbot-service
 
       - name: Build crapi-community image
         uses: docker/build-push-action@v3
@@ -190,7 +203,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -201,7 +214,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23'
 
       - name: Start the database
         run: docker compose -f services/docker-database.yml up -d
@@ -219,12 +232,12 @@ jobs:
           go run gotest.tools/gotestsum@latest --format testname --junitfile test-results/unit-tests.xml
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v8.0.0
         with:
           # Require: The version of golangci-lint to use.
           # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
           # When `install-mode` is `goinstall` the value can be v1.2.3, `latest`, or the hash of a commit.
-          version: v1.54
+          version: v2.2.1
           working-directory: services/community
 
 

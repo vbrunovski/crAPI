@@ -37,9 +37,9 @@ COPY --from=gradlebuild /app/build/libs/identity-service-1.0-SNAPSHOT.jar /app/i
 
 ARG SERVER_PORT
 EXPOSE ${SERVER_PORT}
-EXPOSE 10001
+EXPOSE 10001 8080 8989
 
-ENV JAVA_TOOL_OPTIONS "-Xmx128m"
+ENV JAVA_TOOL_OPTIONS="-Xmx128m"
 
 COPY jwks.json /app/default_jwks.json
 COPY entrypoint.sh /entrypoint.sh

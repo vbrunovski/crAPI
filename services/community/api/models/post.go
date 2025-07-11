@@ -28,18 +28,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//Post Field
+// Post Field
 type Post struct {
 	ID        string     `gorm:"primary_key;auto_increment" json:"id"`
 	Title     string     `gorm:"size:255;not null;unique" json:"title"`
 	Content   string     `gorm:"size:255;not null;" json:"content"`
-	Author    Author       `json:"author"`
+	Author    Author     `json:"author"`
 	Comments  []Comments `json:"comments"`
 	AuthorID  uint64     `sql:"type:int REFERENCES users(id)" json:"authorid"`
 	CreatedAt time.Time
 }
 
-//Prepare initialize data
+// Prepare initialize data
 func (post *Post) Prepare() {
 	post.ID = shortuuid.New()
 	post.Title = html.EscapeString(strings.TrimSpace(post.Title))
@@ -51,13 +51,13 @@ func (post *Post) Prepare() {
 }
 
 type PostsResponse struct {
-	Posts []Post `json:"posts"`
+	Posts      []Post `json:"posts"`
 	NextOffset *int64 `json:"next_offset"`
 	PrevOffset *int64 `json:"previous_offset"`
-	Total int `json:"total"`
+	Total      int    `json:"total"`
 }
 
-//Validate data of post
+// Validate data of post
 func (post *Post) Validate() error {
 
 	if post.Title == "" {
@@ -72,7 +72,7 @@ func (post *Post) Validate() error {
 	return nil
 }
 
-//Prepare initialize Field
+// Prepare initialize Field
 func Prepare() Author {
 	var u Author
 	u.Nickname = nickname
@@ -83,7 +83,7 @@ func Prepare() Author {
 	return u
 }
 
-//SavePost persits data into database
+// SavePost persits data into database
 func SavePost(client *mongo.Client, post Post) (Post, error) {
 
 	collection := client.Database("crapi").Collection("post")
@@ -95,7 +95,7 @@ func SavePost(client *mongo.Client, post Post) (Post, error) {
 	return post, err
 }
 
-//GetPostByID fetch post by postId
+// GetPostByID fetch post by postId
 func GetPostByID(client *mongo.Client, ID string) (Post, error) {
 	var post Post
 
@@ -111,10 +111,10 @@ func GetPostByID(client *mongo.Client, ID string) (Post, error) {
 
 }
 
-//FindAllPost return all recent post
+// FindAllPost return all recent post
 func FindAllPost(client *mongo.Client, offset int64, limit int64) (PostsResponse, error) {
 	postList := []Post{}
-	var postsResponse PostsResponse = PostsResponse{}
+	postsResponse := PostsResponse{}
 	options := options.Find()
 	options.SetSort(bson.D{{Key: "_id", Value: -1}})
 	options.SetLimit(limit)
@@ -143,11 +143,11 @@ func FindAllPost(client *mongo.Client, offset int64, limit int64) (PostsResponse
 		log.Println("Error in counting posts: ", err1)
 		return postsResponse, err1
 	}
-	if offset - limit >= 0 {
+	if offset-limit >= 0 {
 		tempOffset := offset - limit
 		postsResponse.PrevOffset = &tempOffset
 	}
-	if offset + limit < count {
+	if offset+limit < count {
 		tempOffset := offset + limit
 		postsResponse.NextOffset = &tempOffset
 	}

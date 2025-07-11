@@ -19,11 +19,13 @@ interface APIServiceType {
   IDENTITY_SERVICE: string;
   WORKSHOP_SERVICE: string;
   COMMUNITY_SERVICE: string;
+  CHATBOT_SERVICE: string;
 }
 
 export const APIService: APIServiceType = {
   IDENTITY_SERVICE: crapienv.IDENTITY_SERVICE,
   WORKSHOP_SERVICE: crapienv.WORKSHOP_SERVICE,
+  CHATBOT_SERVICE: crapienv.CHATBOT_SERVICE,
   COMMUNITY_SERVICE: crapienv.COMMUNITY_SERVICE,
 };
 

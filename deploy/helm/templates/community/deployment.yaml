@@ -35,7 +35,7 @@ spec:
           args:
             - "service"
             - {{ .Values.mongodb.service.name | quote }}
-        - name: wait-for-java
+        - name: wait-for-identity
           image: {{ .Values.waitForK8sResources.image }}
           imagePullPolicy: {{ .Values.waitForK8sResources.imagePullPolicy }}
           args:

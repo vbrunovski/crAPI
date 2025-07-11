@@ -42,6 +42,7 @@ import PostContainer from "../../containers/post/post";
 import VehicleServiceDashboardContainer from "../../containers/vehicleServiceDashboard/vehicleServiceDashboard";
 import ServiceReportContiner from "../../containers/serviceReport/serviceReport";
 import MechanicServiceRequestContainer from "../../containers/mechanicServiceRequest/mechanicServiceRequest";
+import ChatBotComponent from "../bot/Bot";
 import {
   logOutUserAction,
   validateAccessTokenAction,
@@ -447,6 +448,11 @@ const StyledComp: React.FC<PropsFromRedux> = (props) => {
               }
             />
           </Routes>
+          <ChatBotComponent
+            accessToken={props.accessToken}
+            isLoggedIn={props.isLoggedIn}
+            role={props.role}
+          />
         </Content>
       </Layout>
     </Spin>

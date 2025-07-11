@@ -25,12 +25,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-//AddNewCoupon Coupon add coupon in database
-//@params ResponseWriter, Request
-//Server have database connection
+// AddNewCoupon Coupon add coupon in database
+// @params ResponseWriter, Request
+// Server have database connection
 func (s *Server) AddNewCoupon(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println("Error closing request body:", err)
+		}
+	}()
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -52,20 +56,24 @@ func (s *Server) AddNewCoupon(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//ValidateCoupon Coupon check coupon in database, if coupon code is valid it returns
-//@return
-//@params ResponseWriter, Request
-//Server have database connection
+// ValidateCoupon Coupon check coupon in database, if coupon code is valid it returns
+// @return
+// @params ResponseWriter, Request
+// Server have database connection
 func (s *Server) ValidateCoupon(w http.ResponseWriter, r *http.Request) {
 
 	//coupon := models.CouponBody{}
 	var bsonMap bson.M
 
 	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println("Error closing request body:", err)
+		}
+	}()
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
-		log.Println("No payload for ValidateCoupon", body, err)
+		log.Println("No payload for ValidateCoupon", string(body), err)
 		return
 	}
 	err = json.Unmarshal(body, &bsonMap)

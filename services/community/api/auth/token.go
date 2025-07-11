@@ -71,7 +71,11 @@ func ExtractTokenID(r *http.Request, db *gorm.DB) (uint32, error) {
 		log.Println(err)
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Println("Error closing response body:", err)
+		}
+	}()
 
 	tokenValid := resp.StatusCode == 200
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})

@@ -37,6 +37,8 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v8
+        with:
+          strip_tag_prefix: 'v'
 
       - name: Current branch name
         run: |
@@ -48,7 +50,7 @@ jobs:
         if: steps.branch-name.outputs.is_tag == 'true'
         run: |
           echo "TAG_NAME=${{ steps.branch-name.outputs.tag }}" >> ${GITHUB_ENV}
-          echo "TAG_LATEST=latest" >> ${GITHUB_ENV}
+          echo "TAG_LATEST=${{ steps.branch-name.outputs.tag }}" >> ${GITHUB_ENV}
 
       - name: Running on a branch and merge.
         if: steps.branch-name.outputs.is_tag != 'true' && github.event_name == 'push' && steps.branch-name.outputs.current_branch != 'main'
@@ -101,6 +103,16 @@ jobs:
           push: true
           cache-from: type=gha,scope=workshop-service
           cache-to: type=gha,mode=max,scope=workshop-service
+
+      - name: Build crapi-chatbot all platforms and push to Docker Hub
+        uses: docker/build-push-action@v3
+        with:
+            context: ./services/chatbot
+            tags: crapi/crapi-chatbot:${{ env.TAG_LATEST }},crapi/crapi-chatbot:${{ env.TAG_NAME }}
+            platforms: ${{ env.PLATFORMS }}
+            push: true
+            cache-from: type=gha,scope=chatbot-service
+            cache-to: type=gha,mode=max,scope=chatbot-service
 
       - name: Build crapi-community all platforms and push to Docker Hub
         uses: docker/build-push-action@v3

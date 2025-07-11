@@ -20,8 +20,8 @@ COPY ./*.json /app/
 RUN npm install --silent
 COPY ./src /app/src
 COPY ./public /app/public
-COPY ./src/config.ts.template /app/src/config.ts
-RUN NODE_OPTIONS=--max-old-space-size=1536 npm run build
+RUN cp ./src/config.js.template ./src/config.js
+RUN NODE_OPTIONS=--max_old_space_size=4096 npm run build
 RUN ls /app/build
 
 # Main Image

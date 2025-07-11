@@ -43,9 +43,9 @@ public class ManagementControlller {
   /**
    * @param lockAccountForm contains code to unlock the account
    * @param request getting jwt token for user from request header
-   * @return unlock account for the user. first verify token, validate code and then unlock
+   * @return CRAPIResponse with message
    */
-  @PostMapping("/user/lock")
+  @PostMapping("/admin/lockUser")
   public ResponseEntity<CRAPIResponse> lockAccount(
       @RequestBody LockAccountForm lockAccountForm, HttpServletRequest request)
       throws UnsupportedEncodingException {
@@ -53,15 +53,11 @@ public class ManagementControlller {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  /**
-   * @param lockAccountForm contains code to unlock the account
-   * @param request getting jwt token for user from request header
-   * @return unlock account for the user. first verify token, validate code and then unlock
-   */
-  @PostMapping("/admin/apikey")
-  public ResponseEntity<ApiKeyResponse> generateApiKey(HttpServletRequest request)
+  @PostMapping("/user/apikey")
+  public ResponseEntity<ApiKeyResponse> generateApiKey(
+      @RequestBody LoginForm loginForm, HttpServletRequest request)
       throws UnsupportedEncodingException {
-    ApiKeyResponse response = userService.generateApiKey(request);
+    ApiKeyResponse response = userService.generateApiKey(request, loginForm);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }
