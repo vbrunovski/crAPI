@@ -167,17 +167,32 @@ class ActionProvider {
         console.log("Chat response:", res);
         if (err) {
           console.log(err);
-          const errormessage = this.createChatBotMessage(
-            "Failed to get response from chatbot. Please reverify the OpenAI API key.",
-            Math.floor(Math.random() * 65536),
-            {
-              loading: true,
-              terminateLoading: true,
-              role: "assistant",
-            },
-          );
-          this.addMessageToState(errormessage);
-          return;
+          // if status code is 4xx
+          if (err.status >= 400 && err.status < 500) {
+            const errormessage = this.createChatBotMessage(
+              "Failed to get response from chatbot. Please reverify the OpenAI API key.",
+              Math.floor(Math.random() * 65536),
+              {
+                loading: true,
+                terminateLoading: true,
+                role: "assistant",
+              },
+            );
+            this.addMessageToState(errormessage);
+            return;
+          } else {
+            const errormessage = this.createChatBotMessage(
+              "Failed to get response from chatbot service.",
+              Math.floor(Math.random() * 65536),
+              {
+                loading: true,
+                terminateLoading: true,
+                role: "assistant",
+              },
+            );
+            this.addMessageToState(errormessage);
+            return;
+          }
         }
         console.log(res);
         const successmessage = this.createChatBotMessage(

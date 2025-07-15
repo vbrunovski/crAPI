@@ -29,16 +29,24 @@ import Icon, {
   WechatWorkOutlined,
 } from "@ant-design/icons";
 import "./chatbot.css";
+import MarkdownMessage from "./MarkdownMessage";
 
 const superagent = require("superagent");
 
-const PandaSvg = (): JSX.Element => (
-  <svg viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
-    <path
-      d="M437.333,21.355H74.667C33.493,21.355,0,54.848,0,96.021v213.333c0,41.173,33.493,74.667,74.667,74.667h48.256    l-36.821,92.032c-1.771,4.395-0.405,9.429,3.328,12.352c1.92,1.515,4.245,2.283,6.592,2.283c2.176,0,4.352-0.661,6.208-1.984    l146.56-104.683h188.587c41.173,0,74.667-33.493,74.667-74.667V96.021C512,54.848,478.507,21.355,437.333,21.355z"
-      fill="#1890FF"
-    />
-  </svg>
+const BotAvatar = (): JSX.Element => (
+  <div className="bot-avatar">
+    <div className="react-chatbot-kit-chat-bot-avatar">
+      <div className="react-chatbot-kit-chat-bot-avatar-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 512 512"
+          className="react-chatbot-kit-bot-avatar-icon "
+        >
+          <path d="M256 288c79.5 0 144-64.5 144-144S335.5 0 256 0 112 64.5 112 144s64.5 144 144 144zm128 32h-55.1c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16H128C57.3 320 0 377.3 0 448v16c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48v-16c0-70.7-57.3-128-128-128z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
 );
 
 const ChatIcon = ({ size = "26pt" }: { size?: string | number }) => (
@@ -160,13 +168,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
     ...config,
     customComponents: {
       header: headerText,
-      botAvatar: () => (
-        <Icon
-          component={PandaSvg}
-          className="app-chatbot-button-icon"
-          style={{ fontSize: "40", color: "white" }}
-        />
-      ),
+      botAvatar: () => <BotAvatar />,
       customButtons: (
         <button
           className="expand-chatbot-btn"
@@ -177,6 +179,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
           ⤢
         </button>
       ),
+      botChatMessage: (props?: any) => <MarkdownMessage {...props} />,
     },
     state: chatbotState,
   };
