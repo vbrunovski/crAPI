@@ -151,6 +151,7 @@ chatbot:
     postgresDbDriver: postgres
     mongoDbDriver: mongodb
     secretKey: crapi
+    defaultModel: gpt-4o-mini
   deploymentLabels:
     app: crapi-chatbot
   podLabels:

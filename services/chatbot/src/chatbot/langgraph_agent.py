@@ -20,8 +20,6 @@ from langgraph.prebuilt import create_react_agent
 from .extensions import postgresdb
 from .mcp_client import mcp_client
 
-model_name = "gpt-4o-mini"
-
 
 async def get_retriever_tool(api_key):
     embeddings = OpenAIEmbeddings(api_key=api_key)
@@ -48,7 +46,7 @@ async def get_retriever_tool(api_key):
     return retriever_tool
 
 
-async def build_langgraph_agent(api_key):
+async def build_langgraph_agent(api_key, model_name):
     system_prompt = textwrap.dedent(
         """
 You are crAPI Assistant — an expert agent that helps users explore and test the Completely Ridiculous API (crAPI), a vulnerable-by-design application for learning and evaluating modern API security issues.
@@ -86,7 +84,7 @@ Always explain your reasoning briefly and select tools wisely.
 Use the tools only if you don't know the answer.
     """
     )
-    llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
+    llm = ChatOpenAI(api_key=api_key, model=model_name)
     toolkit = SQLDatabaseToolkit(db=postgresdb, llm=llm)
     mcp_tools = await mcp_client.get_tools()
     db_tools = toolkit.get_tools()
@@ -97,8 +95,8 @@ Use the tools only if you don't know the answer.
     return agent_node
 
 
-async def execute_langgraph_agent(api_key, messages, session_id=None):
-    agent = await build_langgraph_agent(api_key)
+async def execute_langgraph_agent(api_key, model_name, messages, session_id=None):
+    agent = await build_langgraph_agent(api_key, model_name)
     print("messages", messages)
     print("Session ID", session_id)
     response = await agent.ainvoke({"messages": messages})

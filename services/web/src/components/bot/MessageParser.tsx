@@ -18,6 +18,7 @@ import request from "superagent";
 interface State {
   initializationRequired?: boolean;
   initializing?: boolean;
+  modelSelection?: boolean;
   accessToken: string;
   chatHistory: ChatMessage[];
 }
@@ -40,6 +41,8 @@ interface ActionProvider {
     chatHistory: ChatMessage[],
   ) => void;
   handleNotInitialized: () => void;
+  handleModelSelection: (initRequired: boolean) => void;
+  handleModelConfirmation: (message: string, accessToken: string) => void;
   handleChat: (message: string, accessToken: string) => void;
 }
 
@@ -107,6 +110,12 @@ class MessageParser {
       return this.actionProvider.handleInitialize(
         this.state.initializationRequired,
       );
+    } else if (message_l === "model" || message_l === "models") {
+      const [initRequired, chatHistory] = await this.initializationRequired();
+      this.state.initializationRequired = initRequired;
+      this.state.chatHistory = chatHistory;
+      console.log("State help:", this.state);
+      return this.actionProvider.handleModelSelection(this.state.initializationRequired);
     } else if (
       message_l === "clear" ||
       message_l === "reset" ||
@@ -121,6 +130,8 @@ class MessageParser {
       );
     } else if (this.state.initializationRequired) {
       return this.actionProvider.handleNotInitialized();
+    } else if (this.state.modelSelection) {
+      return this.actionProvider.handleModelConfirmation(message, this.state.accessToken);
     }
 
     return this.actionProvider.handleChat(message, this.state.accessToken);

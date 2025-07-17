@@ -21,3 +21,4 @@ data:
     MONGO_DB_PASSWORD: {{ .Values.mongodb.config.mongoPassword }}
     MONGO_DB_NAME: {{ .Values.mongodb.config.mongoDbName }}
     CHATBOT_OPENAI_API_KEY: {{ .Values.openAIApiKey }}
+    DEFAULT_MODEL: {{ .Values.chatbot.config.defaultModel | quote }}

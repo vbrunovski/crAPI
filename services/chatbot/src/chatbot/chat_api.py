@@ -1,12 +1,15 @@
 import logging
 from quart import Blueprint, jsonify, request, session
 from uuid import uuid4
+from .config import Config
 from .chat_service import delete_chat_history, get_chat_history, process_user_message
 from .session_service import (
     delete_api_key,
     get_api_key,
+    get_model_name,
     get_or_create_session_id,
     store_api_key,
+    store_model_name,
 )
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/genai")
@@ -34,11 +37,22 @@ async def init():
     await store_api_key(session_id, openai_api_key)
     return jsonify({"message": "Initialized"}), 200
 
+@chat_bp.route("/model", methods=["POST"])
+async def model():
+    session_id = await get_or_create_session_id()
+    data = await request.get_json()
+    model_name = Config.DEFAULT_MODEL_NAME
+    if data and "model_name" in data and data["model_name"]:
+        model_name = data["model_name"]
+    logger.debug("Setting model %s for session %s", model_name, session_id)
+    await store_model_name(session_id, model_name)
+    return jsonify({"model_used": model_name}), 200
 
 @chat_bp.route("/ask", methods=["POST"])
 async def chat():
     session_id = await get_or_create_session_id()
     openai_api_key = await get_api_key(session_id)
+    model_name = await get_model_name(session_id)
     if not openai_api_key:
         return jsonify({"message": "Missing OpenAI API key. Please authenticate."}), 400
     data = await request.get_json()
@@ -46,7 +60,7 @@ async def chat():
     id = data.get("id", uuid4().int & (1 << 63) - 1)
     if not message:
         return jsonify({"message": "Message is required", "id": id}), 400
-    reply, response_id = await process_user_message(session_id, message, openai_api_key)
+    reply, response_id = await process_user_message(session_id, message, openai_api_key, model_name)
     return jsonify({"id": response_id, "message": reply}), 200
 
 

@@ -22,13 +22,13 @@ async def delete_chat_history(session_id):
     await db.chat_sessions.delete_one({"session_id": session_id})
 
 
-async def process_user_message(session_id, user_message, api_key):
+async def process_user_message(session_id, user_message, api_key, model_name):
     history = await get_chat_history(session_id)
     # generate a unique numeric id for the message that is random but unique
     source_message_id = uuid4().int & (1 << 63) - 1
     history.append({"id": source_message_id, "role": "user", "content": user_message})
     # Run LangGraph agent
-    response = await execute_langgraph_agent(api_key, history, session_id)
+    response = await execute_langgraph_agent(api_key, model_name, history, session_id)
     print("Response", response)
     reply: Messages = response.get("messages", [{}])[-1]
     print("Reply", reply.content)

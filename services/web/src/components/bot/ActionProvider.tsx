@@ -141,7 +141,7 @@ class ActionProvider {
         }
         console.log(res);
         const successmessage = this.createChatBotMessage(
-          "Chatbot initialized successfully.",
+          "Chatbot initialized successfully. By default, GPT-4o-mini model is being used. To change chatbot's model, please type model and press enter.",
           Math.floor(Math.random() * 65536),
           {
             loading: true,
@@ -151,6 +151,95 @@ class ActionProvider {
         );
         this.addMessageToState(successmessage);
         this.addInitializedToState();
+      });
+  };
+
+  handleModelSelection = (initRequired: boolean): void => {
+    console.log("Initialization required:", initRequired);
+    if (initRequired) {
+      const message = this.createChatBotMessage(
+        "Chatbot not initialized. To initialize the chatbot, please type init and press enter.",
+        Math.floor(Math.random() * 65536),
+        {
+          loading: true,
+          terminateLoading: true,
+          role: "assistant",
+        },
+      );
+      this.addMessageToState(message);
+    } else {
+      this.addModelSelectionToState();
+      const message = this.createChatBotMessage(
+        `Type one of these available options and press enter:\n\n` +
+        `1. \`gpt-4o\` : GPT-4 Omni (fastest, multimodal, best for general use)\n\n` +
+        `2. \`gpt-4o-mini\` : Lighter version of GPT-4o (efficient for most tasks)\n\n` +
+        `3. \`gpt-4-turbo\` : GPT-4 Turbo (older but solid performance)\n\n` +
+        `4. \`gpt-3.5-turbo\` : GPT-3.5 Turbo (cheaper, good for lightweight tasks)\n\n` +
+        `5. \`gpt-3.5-turbo-16k\` : Like above but with 16k context window\n\n` +
+        `By default, GPT-4o-mini will be used if any invalid option is entered.`,
+        Math.floor(Math.random() * 65536),
+        {
+          loading: true,
+          terminateLoading: true,
+          role: "assistant",
+        },
+      );
+      this.addMessageToState(message);
+    }
+  };
+
+  handleModelConfirmation = (model_name: string | null, accessToken: string): void => {
+    const validModels: Record<string, string> = {
+      "1": "gpt-4o",
+      "2": "gpt-4o-mini",
+      "3": "gpt-4-turbo",
+      "4": "gpt-3.5-turbo",
+      "5": "gpt-3.5-turbo-16k",
+      "gpt-4o": "gpt-4o",
+      "gpt-4o-mini": "gpt-4o-mini",
+      "gpt-4-turbo": "gpt-4-turbo",
+      "gpt-3.5-turbo": "gpt-3.5-turbo",
+      "gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k"
+    };
+    const selectedModel = model_name?.trim();
+    const modelToUse = selectedModel && validModels[selectedModel] ? validModels[selectedModel] : null;
+
+    const modelUrl = APIService.CHATBOT_SERVICE + "genai/model";
+    superagent
+      .post(modelUrl)
+      .send({ model_name: modelToUse })
+      .set("Accept", "application/json")
+      .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .end((err, res) => {
+        if (err) {
+          console.log(err);
+          const errormessage = this.createChatBotMessage(
+            "Failed to set model. Please try again.",
+            Math.floor(Math.random() * 65536),
+            {
+              loading: true,
+              terminateLoading: true,
+              role: "assistant",
+            },
+          );
+          this.addMessageToState(errormessage);
+          return;
+        }
+
+        console.log(res);
+        const currentModel = res.body?.model_used || modelToUse;
+        const successmessage = this.createChatBotMessage(
+          `Model has been successfully set to ${currentModel}. You can now start chatting.`,
+          Math.floor(Math.random() * 65536),
+          {
+            loading: true,
+            terminateLoading: true,
+            role: "assistant",
+          },
+        );
+        this.addMessageToState(successmessage);
+        this.addModelConfirmationToState();
       });
   };
 
@@ -223,7 +312,7 @@ class ActionProvider {
       this.addMessageToState(message);
     } else {
       const message = this.createChatBotMessage(
-        "Chat with the bot and exploit it.",
+        "Chat with the bot and exploit it. To change chatbot's model, please type model and press enter.",
         Math.floor(Math.random() * 65536),
         {
           loading: true,
@@ -300,6 +389,20 @@ class ActionProvider {
       ...state,
       initializing: false,
       initializationRequired: false,
+    }));
+  };
+
+  addModelSelectionToState = (): void => {
+    this.setState((state) => ({
+      ...state,
+      modelSelection: true,
+    }));
+  };
+
+  addModelConfirmationToState = (): void => {
+    this.setState((state) => ({
+      ...state,
+      modelSelection: false,
     }));
   };
 
