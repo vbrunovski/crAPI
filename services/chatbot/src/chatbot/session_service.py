@@ -57,3 +57,9 @@ async def get_model_name(session_id):
     if "model_name" not in doc:
         return Config.DEFAULT_MODEL_NAME
     return doc["model_name"]
+
+async def get_user_jwt() -> str | None:
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        return auth.replace("Bearer ", "")
+    return None

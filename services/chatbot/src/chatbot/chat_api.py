@@ -10,6 +10,7 @@ from .session_service import (
     get_or_create_session_id,
     store_api_key,
     store_model_name,
+    get_user_jwt
 )
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/genai")
@@ -53,6 +54,7 @@ async def chat():
     session_id = await get_or_create_session_id()
     openai_api_key = await get_api_key(session_id)
     model_name = await get_model_name(session_id)
+    user_jwt = await get_user_jwt()
     if not openai_api_key:
         return jsonify({"message": "Missing OpenAI API key. Please authenticate."}), 400
     data = await request.get_json()
@@ -60,7 +62,7 @@ async def chat():
     id = data.get("id", uuid4().int & (1 << 63) - 1)
     if not message:
         return jsonify({"message": "Message is required", "id": id}), 400
-    reply, response_id = await process_user_message(session_id, message, openai_api_key, model_name)
+    reply, response_id = await process_user_message(session_id, message, openai_api_key, model_name, user_jwt)
     return jsonify({"id": response_id, "message": reply}), 200
 
 
