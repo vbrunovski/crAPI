@@ -115,7 +115,9 @@ class MessageParser {
       this.state.initializationRequired = initRequired;
       this.state.chatHistory = chatHistory;
       console.log("State help:", this.state);
-      return this.actionProvider.handleModelSelection(this.state.initializationRequired);
+      return this.actionProvider.handleModelSelection(
+        this.state.initializationRequired,
+      );
     } else if (
       message_l === "clear" ||
       message_l === "reset" ||
@@ -131,7 +133,10 @@ class MessageParser {
     } else if (this.state.initializationRequired) {
       return this.actionProvider.handleNotInitialized();
     } else if (this.state.modelSelection) {
-      return this.actionProvider.handleModelConfirmation(message, this.state.accessToken);
+      return this.actionProvider.handleModelConfirmation(
+        message,
+        this.state.accessToken,
+      );
     }
 
     return this.actionProvider.handleChat(message, this.state.accessToken);

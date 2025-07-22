@@ -171,12 +171,12 @@ class ActionProvider {
       this.addModelSelectionToState();
       const message = this.createChatBotMessage(
         `Type one of these available options and press enter:\n\n` +
-        `1. \`gpt-4o\` : GPT-4 Omni (fastest, multimodal, best for general use)\n\n` +
-        `2. \`gpt-4o-mini\` : Lighter version of GPT-4o (efficient for most tasks)\n\n` +
-        `3. \`gpt-4-turbo\` : GPT-4 Turbo (older but solid performance)\n\n` +
-        `4. \`gpt-3.5-turbo\` : GPT-3.5 Turbo (cheaper, good for lightweight tasks)\n\n` +
-        `5. \`gpt-3.5-turbo-16k\` : Like above but with 16k context window\n\n` +
-        `By default, GPT-4o-mini will be used if any invalid option is entered.`,
+          `1. \`gpt-4o\` : GPT-4 Omni (fastest, multimodal, best for general use)\n\n` +
+          `2. \`gpt-4o-mini\` : Lighter version of GPT-4o (efficient for most tasks)\n\n` +
+          `3. \`gpt-4-turbo\` : GPT-4 Turbo (older but solid performance)\n\n` +
+          `4. \`gpt-3.5-turbo\` : GPT-3.5 Turbo (cheaper, good for lightweight tasks)\n\n` +
+          `5. \`gpt-3.5-turbo-16k\` : Like above but with 16k context window\n\n` +
+          `By default, GPT-4o-mini will be used if any invalid option is entered.`,
         Math.floor(Math.random() * 65536),
         {
           loading: true,
@@ -188,7 +188,10 @@ class ActionProvider {
     }
   };
 
-  handleModelConfirmation = (model_name: string | null, accessToken: string): void => {
+  handleModelConfirmation = (
+    model_name: string | null,
+    accessToken: string,
+  ): void => {
     const validModels: Record<string, string> = {
       "1": "gpt-4o",
       "2": "gpt-4o-mini",
@@ -199,10 +202,13 @@ class ActionProvider {
       "gpt-4o-mini": "gpt-4o-mini",
       "gpt-4-turbo": "gpt-4-turbo",
       "gpt-3.5-turbo": "gpt-3.5-turbo",
-      "gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k"
+      "gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k",
     };
     const selectedModel = model_name?.trim();
-    const modelToUse = selectedModel && validModels[selectedModel] ? validModels[selectedModel] : null;
+    const modelToUse =
+      selectedModel && validModels[selectedModel]
+        ? validModels[selectedModel]
+        : null;
 
     const modelUrl = APIService.CHATBOT_SERVICE + "genai/model";
     superagent
