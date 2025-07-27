@@ -22,3 +22,4 @@ data:
     MONGO_DB_NAME: {{ .Values.mongodb.config.mongoDbName }}
     CHATBOT_OPENAI_API_KEY: {{ .Values.openAIApiKey }}
     DEFAULT_MODEL: {{ .Values.chatbot.config.defaultModel | quote }}
+    CHROMA_PERSIST_DIRECTORY: {{ .Values.chatbot.config.chromaPersistDirectory | quote }}

@@ -152,6 +152,24 @@ chatbot:
     mongoDbDriver: mongodb
     secretKey: crapi
     defaultModel: gpt-4o-mini
+    chromaPersistDirectory: /app/vectorstore
+  storage:
+    # type: "manual"
+    # pv:
+    #   name: chatbot-vectors-pv
+    #   labels:
+    #     app: crapi-chatbot
+    #   resources:
+    #     storage: 1Gi
+    #   hostPath: /mnt/vectorstore
+    type: "default"
+    pvc:
+      name: chatbot-vectors-pv-claim
+      labels:
+        app: crapi-chatbot
+      resources:
+        requests:
+          storage: 1Gi
   deploymentLabels:
     app: crapi-chatbot
   podLabels:

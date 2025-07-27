@@ -167,7 +167,10 @@ services:
       - MONGO_DB_PASSWORD=crapisecretpassword
       - MONGO_DB_NAME=crapi
       - DEFAULT_MODEL=gpt-4o-mini
+      - CHROMA_PERSIST_DIRECTORY=/app/vectorstore
       # - CHATBOT_OPENAI_API_KEY=
+    volumes:
+      - chatbot-vectors:/app/vectorstore
     depends_on:
       mongodb:
         condition: service_healthy
@@ -295,3 +298,4 @@ services:
 volumes:
   mongodb-data:
   postgresql-data:
+  chatbot-vectors:

@@ -35,3 +35,22 @@ postgresdb:
       resources:
         requests:
           storage: 2Gi
+
+chatbot:
+  storage:
+    type: "manual"
+    pv:
+      name: chatbot-vectors-pv
+      labels:
+        app: crapi-chatbot
+      resources:
+        storage: 1Gi
+      hostPath: /mnt/vectorstore
+    type: "default"
+    pvc:
+      name: chatbot-vectors-pv-claim
+      labels:
+        app: crapi-chatbot
+      resources:
+        requests:
+          storage: 1Gi
