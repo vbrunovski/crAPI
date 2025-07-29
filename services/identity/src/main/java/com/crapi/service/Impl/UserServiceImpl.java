@@ -25,7 +25,6 @@ import com.crapi.exception.EntityNotFoundException;
 import com.crapi.model.*;
 import com.crapi.repository.*;
 import com.crapi.service.UserService;
-import com.crapi.utils.ApiKeyGenerator;
 import com.crapi.utils.EmailTokenGenerator;
 import com.crapi.utils.MailBody;
 import com.crapi.utils.OTPGenerator;
@@ -469,19 +468,17 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public ApiKeyResponse generateApiKey(HttpServletRequest request, LoginForm loginForm) {
-    // if user is unauthenticated, use loginForm else user token to authenticate
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
+    if (authentication == null) {
+      return new ApiKeyResponse(null, UserMessage.INVALID_CREDENTIALS);
+    }
+    log.info("Generate Api Key for user: {}", loginForm.getEmail());
     User user;
     if (request == null || jwtAuthTokenFilter.getToken(request) == null) {
       user = userRepository.findByEmail(loginForm.getEmail());
     } else {
-      log.info("Generate Api Key for user: {}", loginForm.getEmail());
-      Authentication authentication =
-          authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(
-                  loginForm.getEmail(), loginForm.getPassword()));
-      if (authentication == null) {
-        return new ApiKeyResponse(null, UserMessage.INVALID_CREDENTIALS);
-      }
       user = getUserFromToken(request);
     }
     if (user == null) {
@@ -493,11 +490,13 @@ public class UserServiceImpl implements UserService {
       log.debug("Api Key already generated for user: {}", user.getEmail());
       return new ApiKeyResponse(user.getApiKey());
     }
-    log.info("Generate Api Key for user in token: {}", user.getEmail());
-    String apiKey = ApiKeyGenerator.generateRandom(512);
-    log.debug("Api Key for user in token {}: {}", user.getEmail(), apiKey);
+    String apiKey = jwtProvider.generateApiKey(user);
+    log.debug("Api Key for user {}: {}", user.getEmail(), apiKey);
+    if (apiKey == null) {
+      return new ApiKeyResponse(null, UserMessage.API_KEY_GENERATION_FAILED);
+    }
     user.setApiKey(apiKey);
-    userRepository.save(user);
+    userRepository.saveAndFlush(user);
     return new ApiKeyResponse(user.getApiKey(), UserMessage.API_KEY_GENERATED_MESSAGE);
   }
 

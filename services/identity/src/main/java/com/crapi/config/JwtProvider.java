@@ -103,27 +103,27 @@ public class JwtProvider {
   }
 
   /**
-   * @param token
-   * @return username from JWT Token
+   * @param user
+   * @return generated apikey token without expiry date
    */
-  public String getUserNameFromJwtToken(String token) throws ParseException {
-    // Parse without verifying token signature
-    return JWTParser.parse(token).getJWTClaimsSet().getSubject();
+  public String generateApiKey(User user) {
+    JwtBuilder builder =
+        Jwts.builder()
+            .subject(user.getEmail())
+            .issuedAt(new Date())
+            .claim("role", user.getRole().getName())
+            .signWith(this.keyPair.getPrivate());
+    String jwt = builder.compact();
+    return jwt;
   }
 
   /**
    * @param token
    * @return username from JWT Token
    */
-  public String getUserNameFromApiToken(String token) throws ParseException {
+  public String getUserNameFromJwtToken(String token) throws ParseException {
     // Parse without verifying token signature
-    if (token != null) {
-      User user = userRepository.findByApiKey(token);
-      if (user != null) {
-        return user.getEmail();
-      }
-    }
-    return null;
+    return JWTParser.parse(token).getJWTClaimsSet().getSubject();
   }
 
   // Load RSA Public Key for JKU header if present

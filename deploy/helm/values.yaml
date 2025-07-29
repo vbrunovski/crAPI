@@ -153,6 +153,9 @@ chatbot:
     secretKey: crapi
     defaultModel: gpt-4o-mini
     chromaPersistDirectory: /app/vectorstore
+    apiUser: admin@example.com
+    apiPassword: Admin!123
+    openapiSpec: /app/resources/crapi-openapi-spec.json
   storage:
     # type: "manual"
     # pv:

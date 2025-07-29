@@ -121,7 +121,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     if (token != null) {
       if (apiType == ApiType.APIKEY) {
         log.debug("Token is api token");
-        username = tokenProvider.getUserNameFromApiToken(token);
+        username = tokenProvider.getUserNameFromJwtToken(token);
       } else {
         log.debug("Token is jwt token");
         if (tokenProvider.validateJwtToken(token)) {

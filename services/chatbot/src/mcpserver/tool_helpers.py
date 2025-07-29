@@ -3,11 +3,9 @@ from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.prompts import PromptTemplate
 from chatbot.extensions import db
-from chatbot.config import Config
+from .config import Config
 from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
-
-retrieval_index_path = "/app/resources/chat_index"
 
 async def get_any_api_key():
     if os.environ.get("CHATBOT_OPENAI_API_KEY"):
