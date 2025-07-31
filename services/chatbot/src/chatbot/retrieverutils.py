@@ -32,7 +32,7 @@ from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 
 
 async def get_chroma_collection(api_key):
-    chroma_client = chromadb.AsyncHttpClient(
+    chroma_client = await chromadb.AsyncHttpClient(
         host=Config.CHROMA_HOST,
         port=Config.CHROMA_PORT,
         ssl=False,
@@ -42,7 +42,7 @@ async def get_chroma_collection(api_key):
         database=DEFAULT_DATABASE,
     )
 
-    collection = chroma_client.get_or_create_collection(
+    collection = await chroma_client.get_or_create_collection(
         name="chats",
         embedding_function=OpenAIEmbeddingFunction(
             api_key=api_key,
@@ -54,7 +54,7 @@ async def get_chroma_collection(api_key):
 
 async def add_to_chroma_collection(api_key, session_id, new_messages):
     collection = await get_chroma_collection(api_key)
-    collection.add(
+    res = await collection.add(
         documents=[
             {"content": content, "metadata": {"session_id": session_id, "role": role}}
             for role, content in new_messages.items()
