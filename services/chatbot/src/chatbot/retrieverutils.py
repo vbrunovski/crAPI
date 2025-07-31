@@ -62,9 +62,7 @@ def get_chroma_vectorstore(api_key):
     return vectorstore
 
 
-def add_to_chroma_collection(
-    api_key, session_id, new_messages: dict[str, str]
-) -> list:
+def add_to_chroma_collection(api_key, session_id, new_messages: dict[str, str]) -> list:
     vectorstore = get_chroma_vectorstore(api_key)
     res: list = vectorstore.add_documents(
         documents=[
@@ -75,7 +73,7 @@ def add_to_chroma_collection(
     return res
 
 
-async def get_retriever_tool(api_key):
+def get_retriever_tool(api_key):
     vectorstore = get_chroma_vectorstore(api_key)
     retriever = vectorstore.as_retriever()
     retriever_tool = create_retriever_tool(

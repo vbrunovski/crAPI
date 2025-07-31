@@ -69,7 +69,7 @@ Use the tools only if you don't know the answer.
     mcp_tools = await mcp_client.get_tools()
     db_tools = toolkit.get_tools()
     tools = mcp_tools + db_tools
-    retriever_tool = await get_retriever_tool(api_key)
+    retriever_tool = get_retriever_tool(api_key)
     tools.append(retriever_tool)
     agent_node = create_react_agent(model=llm, tools=tools, prompt=system_prompt)
     return agent_node
