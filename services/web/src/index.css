@@ -142,10 +142,60 @@ code {
               transform var(--transition-normal);
 }
 
+/* Container width constraints for all screens */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+}
+
+.container-narrow {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+}
+
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+}
+
 /* Responsive Design Breakpoints */
+@media (max-width: 1440px) {
+  .layout-content {
+    max-width: 1000px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .layout-content {
+    max-width: 900px;
+  }
+  
+  .container {
+    max-width: 900px;
+  }
+  
+  .container-wide {
+    max-width: 1000px;
+  }
+}
+
 @media (max-width: 768px) {
   .layout-content {
-    padding: var(--spacing-sm) var(--spacing-sm) !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    max-width: 100%;
+  }
+  
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding: 0 var(--spacing-md);
+    max-width: 100%;
   }
   
   .form-card {
@@ -171,7 +221,7 @@ code {
 
 @media (max-width: 480px) {
   .layout-content {
-    padding: var(--spacing-sm) var(--spacing-sm) !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
   }
   
   .form-card {

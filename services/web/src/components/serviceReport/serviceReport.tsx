@@ -14,9 +14,29 @@
  */
 
 import React from "react";
-import { Card, Row, Col, Descriptions, Spin, Layout, Timeline } from "antd";
+import {
+  Card,
+  Row,
+  Col,
+  Descriptions,
+  Spin,
+  Layout,
+  Timeline,
+  Typography,
+} from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 import { Content } from "antd/es/layout/layout";
+import {
+  FileTextOutlined,
+  UserOutlined,
+  CarOutlined,
+  ToolOutlined,
+  CommentOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons";
+import "./styles.css";
+
+const { Title, Text } = Typography;
 
 interface Owner {
   email: string;
@@ -55,122 +75,165 @@ const ServiceReport: React.FC<ServiceReportProps> = ({ service }) => {
   if (!service) {
     console.log("Service is undefined");
     return (
-      <Content>
-        <Spin
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
-        />
-      </Content>
+      <div className="loading-container">
+        <Spin size="large" />
+      </div>
     );
   }
 
+  const getStatusBadge = (status: string) => {
+    const statusClass = status.toLowerCase().replace(/\s+/g, "-");
+    return <div className={`report-status ${statusClass}`}>{status}</div>;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
-    <Layout className="page-container">
-      <PageHeader
-        title={`Service Report: ${service.vehicle.vin} ${service.status}`}
-        subTitle={service.created_on}
-        className="service-report-header"
-        style={{ width: "80%", margin: "auto" }}
-      />
-      <Card
-        className="service-report-card"
-        style={{ margin: "auto", width: "80%" }}
-      >
-        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          <Col>
-            <Card title="Report Details" className="info-card">
-              <Descriptions column={1}>
-                <Descriptions.Item label="Report ID">
-                  {service.id}
-                </Descriptions.Item>
-                <Descriptions.Item label="Report Status">
-                  {service.status}
-                </Descriptions.Item>
-                <Descriptions.Item label="Created On">
-                  {service.created_on}
-                </Descriptions.Item>
-                <Descriptions.Item
-                  label="Problem Details"
-                  style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                >
-                  {service.problem_details}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-      </Card>
-      <Card
-        className="service-report-comments"
-        style={{ margin: "auto", width: "80%" }}
-      >
-        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          <Col>
-            <Card title="Comments" className="comments-card">
-              <Descriptions
-                title="Comments"
-                column={1}
-                style={{ width: "500px" }}
-              >
-                <Descriptions.Item label="Comments">
-                  <Timeline
-                    mode="left"
-                    style={{ marginTop: "16px" }}
-                    items={service?.comments.map((comment, index) => ({
-                      label: comment.created_on,
-                      children: comment.comment,
-                      color: index === 0 ? "green" : "gray",
-                    }))}
-                  ></Timeline>
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          <Col>
-            <Card title="Assigned Mechanic" className="info-card">
-              <Descriptions column={1}>
-                <Descriptions.Item label="Mechanic Code">
-                  {service.mechanic.mechanic_code}
-                </Descriptions.Item>
-                <Descriptions.Item label="Mechanic Email">
-                  {service.mechanic.user.email}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          <Col>
-            <Card title="Vehicle Information" className="info-card">
-              <Descriptions column={1}>
-                <Descriptions.Item label="VIN">
+    <Layout className="page-container service-report-page">
+      <div className="service-report-header">
+        <PageHeader
+          title={
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FileTextOutlined
+                style={{ fontSize: "24px", color: "#8b5cf6" }}
+              />
+              <Title level={2} style={{ margin: 0, color: "#1f2937" }}>
+                Service Report
+              </Title>
+            </div>
+          }
+          subTitle={
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+            >
+              <Text style={{ fontSize: "16px", color: "#6b7280" }}>
+                Vehicle VIN:{" "}
+                <Text strong style={{ color: "#8b5cf6" }}>
                   {service.vehicle.vin}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          <Col>
-            <Card title="Owner Information" className="info-card">
-              <Descriptions column={1}>
-                <Descriptions.Item label="Email">
-                  {service.vehicle.owner.email}
-                </Descriptions.Item>
-                <Descriptions.Item label="Phone">
-                  {service.vehicle.owner.number}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-      </Card>
+                </Text>
+              </Text>
+              <Text style={{ fontSize: "14px", color: "#9ca3af" }}>
+                <CalendarOutlined style={{ marginRight: "4px" }} />
+                {formatDate(service.created_on)}
+              </Text>
+            </div>
+          }
+        />
+      </div>
+
+      <div className="report-grid">
+        {/* Main Report Details */}
+        <div>
+          <Card className="service-report-card">
+            {getStatusBadge(service.status)}
+
+            <div className="section-title">
+              <FileTextOutlined style={{ color: "#8b5cf6" }} />
+              Report Details
+            </div>
+
+            <Descriptions column={1} size="middle">
+              <Descriptions.Item label="Report ID">
+                {service.id}
+              </Descriptions.Item>
+              <Descriptions.Item label="Service Status">
+                {service.status}
+              </Descriptions.Item>
+              <Descriptions.Item label="Created On">
+                {formatDate(service.created_on)}
+              </Descriptions.Item>
+              <Descriptions.Item
+                label="Problem Details"
+                style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+              >
+                {service.problem_details}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+
+          {/* Comments Section */}
+          <Card className="comments-card">
+            <div className="section-title">
+              <CommentOutlined style={{ color: "#8b5cf6" }} />
+              Service Comments
+            </div>
+
+            {service.comments && service.comments.length > 0 ? (
+              <Timeline
+                mode="left"
+                items={service.comments.map((comment, index) => ({
+                  label: formatDate(comment.created_on),
+                  children: comment.comment,
+                  color: index === 0 ? "#8b5cf6" : "#6b7280",
+                }))}
+              />
+            ) : (
+              <Text style={{ color: "#9ca3af", fontStyle: "italic" }}>
+                No comments available for this service.
+              </Text>
+            )}
+          </Card>
+        </div>
+
+        {/* Sidebar Information */}
+        <div>
+          {/* Assigned Mechanic */}
+          <Card className="info-card">
+            <div className="section-title">
+              <ToolOutlined style={{ color: "#8b5cf6" }} />
+              Assigned Mechanic
+            </div>
+
+            <Descriptions column={1} size="middle">
+              <Descriptions.Item label="Mechanic Code">
+                {service.mechanic.mechanic_code}
+              </Descriptions.Item>
+              <Descriptions.Item label="Mechanic Email">
+                {service.mechanic.user.email}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+
+          {/* Vehicle Information */}
+          <Card className="info-card">
+            <div className="section-title">
+              <CarOutlined style={{ color: "#8b5cf6" }} />
+              Vehicle Information
+            </div>
+
+            <Descriptions column={1} size="middle">
+              <Descriptions.Item label="Vehicle VIN">
+                {service.vehicle.vin}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+
+          {/* Owner Information */}
+          <Card className="info-card">
+            <div className="section-title">
+              <UserOutlined style={{ color: "#8b5cf6" }} />
+              Owner Information
+            </div>
+
+            <Descriptions column={1} size="middle">
+              <Descriptions.Item label="Owner Email">
+                {service.vehicle.owner.email}
+              </Descriptions.Item>
+              <Descriptions.Item label="Owner Phone">
+                {service.vehicle.owner.number}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </div>
+      </div>
     </Layout>
   );
 };

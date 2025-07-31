@@ -1,9 +1,11 @@
 .layout-content {
-  padding: var(--spacing-sm) var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-xxl);
   background: var(--bg-layout);
   min-height: calc(100vh - 56px);
   position: relative;
-  min-width: 50vw;
+  min-width: 1276px;
+  max-width: 1276px;
+  margin: 0 auto;
 }
 
 .layout-content::before {
@@ -42,6 +44,9 @@ body > iframe {
 .page-container {
   background: transparent;
   padding: var(--spacing-lg) 0;
+  max-width: 1276px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .page-container .ant-page-header-heading-title {

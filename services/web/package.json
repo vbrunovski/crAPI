@@ -1,7 +1,7 @@
 {
   "name": "crapi-web",
   "version": "0.1.0",
-  "proxy": "http://localhost:8888",
+  "proxy": "https://crapi.allvapps.com",
   "private": true,
   "dependencies": {
     "@ant-design/cssinjs": "^1.21.1",
