@@ -17,7 +17,7 @@ from langgraph.graph import MessageGraph, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
-
+from langchain_chroma import Chroma as ChromaClient
 
 from .extensions import postgresdb
 from .config import Config
@@ -31,8 +31,8 @@ from .config import Config
 from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 
 
-async def get_chroma_collection(api_key):
-    chroma_client = await chromadb.AsyncHttpClient(
+async def get_chroma_client():
+    chroma_client = chromadb.HttpClient(
         host=Config.CHROMA_HOST,
         port=Config.CHROMA_PORT,
         ssl=False,
@@ -41,30 +41,43 @@ async def get_chroma_collection(api_key):
         tenant=DEFAULT_TENANT,
         database=DEFAULT_DATABASE,
     )
+    return chroma_client
 
-    collection = await chroma_client.get_or_create_collection(
-        name="chats",
-        embedding_function=OpenAIEmbeddingFunction(
-            api_key=api_key,
-            model_name="text-embedding-3-large",
-        ),
+
+def get_embedding_function(api_key):
+    return OpenAIEmbeddingFunction(
+        api_key=api_key,
+        model_name="text-embedding-3-large",
     )
-    return collection
 
 
-async def add_to_chroma_collection(api_key, session_id, new_messages):
-    collection = await get_chroma_collection(api_key)
-    res = await collection.add(
+def get_chroma_vectorstore(api_key):
+    chroma_client = get_chroma_client()
+    vectorstore = ChromaClient(
+        client=chroma_client,
+        collection_name="chats",
+        create_collection_if_not_exists=True,
+        embedding_function=get_embedding_function(api_key),
+    )
+    return vectorstore
+
+
+def add_to_chroma_collection(
+    api_key, session_id, new_messages: dict[str, str]
+) -> list:
+    vectorstore = get_chroma_vectorstore(api_key)
+    res: list = vectorstore.add_documents(
         documents=[
             {"content": content, "metadata": {"session_id": session_id, "role": role}}
             for role, content in new_messages.items()
         ]
     )
+    return res
 
 
 async def get_retriever_tool(api_key):
-    collection = await get_chroma_collection(api_key)
-    retriever = collection.as_retriever()
+    vectorstore = get_chroma_vectorstore(api_key)
+    retriever = vectorstore.as_retriever()
     retriever_tool = create_retriever_tool(
         retriever,
         name="chat_rag",

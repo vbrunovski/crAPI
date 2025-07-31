@@ -37,7 +37,7 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     history.append(
         {"id": response_message_id, "role": "assistant", "content": reply.content}
     )
-    await add_to_chroma_collection(
+    res = add_to_chroma_collection(
         api_key, session_id, [{"user": user_message}, {"assistant": reply.content}]
     )
     # Limit chat history to last 20 messages
