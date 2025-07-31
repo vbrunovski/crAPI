@@ -39,6 +39,12 @@ spec:
           args:
             - "service"
             - {{ .Values.identity.service.name | quote }}
+        - name: wait-for-chromadb
+          image: {{ .Values.waitForK8sResources.image }}
+          imagePullPolicy: {{ .Values.waitForK8sResources.imagePullPolicy }}
+          args:
+            - "service"
+            - {{ .Values.chromadb.service.name | quote }}
       containers:
         - name: {{ .Values.chatbot.name }}
           image: {{ .Values.chatbot.image }}:{{ .Chart.AppVersion }}

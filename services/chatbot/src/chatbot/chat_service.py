@@ -1,6 +1,6 @@
 from uuid import uuid4
 from langgraph.graph.message import Messages
-from services.chatbot.src.chatbot.retrieverutils import add_to_chroma_collection
+from .retrieverutils import add_to_chroma_collection
 from .extensions import db
 from .langgraph_agent import execute_langgraph_agent
 
