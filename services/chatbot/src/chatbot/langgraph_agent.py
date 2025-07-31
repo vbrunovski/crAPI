@@ -16,34 +16,13 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import MessageGraph, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
+from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
+
 
 from .extensions import postgresdb
+from .config import Config
 from .mcp_client import get_mcp_client
-
-
-async def get_retriever_tool(api_key):
-    embeddings = OpenAIEmbeddings(api_key=api_key)
-    if os.path.exists("faiss_index"):
-        vectorstore = FAISS.load_local(
-            "faiss_index", embeddings, allow_dangerous_deserialization=True
-        )
-    else:
-        retrival_dir = os.path.join(os.path.dirname(__file__), "../../retrieval")
-        loader = DirectoryLoader(retrival_dir)  # or PDF, Markdown, etc.
-        docs = loader.load()
-        vectorstore = FAISS.from_documents(docs, embeddings)
-        vectorstore.save_local("faiss_index")
-    retriever = vectorstore.as_retriever(
-        search_type="similarity", search_kwargs={"k": 3}
-    )
-
-    # ✅ Create RAG tool
-    retriever_tool = create_retriever_tool(
-        retriever,
-        name="crapi_rag",
-        description="Use this to answer questions about crAPI, its endpoints, flows, vulnerabilities, and APIs.",
-    )
-    return retriever_tool
+import chromadb
 
 
 async def build_langgraph_agent(api_key, model_name, user_jwt):
@@ -90,13 +69,15 @@ Use the tools only if you don't know the answer.
     mcp_tools = await mcp_client.get_tools()
     db_tools = toolkit.get_tools()
     tools = mcp_tools + db_tools
-    # retriever_tool = await get_retriever_tool(api_key)
-    # tools.append(retriever_tool)
+    retriever_tool = await get_retriever_tool(api_key)
+    tools.append(retriever_tool)
     agent_node = create_react_agent(model=llm, tools=tools, prompt=system_prompt)
     return agent_node
 
 
-async def execute_langgraph_agent(api_key, model_name, messages, user_jwt, session_id=None):
+async def execute_langgraph_agent(
+    api_key, model_name, messages, user_jwt, session_id=None
+):
     agent = await build_langgraph_agent(api_key, model_name, user_jwt)
     print("messages", messages)
     print("Session ID", session_id)

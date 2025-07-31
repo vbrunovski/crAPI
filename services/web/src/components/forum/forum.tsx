@@ -107,15 +107,15 @@ const Forum: React.FC<ForumProps> = (props) => {
         ]}
       />
       <Content>
-        <Row gutter={[40, 40]}>
+        <Row gutter={[32, 32]}>
           {posts.map((post) => (
-            <Col key={post.id}>
+            <Col span={24} key={post.id}>
               <Card hoverable onClick={() => handlePostClick(post.id)}>
                 <Meta
                   avatar={renderAvatar(post.author.profile_pic_url)}
                   title={post.title}
                 />
-                <Descriptions size="small">
+                <Descriptions size="small" column={1}>
                   <Descriptions.Item label="Posted by">
                     {post.author.nickname}
                   </Descriptions.Item>
@@ -132,25 +132,29 @@ const Forum: React.FC<ForumProps> = (props) => {
             </Col>
           ))}
         </Row>
-        <Row justify="center">
-          <Button
-            type="primary"
-            shape="round"
-            size="large"
-            onClick={() => props.handleOffsetChange(prevOffset)}
-            disabled={prevOffset === null}
-          >
-            Previous
-          </Button>
-          <Button
-            type="primary"
-            shape="round"
-            size="large"
-            onClick={() => props.handleOffsetChange(nextOffset)}
-            disabled={!nextOffset}
-          >
-            Next
-          </Button>
+        <Row justify="center" className="pagination">
+          <Col>
+            <Button
+              type="primary"
+              shape="round"
+              size="large"
+              onClick={() => props.handleOffsetChange(prevOffset)}
+              disabled={prevOffset === null}
+            >
+              ← Previous
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              type="primary"
+              shape="round"
+              size="large"
+              onClick={() => props.handleOffsetChange(nextOffset)}
+              disabled={!nextOffset}
+            >
+              Next →
+            </Button>
+          </Col>
         </Row>
       </Content>
     </Layout>

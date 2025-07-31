@@ -57,10 +57,3 @@ spec:
               port: {{ .Values.chatbot.port }}
             initialDelaySeconds: 15
             periodSeconds: 10
-          volumeMounts:
-            - name: chatbot-vectors
-              mountPath: {{ .Values.chatbot.config.chromaPersistDirectory | quote }}
-      volumes:
-        - name: chatbot-vectors
-          persistentVolumeClaim:
-            claimName: {{ .Values.chatbot.storage.pvc.name }}

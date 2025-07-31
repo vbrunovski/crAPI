@@ -74,8 +74,9 @@ const ProductDescription: React.FC<{
   product: Product;
   onBuyProduct: (product: Product) => void;
 }> = ({ product, onBuyProduct }) => (
-  <>
-    <PageHeader title={`${product.name}, $${product.price}`} />
+  <div className="product-info">
+    <div className="product-title">{product.name}</div>
+    <div className="product-price">${Number(product.price).toFixed(2)}</div>
     <Button
       type="primary"
       shape="round"
@@ -87,7 +88,7 @@ const ProductDescription: React.FC<{
     >
       Buy
     </Button>
-  </>
+  </div>
 );
 
 const Shop: React.FC<ShopProps> = (props) => {
@@ -141,7 +142,7 @@ const Shop: React.FC<ShopProps> = (props) => {
         </Descriptions.Item>
       </Descriptions>
       <Content>
-        <Row gutter={[40, 40]}>
+        <Row gutter={[30, 30]}>
           {products.map((product) => (
             <Col span={8} key={product.id}>
               <Card

@@ -239,146 +239,199 @@ const Profile: React.FC<PropsFromRedux> = (props) => {
   const renderChangePicButton = () => (
     <Button
       type="primary"
-      shape="round"
+      shape="circle"
       icon={<CameraOutlined />}
       size="large"
+      className="change-pic-btn"
       onClick={() => picInputRef.current?.click()}
     />
   );
 
   const renderProfileDescription = () => (
-    <Row gutter={[60, 20]}>
-      <Col flex="200px">
-        <Badge offset={[0, 200]} count={renderChangePicButton()}>
-          <input
-            type="file"
-            hidden
-            ref={picInputRef}
-            accept="image/*"
-            onChange={handleUploadProfilePic}
-          />
-          <Avatar
-            shape="square"
-            size={{ xs: 200, sm: 229, md: 240, lg: 260, xl: 280, xxl: 300 }}
-            src={profileData.profilePicData || defaultProfilePic}
-          />
-        </Badge>
-      </Col>
-      <Col flex="600px">
-        <Descriptions column={1}>
-          <Descriptions.Item label="Name">{userData.name}</Descriptions.Item>
-          <Descriptions.Item label="Email">
-            {userData.email}
-            <Button
-              type="primary"
-              shape="round"
-              className="change-email-btn"
-              icon={<EditOutlined />}
-              onClick={() => navigate("/change-email")}
-            >
-              Change email
-            </Button>
-          </Descriptions.Item>
-          <Descriptions.Item label="Phone No.">
-            {userData.number}
-            <Button
-              type="primary"
-              shape="round"
-              className="change-phone-number-btn"
-              icon={<EditOutlined />}
-              onClick={() => navigate("/change-phone-number")}
-            >
-              Change phone number
-            </Button>
-          </Descriptions.Item>
-        </Descriptions>
-      </Col>
-    </Row>
+    <div className="profile-content">
+      <Row gutter={[40, 40]} align="top">
+        <Col xs={24} sm={24} md={8} lg={6}>
+          <div className="profile-avatar-section">
+            <Badge offset={[-10, 180]} count={renderChangePicButton()}>
+              <input
+                type="file"
+                hidden
+                ref={picInputRef}
+                accept="image/*"
+                onChange={handleUploadProfilePic}
+              />
+              <div className="avatar-container">
+                <Avatar
+                  size={200}
+                  src={profileData.profilePicData || defaultProfilePic}
+                  className="profile-avatar"
+                />
+              </div>
+            </Badge>
+          </div>
+        </Col>
+        <Col xs={24} sm={24} md={16} lg={18}>
+          <div className="profile-info">
+            <div className="info-item">
+              <div className="info-label">Name</div>
+              <div className="info-value">{userData.name}</div>
+            </div>
+
+            <div className="info-item">
+              <div className="info-label">Email</div>
+              <div className="info-value-with-action">
+                <span className="info-value">{userData.email}</span>
+                <Button
+                  type="primary"
+                  shape="round"
+                  className="action-btn change-email-btn"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate("/change-email")}
+                >
+                  Change email
+                </Button>
+              </div>
+            </div>
+
+            <div className="info-item">
+              <div className="info-label">Phone Number</div>
+              <div className="info-value-with-action">
+                <span className="info-value">{userData.number}</span>
+                <Button
+                  type="primary"
+                  shape="round"
+                  className="action-btn change-phone-btn"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate("/change-phone-number")}
+                >
+                  Change phone number
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
+    </div>
   );
 
   const renderVideo = () => (
-    <Row gutter={[60, 20]}>
-      <Col span={24}>
-        <>
-          <video controls className="profile-video" key={videoData || ""}>
-            <source src={videoData || ""} type="video/mp4" />
-          </video>
-        </>
-      </Col>
-    </Row>
+    <div className="video-container">
+      <video controls className="profile-video" key={videoData || ""}>
+        <source src={videoData || ""} type="video/mp4" />
+      </video>
+    </div>
   );
 
   return (
-    <Layout className="page-container">
-      <PageHeader title="Your Profile" className="profile-header" />
-      <Content>
-        <Card>
+    <Layout className="page-container profile-page">
+      <div className="profile-header-section">
+        <h1 className="profile-title">Your Profile</h1>
+        <p className="profile-subtitle">
+          Manage your personal information and settings
+        </p>
+      </div>
+
+      <Content className="profile-content-wrapper">
+        <Card className="profile-card" hoverable>
           <Meta description={renderProfileDescription()} />
         </Card>
-        <PageHeader
-          className="profile-header"
-          title="My Personal Video"
-          subTitle="Max File Size: 10MB"
-          extra={[
-            videoData ? (
-              <Dropdown.Button
-                menu={MenuProps}
-                key="drop-down"
-                onClick={handleUploadVideoAction}
-              >
-                <VideoCameraOutlined />
-              </Dropdown.Button>
-            ) : (
-              <Button
-                type="primary"
-                shape="round"
-                icon={<VideoCameraOutlined />}
-                size="large"
-                onClick={() => videoInputRef.current?.click()}
-              >
-                Upload Video
-              </Button>
-            ),
-          ]}
-        />
-        <input
-          type="file"
-          hidden
-          ref={videoInputRef}
-          accept="video/*"
-          onChange={handleUploadVideo}
-        />
-        {videoData && (
-          <Card>
-            <Meta description={renderVideo()} />
-          </Card>
-        )}
+
+        <Card className="video-section-card" hoverable>
+          <div className="video-header">
+            <div className="video-info">
+              <h2 className="video-title">My Personal Video</h2>
+              <p className="video-subtitle">Max File Size: 10MB</p>
+            </div>
+            <div className="video-actions">
+              {videoData ? (
+                <Dropdown.Button
+                  menu={MenuProps}
+                  key="drop-down"
+                  onClick={handleUploadVideoAction}
+                  className="video-dropdown-btn"
+                  type="primary"
+                  size="large"
+                >
+                  <VideoCameraOutlined />
+                  Manage Video
+                </Dropdown.Button>
+              ) : (
+                <Button
+                  type="primary"
+                  shape="round"
+                  icon={<VideoCameraOutlined />}
+                  size="large"
+                  className="upload-video-btn"
+                  onClick={() => videoInputRef.current?.click()}
+                >
+                  Upload Video
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <input
+            type="file"
+            hidden
+            ref={videoInputRef}
+            accept="video/*"
+            onChange={handleUploadVideo}
+          />
+
+          {videoData && (
+            <div className="video-player-container">{renderVideo()}</div>
+          )}
+        </Card>
       </Content>
       <Modal
-        title="Enter new Video Name"
-        visible={isVideoModalOpen}
+        title={<span className="modal-title">📹 Enter New Video Name</span>}
+        open={isVideoModalOpen}
         footer={null}
         onCancel={() => setIsVideoModalOpen(false)}
+        className="video-name-modal"
+        centered
       >
         <Form
-          name="basic"
+          name="video-name-form"
+          layout="vertical"
           initialValues={{
             remember: true,
           }}
           onFinish={handleChangeVideoName}
+          className="video-name-form"
         >
           <Form.Item
             name="videoName"
+            label="Video Name"
             initialValue={profileData.videoName}
             rules={[{ required: true, message: VIDEO_NAME_REQUIRED }]}
           >
-            <Input placeholder="Car Video Name" />
+            <Input
+              placeholder="Enter your video name..."
+              className="video-name-input"
+              size="large"
+            />
           </Form.Item>
-          <Form.Item>
+          <Form.Item className="form-actions">
             {hasErrored && <div className="error-message">{errorMessage}</div>}
-            <Button type="primary" htmlType="submit" className="form-button">
-              Change Video Name
-            </Button>
+            <div className="modal-buttons">
+              <Button
+                onClick={() => setIsVideoModalOpen(false)}
+                className="cancel-btn"
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="submit-btn"
+                size="large"
+                icon={<VideoCameraOutlined />}
+              >
+                Update Name
+              </Button>
+            </div>
           </Form.Item>
         </Form>
       </Modal>

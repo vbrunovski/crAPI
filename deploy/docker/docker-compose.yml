@@ -172,14 +172,15 @@ services:
       - API_PASSWORD=Admin!123
       - OPENAPI_SPEC=/app/resources/crapi-openapi-spec.json
       - DEFAULT_MODEL=gpt-4o-mini
-      - CHROMA_PERSIST_DIRECTORY=/app/vectorstore
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
       # - CHATBOT_OPENAI_API_KEY=
-    volumes:
-      - chatbot-vectors:/app/vectorstore
     depends_on:
       mongodb:
         condition: service_healthy
       crapi-identity:
+        condition: service_healthy
+      chromadb:
         condition: service_healthy
     # ports:
     #  - "${LISTEN_IP:-127.0.0.1}:5002:5002"
@@ -262,6 +263,16 @@ services:
           cpus: '0.3'
           memory: 128M
 
+  chromadb:
+    container_name: chromadb
+    image: 'chromadb/chroma:latest'
+    environment:
+      IS_PERSISTENT: 'TRUE'
+    volumes:
+      - chromadb-data:/data
+    # ports:
+    #   - "${LISTEN_IP:-127.0.0.1}:8000:8000"
+
   mailhog:
     user: root
     container_name: mailhog
@@ -303,4 +314,4 @@ services:
 volumes:
   mongodb-data:
   postgresql-data:
-  chatbot-vectors:
+  chromadb-data:

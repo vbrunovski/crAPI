@@ -45,10 +45,12 @@ async def delete_api_key(session_id):
         {"session_id": session_id}, {"$unset": {"openai_api_key": ""}}
     )
 
+
 async def store_model_name(session_id, model_name):
     await db.sessions.update_one(
         {"session_id": session_id}, {"$set": {"model_name": model_name}}, upsert=True
     )
+
 
 async def get_model_name(session_id):
     doc = await db.sessions.find_one({"session_id": session_id})
@@ -57,6 +59,7 @@ async def get_model_name(session_id):
     if "model_name" not in doc:
         return Config.DEFAULT_MODEL_NAME
     return doc["model_name"]
+
 
 async def get_user_jwt() -> str | None:
     auth = request.headers.get("Authorization", "")

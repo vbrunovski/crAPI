@@ -326,3 +326,45 @@ apiGatewayService:
     app: gateway-service
   serviceSelectorLabels:
     app: gateway-service
+
+
+chromadb:
+  name: chromadb
+  image: chromadb/chroma
+  version: latest
+  imagePullPolicy: IfNotPresent
+  port: 8000
+  replicaCount: 1
+  service:
+    name: chromadb
+    labels:
+      app: chromadb
+  config:
+    name: chromadb-config
+    labels:
+      app: chromadb
+  storage:
+    # type: "manual"
+    # pv:
+    #   name: chromadb-pv
+    #   labels:
+    #     app: chromadb
+    #   resources:
+    #     storage: 1Gi
+    #   hostPath: /mnt/chromadb
+    type: "default"
+    pvc:
+      name: chromadb-pv-claim
+      labels:
+        app: chromadb
+      resources:
+        requests:
+          storage: 2Gi
+  serviceSelectorLabels:
+    app: chromadb
+  podLabels:
+    app: chromadb
+  statefulsetLabels:
+    app: chromadb
+  statefulsetSelectorMatchLabels:
+    app: chromadb

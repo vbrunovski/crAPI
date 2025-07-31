@@ -66,40 +66,39 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
   const { pastOrders } = props;
 
   const renderAvatar = (url: string) => (
-    <Avatar shape="square" className="order-avatar" size={250} src={url} />
+    <Avatar shape="square" className="order-avatar" size={220} src={url} />
   );
 
   const renderOrderDescription = (order: Order) => (
-    <>
-      <PageHeader
-        title={`${order.product.name}, $${order.product.price * order.quantity}`}
-        subTitle={`${formatDateFromIso(order.created_on)}`}
-        extra={[
-          <Button
-            type="primary"
-            shape="round"
-            size="middle"
-            key="order-details"
-            onClick={() => navigate(`/orders?order_id=${order.id}`)}
-          >
-            {" "}
-            Order Details
-          </Button>,
-
-          <Button
-            type="primary"
-            shape="round"
-            icon={order.status === "delivered" && <RollbackOutlined />}
-            size="middle"
-            key="return-order"
-            disabled={order.status !== "delivered"}
-            onClick={() => props.returnOrder(order.id)}
-          >
-            {order.status === "delivered" ? "Return" : order.status}
-          </Button>,
-        ]}
-      />
-    </>
+    <div className="order-info">
+      <div className="order-product-name">{order.product.name}</div>
+      <div className="order-price">
+        ${(Number(order.product.price) * order.quantity).toFixed(2)}
+      </div>
+      <div className="order-date">{formatDateFromIso(order.created_on)}</div>
+      <div className="order-actions">
+        <Button
+          type="primary"
+          shape="round"
+          size="middle"
+          key="order-details"
+          onClick={() => navigate(`/orders?order_id=${order.id}`)}
+        >
+          Order Details
+        </Button>
+        <Button
+          type="primary"
+          shape="round"
+          icon={order.status === "delivered" && <RollbackOutlined />}
+          size="middle"
+          key="return-order"
+          disabled={order.status !== "delivered"}
+          onClick={() => props.returnOrder(order.id)}
+        >
+          {order.status === "delivered" ? "Return" : order.status}
+        </Button>
+      </div>
+    </div>
   );
 
   return (
@@ -110,12 +109,13 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
         onBack={() => navigate("/shop")}
       />
       <Content>
-        <Row gutter={[20, 20]}>
+        <Row gutter={[32, 32]}>
           {pastOrders.map((order) => (
-            <Col span={8} key={order && order.id}>
+            <Col xs={24} sm={12} lg={8} key={order && order.id}>
               <Card
                 className="order-card"
                 cover={renderAvatar(order && order.product.image_url)}
+                hoverable
               >
                 <Meta description={renderOrderDescription(order)} />
               </Card>
@@ -123,26 +123,30 @@ const PastOrders: React.FC<PastOrdersProps> = (props) => {
           ))}
         </Row>
         <Row justify="center" className="pagination">
-          <Button
-            type="primary"
-            shape="round"
-            size="large"
-            onClick={() => props.handleOffsetChange(props.prevOffset)}
-            key="prev-button"
-            disabled={props.prevOffset === null}
-          >
-            Previous
-          </Button>
-          <Button
-            type="primary"
-            shape="round"
-            size="large"
-            onClick={() => props.handleOffsetChange(props.nextOffset)}
-            key="next-button"
-            disabled={props.nextOffset === null}
-          >
-            Next
-          </Button>
+          <Col>
+            <Button
+              type="primary"
+              shape="round"
+              size="large"
+              onClick={() => props.handleOffsetChange(props.prevOffset)}
+              key="prev-button"
+              disabled={props.prevOffset === null}
+            >
+              ← Previous
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              type="primary"
+              shape="round"
+              size="large"
+              onClick={() => props.handleOffsetChange(props.nextOffset)}
+              key="next-button"
+              disabled={props.nextOffset === null}
+            >
+              Next →
+            </Button>
+          </Col>
         </Row>
       </Content>
     </Layout>

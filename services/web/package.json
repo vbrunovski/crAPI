@@ -1,12 +1,13 @@
 {
   "name": "crapi-web",
   "version": "0.1.0",
-  "proxy": "http://localhost:8888",
+  "proxy": "https://crapi.allvapps.com",
   "private": true,
   "dependencies": {
     "@ant-design/cssinjs": "^1.21.1",
     "@ant-design/icons": "^4.8.3",
     "@ant-design/pro-components": "^2.7.15",
+    "@rcb-plugins/markdown-renderer": "^0.3.1",
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -23,7 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "prop-types": "^15.8.1",
     "react": "^18.3.0",
-    "react-chatbot-kit": "^2.2.2",
+    "react-chatbotify": "^2.2.0",
     "react-dom": "^18.3.0",
     "react-linkify": "^1.0.0-alpha",
     "react-markdown": "^10.1.0",

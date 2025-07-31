@@ -1,6 +1,6 @@
 from uuid import uuid4
 from langgraph.graph.message import Messages
-from .vector_index import update_vector_index
+from services.chatbot.src.chatbot.retrieverutils import add_to_chroma_collection
 from .extensions import db
 from .langgraph_agent import execute_langgraph_agent
 
@@ -27,7 +27,9 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     source_message_id = uuid4().int & (1 << 63) - 1
     history.append({"id": source_message_id, "role": "user", "content": user_message})
     # Run LangGraph agent
-    response = await execute_langgraph_agent(api_key, model_name, history, user_jwt, session_id)
+    response = await execute_langgraph_agent(
+        api_key, model_name, history, user_jwt, session_id
+    )
     print("Response", response)
     reply: Messages = response.get("messages", [{}])[-1]
     print("Reply", reply.content)
@@ -35,11 +37,10 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     history.append(
         {"id": response_message_id, "role": "assistant", "content": reply.content}
     )
+    await add_to_chroma_collection(
+        api_key, session_id, [{"user": user_message}, {"assistant": reply.content}]
+    )
     # Limit chat history to last 20 messages
     history = history[-20:]
     await update_chat_history(session_id, history)
-    # if not os.path.exists(retrieval_index_path):
-    #     await build_vector_index_from_chat_history(api_key)
-    # else:
-    await update_vector_index(api_key, session_id, {"user": user_message, "assistant": reply.content})
     return reply.content, response_message_id

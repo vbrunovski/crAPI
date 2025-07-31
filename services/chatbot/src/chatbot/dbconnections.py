@@ -32,3 +32,6 @@ POSTGRES_URI = "postgresql://%s:%s@%s:%s/%s?sslmode=disable" % (
     POSTGRES_PORT,
     POSTGRES_DB,
 )
+
+CHROMA_HOST = os.environ.get("CHROMA_HOST", "chromadb")
+CHROMA_PORT = os.environ.get("CHROMA_PORT", "8000")

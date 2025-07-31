@@ -78,24 +78,28 @@ const Login: React.FC<LoginProps> = ({
             <Input.Password placeholder="Password" />
           </Form.Item>
           <Form.Item>
-            <button
-              className="alternative-style"
-              onClick={handleForgotPasswordClick}
-              type="button"
-            >
-              Forgot Password?
-            </button>
-            {hasErrored && <div className="error-message">{errorMessage}</div>}
-            <Button type="primary" htmlType="submit" className="form-button">
-              Login
-            </Button>
-            <button
-              className="alternative-style"
-              onClick={handleSignUpClick}
-              type="button"
-            >
-              Don't have an Account? SignUp
-            </button>
+            <div className="form-actions">
+              <button
+                className="alternative-style"
+                onClick={handleForgotPasswordClick}
+                type="button"
+              >
+                Forgot Password?
+              </button>
+              {hasErrored && (
+                <div className="error-message">{errorMessage}</div>
+              )}
+              <Button type="primary" htmlType="submit" className="form-button">
+                Login
+              </Button>
+              <button
+                className="alternative-style"
+                onClick={handleSignUpClick}
+                type="button"
+              >
+                Don't have an Account? SignUp
+              </button>
+            </div>
           </Form.Item>
         </Form>
       </Card>
