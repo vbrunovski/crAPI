@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Config:
     TLS_ENABLED = os.getenv("TLS_ENABLED", "false").lower() in ("true", "1", "yes")
     WEB_SERVICE = os.getenv("WEB_SERVICE", "crapi-web")

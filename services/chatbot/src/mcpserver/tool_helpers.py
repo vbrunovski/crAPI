@@ -7,6 +7,7 @@ from .config import Config
 from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
 
+
 async def get_any_api_key():
     if os.environ.get("CHATBOT_OPENAI_API_KEY"):
         return os.environ.get("CHATBOT_OPENAI_API_KEY")

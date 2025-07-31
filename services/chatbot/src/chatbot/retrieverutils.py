@@ -46,7 +46,7 @@ async def get_chroma_collection(api_key):
         name="chats",
         embedding_function=OpenAIEmbeddingFunction(
             api_key=api_key,
-            model="text-embedding-3-large",
+            model_name="text-embedding-3-large",
         ),
     )
     return collection

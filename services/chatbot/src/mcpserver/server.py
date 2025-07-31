@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 BASE_URL = f"{'https' if Config.TLS_ENABLED else 'http'}://{Config.WEB_SERVICE}"
-BASE_IDENTITY_URL = f"{'https' if Config.TLS_ENABLED else 'http'}://{Config.IDENTITY_SERVICE}"
+BASE_IDENTITY_URL = (
+    f"{'https' if Config.TLS_ENABLED else 'http'}://{Config.IDENTITY_SERVICE}"
+)
 API_KEY = None
 
 
@@ -57,6 +59,7 @@ def get_api_key():
                 return API_KEY
     return API_KEY
 
+
 # Async HTTP client for API calls
 def get_http_client():
     """Create and configure the HTTP client with appropriate authentication."""
@@ -68,7 +71,8 @@ def get_http_client():
         headers=headers,
     )
 
-# Load your OpenAPI spec 
+
+# Load your OpenAPI spec
 with open(Config.OPENAPI_SPEC, "r") as f:
     openapi_spec = json.load(f)
 
