@@ -7,7 +7,6 @@ import logging
 import time
 from .tool_helpers import (
     get_any_api_key,
-    get_chat_history_retriever,
 )
 
 # Configure logging
