@@ -10,44 +10,37 @@ from langchain.tools import Tool
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.agent_toolkits.sql.base import create_sql_agent
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
-from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS  # or Chroma, Weaviate, etc.
 from langchain_openai import ChatOpenAI
 from langgraph.graph import MessageGraph, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
-from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
+from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE
+import chromadb
 from langchain_chroma import Chroma as ChromaClient
 
 from .extensions import postgresdb
 from .config import Config
 from .mcp_client import get_mcp_client
-import chromadb
 
 from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
-from .config import Config
-from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 
 
-async def get_chroma_client():
+def get_chroma_client():
     chroma_client = chromadb.HttpClient(
         host=Config.CHROMA_HOST,
         port=Config.CHROMA_PORT,
         ssl=False,
         headers=None,
-        settings=Settings(),
-        tenant=DEFAULT_TENANT,
-        database=DEFAULT_DATABASE,
     )
     return chroma_client
 
 
 def get_embedding_function(api_key):
-    return OpenAIEmbeddingFunction(
-        api_key=api_key,
-        model_name="text-embedding-3-large",
+    return OpenAIEmbeddings(
+        openai_api_key=api_key,
+        model="text-embedding-3-large",
     )
 
 
@@ -56,20 +49,29 @@ def get_chroma_vectorstore(api_key):
     vectorstore = ChromaClient(
         client=chroma_client,
         collection_name="chats",
-        create_collection_if_not_exists=True,
         embedding_function=get_embedding_function(api_key),
+        create_collection_if_not_exists=True,
     )
     return vectorstore
 
 
-def add_to_chroma_collection(api_key, session_id, new_messages: dict[str, str]) -> list:
+def add_to_chroma_collection(
+    api_key, session_id, new_messages: list[dict[str, str]]
+) -> list:
     vectorstore = get_chroma_vectorstore(api_key)
-    res: list = vectorstore.add_documents(
-        documents=[
-            {"content": content, "metadata": {"session_id": session_id, "role": role}}
-            for role, content in new_messages.items()
-        ]
-    )
+    print("new_messages", new_messages)
+    # new_messages = [{'user': 'hi'}, {'assistant': 'Hello! How can I assist you today?'}]
+    documents = []
+    for message in new_messages:
+        for role, content in message.items():
+            documents.append(
+                Document(
+                    page_content=content,
+                    metadata={"session_id": session_id, "role": role},
+                )
+            )
+    print("documents", documents)
+    res: list = vectorstore.add_documents(documents=documents)
     return res
 
 
