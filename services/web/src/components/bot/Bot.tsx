@@ -211,10 +211,6 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
             response.body.initialized === true;
 
           if (isInitialized) {
-            await params.injectMessage(
-              "Chatbot is already initialized! Loading chat history...",
-            );
-
             // Fetch and display chat history
             const chatHistory = await fetchChatHistory();
             console.log("Chat history:", chatHistory);
@@ -233,7 +229,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
                 );
               }
               await params.injectMessage(
-                `Loaded ${chatHistory.length} previous messages. You can now start chatting!`,
+                `Loaded ${chatHistory.length} previous messages!`,
               );
             }
 
@@ -334,7 +330,7 @@ What would you like to do next?`);
           }));
 
           if (chatHistory.length > 0) {
-            await params.injectMessage(
+            await params.simulateStreamMessage(
               `Loaded ${chatHistory.length} previous messages. You can now start chatting!`,
             );
           } else {
