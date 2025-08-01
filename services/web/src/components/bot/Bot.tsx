@@ -67,6 +67,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [chatResetKey, setChatResetKey] = useState<number>(0);
   const helpOptions = ["Initialize", "Clear", "Help"];
+  const [apiKey, setApiKey] = useState("");
 
   const [chatbotState, setChatbotState] = useState<ChatBotState>({
     openapiKey: localStorage.getItem("openapi_key"),
@@ -78,6 +79,10 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
     messages: [],
   });
 
+  const handleApiKey = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setApiKey(event.target.value); // Update state
+  };
+
   // Handle initialization
   const handleInitialization = async (apiKey: string) => {
     try {
@@ -87,7 +92,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
         .set("Accept", "application/json")
         .set("Content-Type", "application/json")
         .set("Authorization", `Bearer ${props.accessToken}`)
-        .send({ openai_key: apiKey });
+        .send({ openai_api_key: apiKey });
 
       console.log("Initialization response:", response.body);
       return response.body.success || response.status === 200;
@@ -262,7 +267,7 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
         switch (params.userInput) {
           case "Initialize":
             await params.injectMessage(
-              "Please enter your OpenAI API key to initialize the chatbot:",
+              "Please type your OpenAI API key below and enter 'Submit' in the chat to initialize the chatbot.",
             );
             return "initialize";
           case "Clear":
@@ -302,25 +307,29 @@ What would you like to do next?`);
       renderMarkdown: ["BOT"],
     },
     initialize: {
-      message: "Please paste your OpenAI API key below:",
-      isSensitive: true,
-      function: async (params: Params) => {
-        const apiKey = params.userInput.trim();
-
-        if (!apiKey) {
+      component: (
+        <input
+          type="password"
+          placeholder="Please paste your OpenAI API key here"
+          onChange={handleApiKey}
+        />
+      ),
+      path: async (params: Params) => {
+        const APIKey = apiKey.trim();
+        if (!APIKey) {
           await params.injectMessage(
-            "API key cannot be empty. Please enter a valid OpenAI API key:",
+            "API key cannot be empty. Please enter a valid OpenAI API key and enter 'Submit' in the chat.",
+          );
+          return "initialize";
+        }
+        if (params.userInput.toLowerCase() !== "submit") {
+          await params.injectMessage(
+            "Please type 'Submit' to confirm your API key.",
           );
           return;
         }
-
-        await params.injectMessage("Initializing chatbot with your API key...");
-
-        const success = await handleInitialization(apiKey);
-
+        const success = await handleInitialization(APIKey);
         if (success) {
-          await params.injectMessage("✅ Chatbot initialized successfully!");
-
           // Fetch chat history after successful initialization
           const chatHistory = await fetchChatHistory();
           setChatbotState((prev) => ({
@@ -331,21 +340,21 @@ What would you like to do next?`);
 
           if (chatHistory.length > 0) {
             await params.simulateStreamMessage(
-              `Loaded ${chatHistory.length} previous messages. You can now start chatting!`,
+              `✅ Chatbot initialized successfully! Loaded ${chatHistory.length} previous messages. You can now start chatting!`,
             );
           } else {
             await params.injectMessage(
-              "Ready to chat! Ask me anything about crAPI.",
+              "✅ Chatbot initialized successfully! Ready to chat! Ask me anything about crAPI.",
             );
           }
+          return "chat";
         } else {
           await params.injectMessage(
             "❌ Failed to initialize chatbot. Please check your API key and try again:",
           );
-          return;
+          return "show_options";
         }
       },
-      path: "chat",
       renderMarkdown: ["BOT"],
     },
     chat: {
