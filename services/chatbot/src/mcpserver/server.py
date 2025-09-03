@@ -55,7 +55,8 @@ def get_api_key():
                 response_json = response.json()
                 logger.info(f"Response: {response_json}")
                 API_KEY = response_json.get("apiKey")
-                logger.info(f"MCP Server API Key: {API_KEY}")
+                if API_KEY:
+                    logger.debug("MCP Server API Key obtained successfully.")
                 return API_KEY
     return API_KEY
 
