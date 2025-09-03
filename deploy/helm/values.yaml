@@ -126,6 +126,7 @@ workshop:
     postgresDbDriver: postgres
     mongoDbDriver: mongodb
     secretKey: crapi
+    filesLimit: 1000
   deploymentLabels:
     app: crapi-workshop
   podLabels:

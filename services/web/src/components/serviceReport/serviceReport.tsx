@@ -14,16 +14,7 @@
  */
 
 import React from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Descriptions,
-  Spin,
-  Layout,
-  Timeline,
-  Typography,
-} from "antd";
+import { Card, Descriptions, Spin, Layout, Timeline, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 import { Content } from "antd/es/layout/layout";
 import {
@@ -33,6 +24,7 @@ import {
   ToolOutlined,
   CommentOutlined,
   CalendarOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import "./styles.css";
 
@@ -65,6 +57,7 @@ interface Service {
     comment: string;
     created_on: string;
   }[];
+  downloadUrl?: string;
 }
 
 interface ServiceReportProps {
@@ -126,6 +119,18 @@ const ServiceReport: React.FC<ServiceReportProps> = ({ service }) => {
               </Text>
             </div>
           }
+          extra={[
+            <a
+              key="1"
+              className="download-report-button"
+              href={service.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DownloadOutlined />
+              Download Report
+            </a>,
+          ]}
         />
       </div>
 

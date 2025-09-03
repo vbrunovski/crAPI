@@ -41,5 +41,6 @@ urlpatterns = [
         r"service_request$",
         mechanic_views.MechanicServiceRequestsView.as_view(),
     ),
+    re_path(r"download_report$", mechanic_views.DownloadReportView.as_view()),
     re_path(r"$", mechanic_views.MechanicView.as_view()),
 ]

@@ -52,6 +52,7 @@ interface Service {
     comment: string;
     created_on: string;
   }[];
+  downloadUrl?: string;
 }
 
 const mapStateToProps = (state: RootState) => ({

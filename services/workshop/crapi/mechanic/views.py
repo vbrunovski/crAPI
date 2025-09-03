@@ -15,7 +15,12 @@
 """
 contains all the views related to Mechanic
 """
+import os
 import bcrypt
+import re
+from urllib.parse import unquote
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
@@ -23,6 +28,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import models
+from django.http import FileResponse
 from crapi_site import settings
 from utils.jwt import jwt_auth_required
 from utils import messages
@@ -39,7 +45,6 @@ from .serializers import (
     ServiceCommentViewSerializer,
 )
 from rest_framework.pagination import LimitOffsetPagination
-
 
 class SignUpView(APIView):
     """
@@ -235,6 +240,7 @@ class GetReportView(APIView):
             )
         serializer = MechanicServiceRequestSerializer(service_request)
         response_data = dict(serializer.data)
+        service_report_pdf(response_data, report_id)
         return Response(response_data, status=status.HTTP_200_OK)
 
 
@@ -366,3 +372,89 @@ class ServiceRequestView(APIView):
         service_request = ServiceRequest.objects.get(id=service_request_id)
         serializer = MechanicServiceRequestSerializer(service_request)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DownloadReportView(APIView):
+    """
+    A view to download a service report.
+    """
+    def get(self, request, format=None):
+        filename_from_user = request.query_params.get('filename')
+        if not filename_from_user:
+            return Response(
+                {"message": "Parameter 'filename' is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        #Checks if input before decoding contains only allowed characters
+        if not validate_filename(filename_from_user):
+            return Response(
+                {"message": "Invalid input."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        filename_from_user = unquote(filename_from_user)
+        full_path = os.path.abspath(os.path.join(settings.BASE_DIR, "reports",  filename_from_user))
+        if os.path.exists(full_path) and os.path.isfile(full_path):
+            return FileResponse(open(full_path, 'rb'))
+        elif not os.path.exists(full_path):
+            return Response(
+                {"message": f"File not found at '{full_path}'."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            return Response(
+                {"message": f"'{full_path}' is not a file."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+def validate_filename(input: str) -> bool:
+    """
+    Allowed: alphanumerics, _, :, %HH
+    """
+    url_encoded_pattern = re.compile(r'^(?:[A-Za-z0-9:_]|%[0-9A-Fa-f]{2})*$')
+    return bool(url_encoded_pattern.fullmatch(input))
+
+
+def service_report_pdf(response_data, report_id):
+    """
+    Generates service report's PDF file from a template and saves it to the disk.
+    """
+    reports_dir = os.path.join(settings.BASE_DIR, 'reports')
+    os.makedirs(reports_dir, exist_ok=True)
+    report_filepath = os.path.join(reports_dir, f"report_{report_id}")
+
+    template = get_template('service_report.html')
+    html_string = template.render({'service': response_data})
+    with open(report_filepath, "w+b") as pdf_file:
+        pisa.CreatePDF(src=html_string, dest=pdf_file)
+
+    manage_reports_directory()
+
+
+def manage_reports_directory():
+    """
+    Checks reports directory and deletes the oldest one if the
+    count exceeds the maximum limit.
+    """
+    try:
+        reports_dir = os.path.join(settings.BASE_DIR, 'reports')
+        report_files = os.listdir(reports_dir)
+        
+        if len(report_files) >= settings.FILES_LIMIT:
+            oldest_file = None
+            oldest_time = float('inf')
+            for filename in report_files:
+                filepath = os.path.join(reports_dir, filename)
+                try:
+                    current_mtime = os.path.getmtime(filepath)
+                    if current_mtime < oldest_time:
+                        oldest_time = current_mtime
+                        oldest_file = filepath
+                except FileNotFoundError:
+                    continue
+
+            if oldest_file:
+                os.remove(oldest_file)
+
+    except (OSError, FileNotFoundError) as e:
+        print(f"Error during report directory management: {e}")

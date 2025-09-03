@@ -41,6 +41,8 @@ def get_env_value(env_variable):
         raise ImproperlyConfigured(error_msg)
 
 
+FILES_LIMIT = int(os.environ.get("FILES_LIMIT", 1000))
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -108,7 +110,7 @@ TEST_OUTPUT_DIR = os.path.join(BASE_DIR, "test-reports")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'utils')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

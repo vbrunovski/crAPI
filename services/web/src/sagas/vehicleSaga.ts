@@ -377,6 +377,12 @@ export function* getServiceReport(action: MyAction): Generator<any, void, any> {
       throw responseJSON;
     }
 
+    const filename = `report_${reportId}`;
+    responseJSON.downloadUrl =
+      APIService.WORKSHOP_SERVICE +
+      requestURLS.DOWNLOAD_SERVICE_REPORT +
+      "?filename=" +
+      filename;
     yield put({ type: actionTypes.FETCHED_DATA, payload: responseJSON });
     callback(responseTypes.SUCCESS, responseJSON);
   } catch (e) {
