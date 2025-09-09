@@ -22,4 +22,4 @@ data:
     SERVER_PORT: {{ .Values.workshop.port | quote }}
     API_GATEWAY_URL: {{ if .Values.apiGatewayServiceInstall }}"https://{{ .Values.apiGatewayService.service.name }}"{{ else }}{{ .Values.apiGatewayServiceUrl }}{{ end }}
     TLS_ENABLED: {{ .Values.tlsEnabled | quote }}
-    FILES_LIMIT: {{ .Values.workshop.config.filesLimit }}
+    FILES_LIMIT: {{ .Values.workshop.config.filesLimit | quote }}
