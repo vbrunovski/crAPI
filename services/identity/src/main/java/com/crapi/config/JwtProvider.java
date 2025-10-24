@@ -189,10 +189,10 @@ public class JwtProvider {
           log.debug("Key from JKU: " + verificationKey.toJSONString());
           verifier = new RSASSAVerifier(verificationKey);
         }
-        valid = signedJWT.verify(verifier);
-        log.debug("JWT valid?: " + valid);
-        return valid;
       }
+      valid = signedJWT.verify(verifier);
+      log.debug("JWT valid?: " + valid);
+      return valid;
 
     } catch (ParseException e) {
       try {
