@@ -217,7 +217,7 @@ jobs:
           go-version: '1.23'
 
       - name: Start the database
-        run: docker compose -f services/docker-database.yml up -d
+        run: docker compose -f services/docker-database.yml up -d --wait
 
       - name: Run identity tests
         run: |
@@ -240,6 +240,11 @@ jobs:
           version: v2.2.1
           working-directory: services/community
 
+
+      - name: Install system dependencies for workshop
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev pkg-config python3-dev
 
       - name: Run workshop tests
         run: |
