@@ -173,6 +173,7 @@ services:
       - API_PASSWORD=Admin!123
       - OPENAPI_SPEC=/app/resources/crapi-openapi-spec.json
       - DEFAULT_MODEL=gpt-4o-mini
+      - MAX_CONTENT_LENGTH=50000
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
       # - CHATBOT_OPENAI_API_KEY=

@@ -1,6 +1,6 @@
 from uuid import uuid4
 from langgraph.graph.message import Messages
-from .retrieverutils import add_to_chroma_collection
+from .retriever_utils import add_to_chroma_collection
 from .extensions import db
 from .langgraph_agent import execute_langgraph_agent
 
@@ -30,9 +30,10 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     response = await execute_langgraph_agent(
         api_key, model_name, history, user_jwt, session_id
     )
+    print("Session ID", session_id)
+    print("Messages", history)
     print("Response", response)
     reply: Messages = response.get("messages", [{}])[-1]
-    print("Reply", reply.content)
     response_message_id = uuid4().int & (1 << 63) - 1
     history.append(
         {"id": response_message_id, "role": "assistant", "content": reply.content}

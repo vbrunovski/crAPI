@@ -1,28 +1,12 @@
-import os
 import textwrap
-from typing import Annotated, Sequence, TypedDict
-
-from langchain.agents.agent_toolkits import create_retriever_tool
-from langchain.chains import LLMChain, RetrievalQA
-from langchain.prompts import PromptTemplate
-from langchain.schema import BaseMessage
-from langchain.tools import Tool
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from langchain_community.agent_toolkits.sql.base import create_sql_agent
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS  # or Chroma, Weaviate, etc.
 from langchain_openai import ChatOpenAI
-from langgraph.graph import MessageGraph, StateGraph
-from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
-from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
-from .retrieverutils import get_retriever_tool
+from .retriever_utils import get_retriever_tool
 
 from .extensions import postgresdb
-from .config import Config
 from .mcp_client import get_mcp_client
-import chromadb
+from .agent_utils import truncate_tool_messages
 
 
 async def build_langgraph_agent(api_key, model_name, user_jwt):
@@ -71,7 +55,7 @@ Use the tools only if you don't know the answer.
     tools = mcp_tools + db_tools
     retriever_tool = get_retriever_tool(api_key)
     tools.append(retriever_tool)
-    agent_node = create_react_agent(model=llm, tools=tools, prompt=system_prompt)
+    agent_node = create_react_agent(model=llm, tools=tools, prompt=system_prompt, pre_model_hook=truncate_tool_messages)
     return agent_node
 
 
@@ -79,8 +63,5 @@ async def execute_langgraph_agent(
     api_key, model_name, messages, user_jwt, session_id=None
 ):
     agent = await build_langgraph_agent(api_key, model_name, user_jwt)
-    print("messages", messages)
-    print("Session ID", session_id)
     response = await agent.ainvoke({"messages": messages})
-    print("Response", response)
     return response

@@ -22,6 +22,7 @@ data:
     MONGO_DB_NAME: {{ .Values.mongodb.config.mongoDbName }}
     CHATBOT_OPENAI_API_KEY: {{ .Values.openAIApiKey }}
     DEFAULT_MODEL: {{ .Values.chatbot.config.defaultModel | quote }}
+    MAX_CONTENT_LENGTH: {{ .Values.chatbot.config.maxContentLength | quote }}
     CHROMA_HOST: {{ .Values.chromadb.service.name }}
     CHROMA_PORT: {{ .Values.chromadb.port | quote }}
     API_USER: {{ .Values.chatbot.config.apiUser | quote }}

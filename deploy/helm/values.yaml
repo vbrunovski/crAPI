@@ -153,6 +153,7 @@ chatbot:
     mongoDbDriver: mongodb
     secretKey: crapi
     defaultModel: gpt-4o-mini
+    maxContentLength: 50000
     chromaPersistDirectory: /app/vectorstore
     apiUser: admin@example.com
     apiPassword: Admin!123
