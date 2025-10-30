@@ -1,6 +1,9 @@
 import json
 
+from langchain.agents import AgentState
+from langchain.agents.middleware.types import before_model
 from langchain_core.messages import ToolMessage
+from langgraph.runtime import Runtime
 
 from .config import Config
 
@@ -60,7 +63,8 @@ def truncate_by_length(content, max_length):
     return content[:max_length] + "\n... [TRUNCATED]"
 
 
-def truncate_tool_messages(state):
+@before_model(state_schema=AgentState)
+def truncate_tool_messages(state: AgentState, runtime: Runtime) -> AgentState:
     """
     Modify large tool messages to prevent exceeding model's token limits.
     Truncate to a length such that it keeps messages within your token limit.

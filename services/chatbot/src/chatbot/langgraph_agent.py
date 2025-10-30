@@ -59,8 +59,8 @@ Use the tools only if you don't know the answer.
     agent_node = create_agent(
         model=llm,
         tools=tools,
-        prompt=system_prompt,
-        pre_model_hook=truncate_tool_messages,
+        system_prompt=system_prompt,
+        middleware=[truncate_tool_messages],
     )
     return agent_node
 

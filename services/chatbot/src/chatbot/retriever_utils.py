@@ -1,8 +1,8 @@
 import chromadb
 from langchain_chroma import Chroma as ChromaClient
-from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
 from langchain_core.tools import create_retriever_tool
+from langchain_openai import OpenAIEmbeddings
 
 from .config import Config
 
