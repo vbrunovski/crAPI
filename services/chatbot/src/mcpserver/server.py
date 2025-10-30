@@ -1,13 +1,12 @@
-import httpx
-from fastmcp import FastMCP, settings
 import json
-import os
-from .config import Config
 import logging
+import os
 import time
-from .tool_helpers import (
-    get_any_api_key,
-)
+
+import httpx
+from fastmcp import FastMCP
+
+from .config import Config
 
 # Configure logging
 logging.basicConfig(
@@ -38,6 +37,7 @@ def get_api_key():
             with httpx.Client(
                 base_url=BASE_URL,
                 headers=headers,
+                verify=False,
             ) as client:
                 response = client.post(auth_url, json=login_body)
                 if response.status_code != 200:
@@ -70,6 +70,7 @@ def get_http_client():
     return httpx.AsyncClient(
         base_url=BASE_URL,
         headers=headers,
+        verify=False,
     )
 
 

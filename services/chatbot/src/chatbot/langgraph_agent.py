@@ -1,12 +1,13 @@
 import textwrap
+
+from langchain.agents import create_agent
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
-from .retriever_utils import get_retriever_tool
 
+from .agent_utils import truncate_tool_messages
 from .extensions import postgresdb
 from .mcp_client import get_mcp_client
-from .agent_utils import truncate_tool_messages
+from .retriever_utils import get_retriever_tool
 
 
 async def build_langgraph_agent(api_key, model_name, user_jwt):
@@ -55,7 +56,12 @@ Use the tools only if you don't know the answer.
     tools = mcp_tools + db_tools
     retriever_tool = get_retriever_tool(api_key)
     tools.append(retriever_tool)
-    agent_node = create_react_agent(model=llm, tools=tools, prompt=system_prompt, pre_model_hook=truncate_tool_messages)
+    agent_node = create_agent(
+        model=llm,
+        tools=tools,
+        prompt=system_prompt,
+        pre_model_hook=truncate_tool_messages,
+    )
     return agent_node
 
 

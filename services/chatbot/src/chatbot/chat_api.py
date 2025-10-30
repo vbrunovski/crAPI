@@ -1,17 +1,14 @@
 import logging
-from quart import Blueprint, jsonify, request, session
 from uuid import uuid4
+
+from quart import Blueprint, jsonify, request
+
+from .chat_service import (delete_chat_history, get_chat_history,
+                           process_user_message)
 from .config import Config
-from .chat_service import delete_chat_history, get_chat_history, process_user_message
-from .session_service import (
-    delete_api_key,
-    get_api_key,
-    get_model_name,
-    get_or_create_session_id,
-    store_api_key,
-    store_model_name,
-    get_user_jwt,
-)
+from .session_service import (get_api_key, get_model_name,
+                              get_or_create_session_id, get_user_jwt,
+                              store_api_key, store_model_name)
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/genai")
 logger = logging.getLogger(__name__)

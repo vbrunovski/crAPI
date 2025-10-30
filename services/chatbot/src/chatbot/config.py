@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from .dbconnections import MONGO_CONNECTION_URI, CHROMA_HOST, CHROMA_PORT
+from .dbconnections import CHROMA_HOST, CHROMA_PORT, MONGO_CONNECTION_URI
 
 load_dotenv()
 

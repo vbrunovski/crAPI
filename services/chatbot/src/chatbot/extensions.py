@@ -1,5 +1,3 @@
-import asyncio
-
 from langchain_community.utilities.sql_database import SQLDatabase
 from motor.motor_asyncio import AsyncIOMotorClient
 

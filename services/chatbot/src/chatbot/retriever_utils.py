@@ -1,9 +1,10 @@
-from langchain.agents.agent_toolkits import create_retriever_tool
 import chromadb
 from langchain_chroma import Chroma as ChromaClient
-from .config import Config
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
+from langchain_core.tools import create_retriever_tool
+
+from .config import Config
 
 
 def get_chroma_client():

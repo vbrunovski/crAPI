@@ -1,8 +1,9 @@
 import os
 import uuid
-from .config import Config
+
 from quart import after_this_request, request
 
+from .config import Config
 from .extensions import db
 
 SESSION_COOKIE_NAME = "chat_session_id"
