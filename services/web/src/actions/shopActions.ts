@@ -114,3 +114,18 @@ export const applyCouponAction = ({
     },
   };
 };
+
+export const newProductAction = ({
+  accessToken,
+  callback,
+  ...data
+}: ActionPayload) => {
+  return {
+    type: actionTypes.NEW_PRODUCT,
+    payload: {
+      accessToken,
+      ...data,
+      callback,
+    },
+  };
+};
