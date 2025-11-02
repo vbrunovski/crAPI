@@ -110,8 +110,8 @@ const AfterLogin: React.FC<AfterLoginProps> = ({
 
   if (
     !componentRole ||
-    (componentRole && componentRole === userRole) ||
-    userRole === roleTypes.ROLE_ADMIN
+    componentRole === userRole ||
+    (componentRole === roleTypes.ROLE_USER && userRole === roleTypes.ROLE_ADMIN)
   ) {
     return <Component />;
   }
