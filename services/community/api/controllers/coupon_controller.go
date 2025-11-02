@@ -16,6 +16,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -46,12 +47,20 @@ func (s *Server) AddNewCoupon(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	coupon.Prepare()
+
+	existingCoupon, err := models.ValidateCode(s.Client, s.DB, bson.M{"coupon_code": coupon.CouponCode})
+	if err == nil && existingCoupon.CouponCode != "" {
+		responses.ERROR(w, http.StatusConflict, fmt.Errorf("coupon code already exists"))
+		return
+	}
+
 	savedCoupon, er := models.SaveCoupon(s.Client, coupon)
 	if er != nil {
 		responses.ERROR(w, http.StatusInternalServerError, er)
+		return
 	}
 	if savedCoupon.CouponCode != "" {
-		responses.JSON(w, http.StatusOK, "Coupon Added in database")
+		responses.JSON(w, http.StatusOK, "Coupon added in database!")
 	}
 
 }

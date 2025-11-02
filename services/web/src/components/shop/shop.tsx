@@ -33,10 +33,12 @@ import {
   PlusOutlined,
   OrderedListOutlined,
   ShoppingCartOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import {
   COUPON_CODE_REQUIRED,
   PRODUCT_DETAILS_REQUIRED,
+  COUPON_AMOUNT_REQUIRED,
 } from "../../constants/messages";
 import { useNavigate } from "react-router-dom";
 import roleTypes from "../../constants/roleTypes";
@@ -68,6 +70,11 @@ interface ShopProps extends PropsFromRedux {
   newProductHasErrored: boolean;
   newProductErrorMessage: string;
   onNewProductFinish: (values: any) => void;
+  isNewCouponFormOpen: boolean;
+  setIsNewCouponFormOpen: (isOpen: boolean) => void;
+  newCouponHasErrored: boolean;
+  newCouponErrorMessage: string;
+  onNewCouponFinish: (values: any) => void;
   role: string;
 }
 
@@ -120,6 +127,11 @@ const Shop: React.FC<ShopProps> = (props) => {
     newProductHasErrored,
     newProductErrorMessage,
     onNewProductFinish,
+    isNewCouponFormOpen,
+    setIsNewCouponFormOpen,
+    newCouponHasErrored,
+    newCouponErrorMessage,
+    onNewCouponFinish,
     role,
   } = props;
 
@@ -130,6 +142,18 @@ const Shop: React.FC<ShopProps> = (props) => {
         title="Shop"
         onBack={() => navigate("/dashboard")}
         extra={[
+          role === roleTypes.ROLE_ADMIN && (
+            <Button
+              type="primary"
+              shape="round"
+              icon={<GiftOutlined />}
+              size="large"
+              key="new-coupon"
+              onClick={() => setIsNewCouponFormOpen(true)}
+            >
+              Create Coupon
+            </Button>
+          ),
           <Button
             type="primary"
             shape="round"
@@ -150,7 +174,7 @@ const Shop: React.FC<ShopProps> = (props) => {
           >
             Past Orders
           </Button>,
-        ]}
+        ].filter(Boolean)}
       />
       <Descriptions column={1} className="balance-desc">
         <Descriptions.Item label="Available Balance">
@@ -287,6 +311,47 @@ const Shop: React.FC<ShopProps> = (props) => {
             )}
             <Button type="primary" htmlType="submit" className="form-button">
               Add
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title="Create New Coupon"
+        open={isNewCouponFormOpen}
+        footer={null}
+        onCancel={() => setIsNewCouponFormOpen(false)}
+      >
+        <Form
+          name="basic"
+          initialValues={{
+            remember: true,
+          }}
+          onFinish={onNewCouponFinish}
+        >
+          <Form.Item
+            name="couponCode"
+            rules={[{ required: true, message: COUPON_CODE_REQUIRED }]}
+          >
+            <Input placeholder="Coupon Code" />
+          </Form.Item>
+          <Form.Item
+            name="amount"
+            rules={[
+              { required: true, message: COUPON_AMOUNT_REQUIRED },
+              {
+                pattern: /^\d+$/,
+                message: "Please enter a valid amount!",
+              },
+            ]}
+          >
+            <Input placeholder="Amount" type="number" step="1" />
+          </Form.Item>
+          <Form.Item>
+            {newCouponHasErrored && (
+              <div className="error-message">{newCouponErrorMessage}</div>
+            )}
+            <Button type="primary" htmlType="submit" className="form-button">
+              Create
             </Button>
           </Form.Item>
         </Form>

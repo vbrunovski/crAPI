@@ -27,6 +27,7 @@ import {
   INVALID_COUPON_CODE,
   COUPON_APPLIED,
   COUPON_NOT_APPLIED,
+  COUPON_NOT_CREATED,
   NEW_PRODUCT_ADDED,
   PRODUCT_NOT_ADDED,
 } from "../constants/messages";
@@ -384,6 +385,45 @@ export function* newProduct(action: MyAction): Generator<any, void, any> {
   }
 }
 
+/**
+ * create a new coupon (admin only)
+ * @payload { accessToken, couponCode, amount, callback} payload
+ * accessToken: access token of the user
+ * couponCode: coupon code to create
+ * amount: amount for the coupon
+ * callback : callback method
+ */
+export function* newCoupon(action: MyAction): Generator<any, void, any> {
+  const { accessToken, couponCode, amount, callback } = action.payload;
+  let recievedResponse: ReceivedResponse = {} as ReceivedResponse;
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    let postUrl = APIService.COMMUNITY_SERVICE + requestURLS.NEW_COUPON;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+    const responseJson = yield fetch(postUrl, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({ coupon_code: couponCode, amount: amount }),
+    }).then((response: Response) => {
+      recievedResponse = response as ReceivedResponse;
+      return response.json();
+    });
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    if (recievedResponse.ok) {
+      callback(responseTypes.SUCCESS, responseJson);
+    } else {
+      callback(responseTypes.FAILURE, COUPON_NOT_CREATED);
+    }
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    callback(responseTypes.FAILURE, COUPON_NOT_CREATED);
+  }
+}
+
 export function* shopActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.GET_PRODUCTS, getProducts);
   yield takeLatest(actionTypes.BUY_PRODUCT, buyProduct);
@@ -392,4 +432,5 @@ export function* shopActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.RETURN_ORDER, returnOrder);
   yield takeLatest(actionTypes.APPLY_COUPON, applyCoupon);
   yield takeLatest(actionTypes.NEW_PRODUCT, newProduct);
+  yield takeLatest(actionTypes.NEW_COUPON, newCoupon);
 }
