@@ -18,7 +18,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Modal } from "antd";
-import { verifyVehicleAction } from "../../actions/vehicleActions";
+import {
+  registerVehicleAction,
+  verifyVehicleAction,
+} from "../../actions/vehicleActions";
 import VerifyVehicle from "../../components/verifyVehicle/verifyVehicle";
 import responseTypes from "../../constants/responseTypes";
 import { SUCCESS_MESSAGE } from "../../constants/messages";
@@ -26,12 +29,27 @@ import { useNavigate } from "react-router-dom";
 
 const VerifyVehicleContainer = (props) => {
   const navigate = useNavigate();
-  const { verifyVehicle } = props;
+  const { registerVehicle, verifyVehicle } = props;
+  const { accessToken, vehicles } = props;
 
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [vehicleRegistered, setVehicleRegistered] = React.useState(0);
+  const [registrationMessage, setRegistrationMessage] = React.useState("");
 
-  const { accessToken } = props;
+  const onRegisterVehicle = () => {
+    setVehicleRegistered(1);
+    const callback = (res, data) => {
+      if (res === responseTypes.SUCCESS) {
+        setVehicleRegistered(2);
+        setRegistrationMessage(data);
+      } else {
+        setVehicleRegistered(0);
+        setRegistrationMessage(data);
+      }
+    };
+    registerVehicle({ callback, accessToken });
+  };
 
   const onFinish = (values) => {
     const callback = (res, data) => {
@@ -58,21 +76,31 @@ const VerifyVehicleContainer = (props) => {
       onFinish={onFinish}
       hasErrored={hasErrored}
       errorMessage={errorMessage}
+      onRegisterVehicle={onRegisterVehicle}
+      vehicleRegistered={vehicleRegistered}
+      registrationMessage={registrationMessage}
+      vehicles={vehicles}
     />
   );
 };
 
-const mapStateToProps = ({ userReducer: { accessToken } }) => {
-  return { accessToken };
+const mapStateToProps = ({
+  userReducer: { accessToken },
+  vehicleReducer: { vehicles },
+}) => {
+  return { accessToken, vehicles };
 };
 
 const mapDispatchToProps = {
+  registerVehicle: registerVehicleAction,
   verifyVehicle: verifyVehicleAction,
 };
 
 VerifyVehicleContainer.propTypes = {
   accessToken: PropTypes.string,
+  registerVehicle: PropTypes.func,
   verifyVehicle: PropTypes.func,
+  vehicles: PropTypes.array,
 };
 
 export default connect(

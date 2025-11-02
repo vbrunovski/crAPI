@@ -14,7 +14,7 @@ Verify the ports of the container by running the following command : `docker ps`
 #### Detailed solution
 
 1. Login to the application from http://localhost:8888/login
-2. From the *Dashboard*, choose *Add a Vehicle* and add the vehicle by providing the VIN and pincode received in Mailhog mailbox after Signup or by reinitiating from *Dashboard* page.
+2. From the *Dashboard*, choose *Add Vehicle* and add the vehicle by providing the VIN and pincode received in Mailhog mailbox after Signup or by reinitiating from *Dashboard* page.
 3. After the vehicle details are verified successful, the vehicle will get added and then be populated in the *Dashboard* page.
 4. Observe the request sent when we click *Refresh Location*. It can be seen that the endpoint is in the format `/identity/api/v2/vehicle/<vehicleid>/location`.
 5. Sensitive information like latitude and longitude are provided back in the response for the endpoint. Send the request to *Repeater* for later purpose.

@@ -41,6 +41,19 @@ public class VehicleController {
   @Autowired VehicleOwnershipService vehicleOwnershipService;
 
   /**
+   * @param request
+   * @return response of success and failure message creates vehicle and sends details to user
+   */
+  @PostMapping("/vehicle/register_vehicle")
+  public ResponseEntity<CRAPIResponse> registerVehicle(HttpServletRequest request) {
+    CRAPIResponse registerVehicleResponse = vehicleService.registerVehicle(request);
+    if (registerVehicleResponse != null && registerVehicleResponse.getStatus() == 200) {
+      return ResponseEntity.status(HttpStatus.OK).body(registerVehicleResponse);
+    }
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(registerVehicleResponse);
+  }
+
+  /**
    * @param vehicleDetails
    * @return response of success and failure message save vehicle Details for user in database
    */

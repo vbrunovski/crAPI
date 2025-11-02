@@ -202,20 +202,18 @@ const Dashboard: React.FC<DashboardProps> = ({
       <PageHeader
         className="dashboard-header"
         title="Vehicles Details"
-        extra={
-          !vehicles.length && [
-            <Button
-              type="primary"
-              shape="round"
-              icon={<PlusOutlined />}
-              size="large"
-              onClick={handleVerifyVehicleClick}
-              key="verify-vehicle"
-            >
-              Add a Vehicle
-            </Button>,
-          ]
-        }
+        extra={[
+          <Button
+            type="primary"
+            shape="round"
+            icon={<PlusOutlined />}
+            size="large"
+            onClick={handleVerifyVehicleClick}
+            key="verify-vehicle"
+          >
+            Add Vehicle
+          </Button>,
+        ]}
       />
       <Content>
         <Row gutter={[40, 40]}>

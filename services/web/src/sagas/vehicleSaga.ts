@@ -27,6 +27,7 @@ import {
   SERVICE_REQUEST_NOT_SENT,
   LOC_NOT_REFRESHED,
   NO_SERVICES,
+  VEHICLE_NOT_REGISTERED,
 } from "../constants/messages";
 
 interface ReceivedResponse extends Response {
@@ -67,6 +68,42 @@ export function* resendMail(action: MyAction): Generator<any, void, any> {
   } catch (e) {
     yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
     callback(responseTypes.FAILURE, EMAIL_NOT_SENT);
+  }
+}
+
+/**
+ * register a new vehicle
+ * @payload { accessToken, callback } payload
+ * accessToken: access token of the user
+ * callback : callback method
+ */
+export function* registerVehicle(action: MyAction): Generator<any, void, any> {
+  const { accessToken, callback } = action.payload;
+  let recievedResponse: ReceivedResponse = {} as ReceivedResponse;
+  try {
+    yield put({ type: actionTypes.FETCHING_DATA });
+    const postUrl = APIService.IDENTITY_SERVICE + requestURLS.REGISTER_VEHICLE;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+    const responseJson = yield fetch(postUrl, {
+      headers,
+      method: "POST",
+    }).then((response: Response) => {
+      recievedResponse = response as ReceivedResponse;
+      return response.json();
+    });
+
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    if (recievedResponse.ok) {
+      callback(responseTypes.SUCCESS, responseJson.message);
+    } else {
+      callback(responseTypes.FAILURE, VEHICLE_NOT_REGISTERED);
+    }
+  } catch (e) {
+    yield put({ type: actionTypes.FETCHED_DATA, payload: recievedResponse });
+    callback(responseTypes.FAILURE, VEHICLE_NOT_REGISTERED);
   }
 }
 
@@ -393,6 +430,7 @@ export function* getServiceReport(action: MyAction): Generator<any, void, any> {
 
 export function* vehicleActionWatcher(): Generator<any, void, any> {
   yield takeLatest(actionTypes.RESEND_MAIL, resendMail);
+  yield takeLatest(actionTypes.REGISTER_VEHICLE, registerVehicle);
   yield takeLatest(actionTypes.VERIFY_VEHICLE, verifyVehicle);
   yield takeLatest(actionTypes.GET_VEHICLES, getVehicles);
   yield takeLatest(actionTypes.GET_MECHANICS, getMechanics);

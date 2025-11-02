@@ -106,6 +106,8 @@ export const EMAIL_NOT_CHANGED: string = "Could not change email id";
 export const NO_SERVICES: string = "Could not get mechanic details";
 export const EMAIL_NOT_SENT: string = "Could not resend mail";
 export const VEHICLE_NOT_ADDED: string = "Internal Server error! Wrong VIN!";
+export const VEHICLE_NOT_REGISTERED: string =
+  "Could not register vehicle. Try again!";
 export const NO_VEHICLES: string = "Could not get vehicles";
 export const NO_MECHANICS: string = "Could not get mechanic details";
 export const SERVICE_REQUEST_SENT: string =

@@ -80,7 +80,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
       return new CRAPIResponse(
           UserMessage.NUMBER_ALREADY_REGISTERED + signUpRequest.getNumber(), 403);
     }
-    // check Number in database
+    // Check Email in database
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       return new CRAPIResponse(
           UserMessage.EMAIL_ALREADY_REGISTERED + signUpRequest.getEmail(), 403);
@@ -107,7 +107,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
       if (vehicleDetails != null) {
         smtpMailServer.sendMail(
             user.getEmail(),
-            MailBody.signupMailBody(
+            MailBody.newVehicleMailBody(
                 vehicleDetails,
                 (userDetails != null && userDetails.getName() != null
                     ? userDetails.getName()

@@ -42,6 +42,7 @@ export const requestURLS: RequestURLSType = {
   FORGOT_PASSWORD: "api/auth/forget-password",
   VERIFY_OTP: "api/auth/v3/check-otp",
   LOGIN_TOKEN: "api/auth/v4.0/user/login-with-token",
+  REGISTER_VEHICLE: "api/v2/vehicle/register_vehicle",
   ADD_VEHICLE: "api/v2/vehicle/add_vehicle",
   GET_VEHICLES: "api/v2/vehicle/vehicles",
   RESEND_MAIL: "api/v2/vehicle/resend_email",

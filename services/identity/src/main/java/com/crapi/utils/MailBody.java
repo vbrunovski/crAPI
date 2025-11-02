@@ -50,13 +50,13 @@ public class MailBody {
    * @param name
    * @return Mail body for user Signup
    */
-  public static String signupMailBody(VehicleDetails vehicleDetails, String name) {
+  public static String newVehicleMailBody(VehicleDetails vehicleDetails, String name) {
     String msgBody =
         "<html><body>"
             + "<font face='calibri' style = 'font-size:15px; color:#000;'>Hi "
             + name
             + "<font>,"
-            + "<br><font face='calibri'><p style = 'font-size:15px; color:#000;'>We are glad to have you on-board. Your newly purchased vehiche details are provided below. Please add it on your crAPI dashboard.</p>"
+            + "<br><font face='calibri'><p style = 'font-size:15px; color:#000;'>We are glad to have you on-board with a new vehicle. Your newly purchased vehicle details are provided below. Please add it on your crAPI dashboard.</p>"
             + "<p><font face='calibri' style = 'font-size:15px;color:#000;'>Your vehicle information is <b>VIN: </font><font face='calibri' font color='#0000ff'>"
             + vehicleDetails.getVin()
             + "</font></b> and <b>Pincode: <font face='calibri' font color='#0000ff'>"
