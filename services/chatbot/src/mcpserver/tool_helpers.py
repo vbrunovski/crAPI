@@ -12,3 +12,18 @@ async def get_any_api_key():
     if doc and "openai_api_key" in doc:
         return doc["openai_api_key"]
     return None
+
+def fix_array_responses_in_spec(spec):
+    for path_item in spec.get("paths", {}).values():
+        for method, operation in path_item.items():
+            if method not in ["get", "post", "put", "patch", "delete"]:
+                continue
+            
+            for response in operation.get("responses", {}).values():
+                for media in response.get("content", {}).values():
+                    schema = media.get("schema", {})
+                    
+                    if schema.get("type") == "array":
+                        del media["schema"]
+    
+    return spec

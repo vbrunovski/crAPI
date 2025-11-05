@@ -6,6 +6,7 @@ import time
 import httpx
 from fastmcp import FastMCP
 
+from .tool_helpers import fix_array_responses_in_spec
 from .config import Config
 
 # Configure logging
@@ -77,6 +78,7 @@ def get_http_client():
 # Load your OpenAPI spec
 with open(Config.OPENAPI_SPEC, "r") as f:
     openapi_spec = json.load(f)
+openapi_spec = fix_array_responses_in_spec(openapi_spec)
 
 # Create the MCP server
 mcp = FastMCP.from_openapi(
