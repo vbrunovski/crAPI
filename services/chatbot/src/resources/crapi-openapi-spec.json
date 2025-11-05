@@ -1011,9 +1011,7 @@
                   "required": [
                     "id",
                     "video_name",
-                    "converstion_params",
-                    "video",
-                    "user"
+                    "conversion_params"
                   ],
                   "properties": {
                     "id": {
@@ -1042,6 +1040,9 @@
                       "required": [
                         "email"
                       ]
+                    },
+                    "profileVideo" : {
+                      "type" : "string"
                     }
                   },
                   "example": {
@@ -1111,9 +1112,7 @@
                   "required": [
                     "id",
                     "video_name",
-                    "converstion_params",
-                    "video",
-                    "user"
+                    "conversion_params"
                   ],
                   "properties": {
                     "id": {
@@ -1142,6 +1141,9 @@
                       "required": [
                         "email"
                       ]
+                    },
+                    "profileVideo" : {
+                      "type" : "string"
                     }
                   },
                   "example": {
@@ -1234,9 +1236,7 @@
                   "required": [
                     "id",
                     "video_name",
-                    "converstion_params",
-                    "video",
-                    "user"
+                    "conversion_params"
                   ],
                   "properties": {
                     "id": {
@@ -1265,6 +1265,9 @@
                       "required": [
                         "email"
                       ]
+                    },
+                    "profileVideo" : {
+                      "type" : "string"
                     }
                   },
                   "example": {
@@ -5061,9 +5064,7 @@
         "required": [
           "id",
           "video_name",
-          "converstion_params",
-          "video",
-          "user"
+          "conversion_params"
         ],
         "properties": {
           "id": {
@@ -5092,6 +5093,9 @@
             "required": [
               "email"
             ]
+          },
+          "profileVideo" : {
+            "type" : "string"
           }
         },
         "example": {

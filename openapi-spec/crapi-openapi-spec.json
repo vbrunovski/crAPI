@@ -3191,7 +3191,7 @@
       },
       "ProfileVideo" : {
         "type" : "object",
-        "required" : [ "id", "video_name", "converstion_params", "video", "user" ],
+        "required" : [ "id", "video_name", "conversion_params" ],
         "properties" : {
           "id" : {
             "type" : "number"
@@ -3207,6 +3207,9 @@
           },
           "user" : {
             "$ref" : "#/components/schemas/User"
+          },
+          "profileVideo" : {
+            "type" : "string"
           }
         },
         "example" : {
