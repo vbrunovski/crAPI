@@ -3390,7 +3390,7 @@
                   "type" : "string"
                 },
                 "status" : {
-                  "enum" : [ "Pending", "Finished" ],
+                  "enum" : [ "pending", "completed", "cancelled", "inprogress" ],
                   "type" : "string"
                 },
                 "created_on" : {
