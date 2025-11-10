@@ -4473,8 +4473,10 @@
                           },
                           "status": {
                             "enum": [
-                              "Pending",
-                              "Finished"
+                              "pending",
+                              "completed",
+                              "cancelled",
+                              "inprogress"
                             ],
                             "type": "string"
                           },
@@ -5315,8 +5317,10 @@
                 },
                 "status": {
                   "enum": [
-                    "Pending",
-                    "Finished"
+                    "pending",
+                    "completed",
+                    "cancelled",
+                    "inprogress"
                   ],
                   "type": "string"
                 },
