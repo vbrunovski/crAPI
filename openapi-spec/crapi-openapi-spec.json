@@ -2545,7 +2545,7 @@
                       "type" : "integer"
                     },
                     "sent" : {
-                      "type" : "string"
+                      "type" : "boolean"
                     },
                     "report_link" : {
                       "type" : "string",
