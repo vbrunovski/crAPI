@@ -2518,7 +2518,7 @@
                     "type": "string"
                   },
                   "amount": {
-                    "type": "integer"
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -2527,7 +2527,7 @@
                 ],
                 "example": {
                   "coupon_code": "TRAC075",
-                  "amount": 75
+                  "amount": "75"
                 }
               }
             }
@@ -2539,28 +2539,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "amount": {
-                      "type": "string"
-                    },
-                    "coupon_code": {
-                      "type": "string"
-                    },
-                    "createdAt": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "amount",
-                    "coupon_code",
-                    "CreatedAt"
-                  ],
-                  "example": {
-                    "coupon_code": "TRAC075",
-                    "amount": "75",
-                    "CreatedAt": "2023-12-07T14:22:29.832Z"
-                  }
+                  "type": "string",
+                  "example": "Coupon added in database!"
                 }
               }
             }
@@ -5152,7 +5132,7 @@
             "type": "string"
           },
           "amount": {
-            "type": "integer"
+            "type": "string"
           }
         },
         "required": [
@@ -5161,32 +5141,12 @@
         ],
         "example": {
           "coupon_code": "TRAC075",
-          "amount": 75
+          "amount": "75"
         }
       },
       "AddCouponResponse": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string"
-          },
-          "coupon_code": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "amount",
-          "coupon_code",
-          "CreatedAt"
-        ],
-        "example": {
-          "coupon_code": "TRAC075",
-          "amount": "75",
-          "CreatedAt": "2023-12-07T14:22:29.832Z"
-        }
+        "type": "string",
+        "example": "Coupon added in database!"
       },
       "ValidateCouponRequest": {
         "type": "object",
