@@ -9,3 +9,4 @@ data:
   IDENTITY_SERVICE: crapi-identity:8080
   WORKSHOP_SERVICE: crapi-workshop:8000
   CHATBOT_SERVICE: crapi-chatbot:5002
+  MAILHOG_WEB_SERVICE: mailhog-web:8025

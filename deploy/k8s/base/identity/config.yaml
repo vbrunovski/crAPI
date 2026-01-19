@@ -26,3 +26,5 @@ data:
   JWT_EXPIRATION: "604800000"
   SMTP_STARTTLS: "true"
   SERVER_PORT: "8080"
+  TLS_ENABLED: "false"
+  API_GATEWAY_URL: "https://api.mypremiumdealership.com"
