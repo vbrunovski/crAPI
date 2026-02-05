@@ -10,6 +10,15 @@ know more about crAPI, please check [crAPI's overview][overview].
 
 ## QuickStart Guide
 
+### Application Workflow (Happy Path)
+
+After setting up crAPI, it is recommended to follow the intended user workflow
+to understand how the application is supposed to work before attempting any
+security challenges.
+
+-[Application Workflow (Happy Path)](docs/happy-path.md)
+
+
 ### Docker and docker compose
 
 You'll need to have Docker and docker compose installed and running on your host system. Also, the version of docker compose should be `1.27.0` or above. Check your docker compose version using:
