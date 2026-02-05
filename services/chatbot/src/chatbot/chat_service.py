@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from langgraph.graph.message import Messages
 
+from .config import Config
 from .extensions import db
 from .langgraph_agent import execute_langgraph_agent
 from .retriever_utils import add_to_chroma_collection
@@ -41,7 +42,11 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
         {"id": response_message_id, "role": "assistant", "content": reply.content}
     )
     add_to_chroma_collection(
-        api_key, session_id, [{"user": user_message}, {"assistant": reply.content}]
+        api_key,
+        session_id,
+        [{"user": user_message}, {"assistant": reply.content}],
+        Config.LLM_PROVIDER,
+        model_name,
     )
     # Limit chat history to last 20 messages
     history = history[-20:]

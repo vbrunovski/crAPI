@@ -11,8 +11,56 @@ apiGatewayServiceInstall: true
 apiGatewayPassword:
 tlsEnabled: false
 jwtExpiration: 604800000
-openAIApiKey: ""
 logLevel: INFO
+
+# Chatbot LLM Configuration
+chatbotLlmProvider: openai
+chatbotLlmModel: ""
+chatbotEmbeddingsModel: ""
+chatbotEmbeddingsDimensions: 1536
+
+# OpenAI API Key
+chatbotOpenaiApiKey: ""
+openAIApiKey: "" # for backward compatibility
+
+# OpenAI Base URL (for DeepSeek or other OpenAI-compatible APIs)
+chatbotOpenaiBaseUrl: ""
+
+# Anthropic API Key
+anthropicApiKey: ""
+
+# Azure configuration
+azureOpenaiApiKey: ""
+azureAdToken: ""
+azureOpenaiEndpoint: ""
+azureOpenaiApiVersion: 2024-02-15-preview
+azureOpenaiChatDeployment: ""
+azureOpenaiEmbeddingsDeployment: ""
+
+# Groq API Key
+groqApiKey: ""
+
+# Mistral API Key
+mistralApiKey: ""
+
+# Cohere API Key
+cohereApiKey: ""
+
+# AWS Bedrock configuration
+awsBearerTokenBedrock: ""
+awsAccessKeyId: ""
+awsSecretAccessKey: ""
+awsSessionToken: ""
+awsRegion: ""
+# AWS IAM Assume Role configuration (optional - use instead of static credentials)
+awsAssumeRoleArn: ""
+awsExternalId: ""
+awsRoleSessionName: "crapi-chatbot-session"
+
+# Google Vertex AI configuration
+googleApplicationCredentials: ""
+vertexProject: ""
+vertexLocation: ""
 
 waitForK8sResources:
   enabled: True
@@ -152,7 +200,6 @@ chatbot:
     postgresDbDriver: postgres
     mongoDbDriver: mongodb
     secretKey: crapi
-    defaultModel: gpt-4o-mini
     maxContentLength: 50000
     chromaPersistDirectory: /app/vectorstore
     apiUser: admin@example.com

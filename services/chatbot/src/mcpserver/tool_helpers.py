@@ -1,15 +1,23 @@
 import os
+
+from chatbot.config import Config
 from chatbot.extensions import db
 
 
 async def get_any_api_key():
-    if os.environ.get("CHATBOT_OPENAI_API_KEY"):
-        return os.environ.get("CHATBOT_OPENAI_API_KEY")
+    provider = Config.LLM_PROVIDER
+    if provider == "openai" and Config.OPENAI_API_KEY:
+        return Config.OPENAI_API_KEY
+    if provider == "anthropic" and Config.ANTHROPIC_API_KEY:
+        return Config.ANTHROPIC_API_KEY
+    key_field = "openai_api_key" if provider == "openai" else "anthropic_api_key"
+    if provider not in {"openai", "anthropic"}:
+        return None
     doc = await db.sessions.find_one(
-        {"openai_api_key": {"$exists": True, "$ne": None}}, {"openai_api_key": 1}
+        {key_field: {"$exists": True, "$ne": None}}, {key_field: 1}
     )
-    if doc and "openai_api_key" in doc:
-        return doc["openai_api_key"]
+    if doc and key_field in doc:
+        return doc[key_field]
     return None
 
 def fix_array_responses_in_spec(spec):

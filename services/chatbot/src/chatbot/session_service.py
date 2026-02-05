@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from quart import after_this_request, request
@@ -24,26 +23,46 @@ async def get_or_create_session_id():
     return session_id
 
 
-async def store_api_key(session_id, api_key):
+def _get_api_key_field(provider: str) -> str | None:
+    if provider == "openai":
+        return "openai_api_key"
+    if provider == "anthropic":
+        return "anthropic_api_key"
+    return None
+
+
+async def store_api_key(session_id, api_key, provider: str):
+    key_field = _get_api_key_field(provider)
+    if not key_field:
+        return
     await db.sessions.update_one(
-        {"session_id": session_id}, {"$set": {"openai_api_key": api_key}}, upsert=True
+        {"session_id": session_id}, {"$set": {key_field: api_key}}, upsert=True
     )
 
 
 async def get_api_key(session_id):
-    if os.environ.get("CHATBOT_OPENAI_API_KEY"):
-        return os.environ.get("CHATBOT_OPENAI_API_KEY")
+    provider = Config.LLM_PROVIDER
+    key_field = _get_api_key_field(provider)
+    if provider == "openai" and Config.OPENAI_API_KEY:
+        return Config.OPENAI_API_KEY
+    if provider == "anthropic" and Config.ANTHROPIC_API_KEY:
+        return Config.ANTHROPIC_API_KEY
+    if not key_field:
+        return None
     doc = await db.sessions.find_one({"session_id": session_id})
     if not doc:
         return None
-    if "openai_api_key" not in doc:
+    if key_field not in doc:
         return None
-    return doc["openai_api_key"]
+    return doc[key_field]
 
 
 async def delete_api_key(session_id):
+    updates = {}
+    for key_field in ("openai_api_key", "anthropic_api_key"):
+        updates[key_field] = ""
     await db.sessions.update_one(
-        {"session_id": session_id}, {"$unset": {"openai_api_key": ""}}
+        {"session_id": session_id}, {"$unset": updates}
     )
 
 
@@ -56,9 +75,9 @@ async def store_model_name(session_id, model_name):
 async def get_model_name(session_id):
     doc = await db.sessions.find_one({"session_id": session_id})
     if not doc:
-        return Config.DEFAULT_MODEL_NAME
+        return Config.LLM_MODEL_NAME
     if "model_name" not in doc:
-        return Config.DEFAULT_MODEL_NAME
+        return Config.LLM_MODEL_NAME
     return doc["model_name"]
 
 

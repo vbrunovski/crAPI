@@ -116,6 +116,8 @@ Visit [http://localhost:8888](http://localhost:8888)
 [http://localhost:8025](http://localhost:8025)
 You can change the smtp configuration if required however all emails with domain **example.com** will still go to mailhog.
 
+For chatbot LLM provider configuration, see [setup instructions](docs/setup.md#chatbot-llm-configuration).
+
 ### Vagrant
 
 This option allows you to run crAPI within a virtual machine, thus isolated from
