@@ -167,3 +167,39 @@ input[type="password"]::placeholder {
   color: #a3a3a3;
   font-style: italic;
 }
+
+/* Smaller markdown headers in chat messages */
+.rcb-bot-message h1,
+.rcb-bot-message h2,
+.rcb-bot-message h3,
+.rcb-bot-message h4,
+.rcb-bot-message h5,
+.rcb-bot-message h6 {
+  font-weight: 600 !important;
+  margin: 0.75em 0 0.25em 0 !important;
+  line-height: 1.3 !important;
+}
+
+.rcb-bot-message h1 {
+  font-size: 1.2em !important;
+}
+
+.rcb-bot-message h2 {
+  font-size: 1.15em !important;
+}
+
+.rcb-bot-message h3 {
+  font-size: 1.1em !important;
+}
+
+.rcb-bot-message h4 {
+  font-size: 1.05em !important;
+}
+
+.rcb-bot-message h5 {
+  font-size: 1.025em !important;
+}
+
+.rcb-bot-message h6 {
+  font-size: 1em !important;
+}
