@@ -35,10 +35,11 @@ def _get_base_session():
         "Creating base boto3 session - region: %s, has_access_key: %s, has_secret_key: %s, has_session_token: %s",
         region, has_access_key, has_secret_key, has_session_token
     )
+    # Use None for empty strings so boto3 falls back to instance profile/IRSA
     return boto3.Session(
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID") or None,
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY") or None,
+        aws_session_token=os.getenv("AWS_SESSION_TOKEN") or None,
         region_name=region,
     )
 
