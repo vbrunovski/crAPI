@@ -43,11 +43,12 @@ def _validate_provider_env(provider: str) -> str | None:
     if provider == "bedrock":
         if not os.environ.get("AWS_REGION"):
             return "Missing AWS_REGION"
-        if not Config.AWS_BEARER_TOKEN_BEDROCK:
+        # Allow: bearer token, static credentials, or assume role (uses instance profile)
+        if not Config.AWS_BEARER_TOKEN_BEDROCK and not Config.AWS_ASSUME_ROLE_ARN:
             if not os.environ.get("AWS_ACCESS_KEY_ID") or not os.environ.get(
                 "AWS_SECRET_ACCESS_KEY"
             ):
-                return "Missing AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY or AWS_BEARER_TOKEN_BEDROCK"
+                return "Missing AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY, AWS_ASSUME_ROLE_ARN, or AWS_BEARER_TOKEN_BEDROCK"
         return None
     if provider == "vertex":
         # GOOGLE_APPLICATION_CREDENTIALS is optional if running in GCP with ADC
