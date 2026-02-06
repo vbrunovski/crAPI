@@ -170,11 +170,15 @@ async def chat():
         return jsonify({"message": "Message is required", "id": id}), 400
 
     logger.debug("Processing message - session_id: %s, message_length: %d", session_id, len(message))
-    reply, response_id = await process_user_message(
-        session_id, message, provider_api_key, model_name, user_jwt
-    )
-    logger.info("Chat response sent - session_id: %s, response_id: %s", session_id, response_id)
-    return jsonify({"id": response_id, "message": reply}), 200
+    try:
+        reply, response_id = await process_user_message(
+            session_id, message, provider_api_key, model_name, user_jwt
+        )
+        logger.info("Chat response sent - session_id: %s, response_id: %s", session_id, response_id)
+        return jsonify({"id": response_id, "message": reply}), 200
+    except Exception as e:
+        logger.error("Error processing message - session_id: %s, error: %s", session_id, str(e), exc_info=True)
+        return jsonify({"id": id, "message": str(e)}), 200
 
 
 @chat_bp.route("/state", methods=["GET"])
