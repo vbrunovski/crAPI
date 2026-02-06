@@ -7,12 +7,23 @@ import time
 from typing import Optional
 
 import boto3
-from botocore.credentials import RefreshableCredentials
-from botocore.session import get_session
+from botocore.config import Config as BotocoreConfig
 
 from .config import Config
 
 logger = logging.getLogger(__name__)
+
+# Clear empty token env vars that botocore might pick up and use for bearer token auth.
+# Empty strings cause botocore to attempt token-based auth with an invalid token.
+_TOKEN_ENV_VARS_TO_CLEAR = [
+    "AWS_BEARER_TOKEN",
+    "AWS_BEARER_TOKEN_BEDROCK",
+    "AZURE_AD_TOKEN",
+]
+for _var in _TOKEN_ENV_VARS_TO_CLEAR:
+    if _var in os.environ and not os.environ[_var]:
+        logger.info("[AWS_CREDS_INIT] Removing empty env var: %s", _var)
+        del os.environ[_var]
 
 # Cache for assumed role credentials
 _credentials_cache = {
@@ -163,13 +174,15 @@ def _set_cached_credentials(credentials: dict) -> None:
         )
 
 
-def get_aws_credentials() -> Optional[dict]:
+def get_aws_credentials() -> dict:
     """
-    Get AWS credentials, using assume role if configured.
+    Get AWS credentials, using assume role if configured, or static credentials.
 
     Returns:
-        dict with 'access_key', 'secret_key', 'token' (optional), and 'region',
-        or None if no credentials are configured/needed.
+        dict with 'access_key', 'secret_key', 'token' (optional), and 'region'.
+
+    Raises:
+        RuntimeError: If no credentials are available.
     """
     region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
     logger.info(
@@ -204,25 +217,18 @@ def get_aws_credentials() -> Optional[dict]:
 
         # Assume role and cache credentials
         logger.info("[AWS_CREDS] No cached credentials, will call assume role now")
-        try:
-            credentials = _assume_role()
-            _set_cached_credentials(credentials)
-            logger.info(
-                "[AWS_CREDS] Assume role succeeded - access_key_prefix: %s",
-                credentials["access_key"][:8] + "..." if credentials.get("access_key") else "(none)"
-            )
-            return {
-                "access_key": credentials["access_key"],
-                "secret_key": credentials["secret_key"],
-                "token": credentials["token"],
-                "region": region,
-            }
-        except Exception as e:
-            logger.error(
-                "[AWS_CREDS] Assume role FAILED - role_arn: %s, error_type: %s, error: %s",
-                Config.AWS_ASSUME_ROLE_ARN, type(e).__name__, str(e)
-            )
-            raise
+        credentials = _assume_role()
+        _set_cached_credentials(credentials)
+        logger.info(
+            "[AWS_CREDS] Assume role succeeded - access_key_prefix: %s",
+            credentials["access_key"][:8] + "..." if credentials.get("access_key") else "(none)"
+        )
+        return {
+            "access_key": credentials["access_key"],
+            "secret_key": credentials["secret_key"],
+            "token": credentials["token"],
+            "region": region,
+        }
 
     # If static credentials are provided via environment variables
     access_key = os.getenv("AWS_ACCESS_KEY_ID")
@@ -244,60 +250,61 @@ def get_aws_credentials() -> Optional[dict]:
             result["token"] = session_token
         return result
 
-    # Return None to use default credential chain (instance profile, etc.)
-    logger.info("[AWS_CREDS] No credentials found, returning None (will use default chain)")
-    return None
+    # No credentials available - raise error
+    raise RuntimeError(
+        "No AWS credentials available. Set AWS_ASSUME_ROLE_ARN for assume role, "
+        "or AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for static credentials."
+    )
 
 
 def get_boto3_session() -> boto3.Session:
     """
-    Get a boto3 session with the appropriate credentials.
+    Get a boto3 session with explicit credentials.
 
-    This handles assume role if configured, otherwise uses the default credential chain.
+    This handles assume role if configured, otherwise uses static credentials.
     """
-    logger.debug("Creating boto3 session")
+    logger.debug("Creating boto3 session with explicit credentials")
     credentials = get_aws_credentials()
 
-    if credentials:
-        logger.debug(
-            "Creating boto3 session with explicit credentials - region: %s, has_token: %s",
-            credentials.get("region"), bool(credentials.get("token"))
-        )
-        return boto3.Session(
-            aws_access_key_id=credentials["access_key"],
-            aws_secret_access_key=credentials["secret_key"],
-            aws_session_token=credentials.get("token"),
-            region_name=credentials.get("region"),
-        )
-
-    # Use default credential chain
-    region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
-    logger.debug("Creating boto3 session with default credential chain - region: %s", region)
-    return boto3.Session(region_name=region)
+    return boto3.Session(
+        aws_access_key_id=credentials["access_key"],
+        aws_secret_access_key=credentials["secret_key"],
+        aws_session_token=credentials.get("token"),
+        region_name=credentials.get("region"),
+    )
 
 
 def get_bedrock_client():
     """
-    Create a boto3 bedrock-runtime client with proper credentials.
+    Create a boto3 bedrock-runtime client with explicit credentials.
 
-    This handles assume role if configured, otherwise uses the default credential chain.
+    This bypasses any token-based auth that botocore might pick up from env vars.
     """
-    logger.info("[BEDROCK_CLIENT] Creating bedrock-runtime client")
-    session = get_boto3_session()
+    logger.info("[BEDROCK_CLIENT] Creating bedrock-runtime client with explicit credentials")
+    credentials = get_aws_credentials()
+    region = credentials.get("region") or os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
 
-    # Verify the session has credentials
-    creds = session.get_credentials()
-    if creds:
-        logger.info(
-            "[BEDROCK_CLIENT] Session has credentials - method: %s, access_key_prefix: %s",
-            getattr(creds, 'method', 'unknown'),
-            creds.access_key[:8] + "..." if creds.access_key else "(none)"
-        )
-    else:
-        logger.error("[BEDROCK_CLIENT] Session has NO credentials - boto3 will fail!")
+    logger.info(
+        "[BEDROCK_CLIENT] Using credentials - access_key_prefix: %s, has_token: %s, region: %s",
+        credentials["access_key"][:8] + "..." if credentials.get("access_key") else "(none)",
+        bool(credentials.get("token")),
+        region
+    )
 
-    client = session.client("bedrock-runtime")
-    logger.info("[BEDROCK_CLIENT] Client created successfully")
+    # Create client with explicit credentials, bypassing any default chain or token discovery
+    client = boto3.client(
+        "bedrock-runtime",
+        aws_access_key_id=credentials["access_key"],
+        aws_secret_access_key=credentials["secret_key"],
+        aws_session_token=credentials.get("token"),
+        region_name=region,
+        # Disable any retries on auth errors to fail fast
+        config=BotocoreConfig(
+            signature_version="v4",  # Force SigV4, not bearer token
+            retries={"max_attempts": 3},
+        ),
+    )
+    logger.info("[BEDROCK_CLIENT] Client created successfully with explicit credentials")
     return client
 
 
@@ -305,27 +312,40 @@ def get_bedrock_credentials_kwargs() -> dict:
     """
     Get kwargs to pass to ChatBedrock or BedrockEmbeddings for credentials.
 
+    Always uses explicit credentials to bypass any token-based auth.
+
     Returns a dict that can be unpacked into the constructor.
     """
     logger.info("[BEDROCK_KWARGS] get_bedrock_credentials_kwargs called")
-    region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
 
-    # Always create our own client to ensure proper credential handling
     try:
-        client = get_bedrock_client()
-        logger.info("[BEDROCK_KWARGS] Using pre-configured bedrock client")
-        # Note: ChatBedrock uses 'client' parameter, not 'bedrock_client'
-        return {
-            "client": client,
-            "region_name": region,
-        }
+        credentials = get_aws_credentials()
     except Exception as e:
         logger.error(
-            "[BEDROCK_KWARGS] Failed to create bedrock client: %s - %s",
+            "[BEDROCK_KWARGS] Failed to get credentials: %s - %s",
             type(e).__name__, str(e)
         )
-        raise RuntimeError(
-            f"Failed to create Bedrock client: {type(e).__name__}: {e}. "
-            f"AWS_ASSUME_ROLE_ARN={Config.AWS_ASSUME_ROLE_ARN or '(not set)'}, "
-            f"AWS_REGION={region}"
-        ) from e
+        raise
+
+    region = credentials.get("region") or os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
+
+    # Pass explicit credentials to ChatBedrock/BedrockEmbeddings
+    # This ensures we use SigV4 signing, not any token-based auth
+    kwargs = {
+        "region_name": region,
+        "credentials_profile_name": None,  # Disable profile lookup
+        "aws_access_key_id": credentials["access_key"],
+        "aws_secret_access_key": credentials["secret_key"],
+    }
+
+    if credentials.get("token"):
+        kwargs["aws_session_token"] = credentials["token"]
+
+    logger.info(
+        "[BEDROCK_KWARGS] Using explicit credentials - access_key_prefix: %s, has_token: %s, region: %s",
+        credentials["access_key"][:8] + "..." if credentials.get("access_key") else "(none)",
+        bool(credentials.get("token")),
+        region
+    )
+
+    return kwargs

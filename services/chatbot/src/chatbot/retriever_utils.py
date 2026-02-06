@@ -11,7 +11,7 @@ from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_mistralai import MistralAIEmbeddings
 from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
-from .aws_credentials import get_bedrock_credentials_kwargs, get_bedrock_client
+from .aws_credentials import get_bedrock_credentials_kwargs
 from .config import Config
 
 logger = logging.getLogger(__name__)

@@ -95,40 +95,31 @@ def _build_llm(api_key, model_name):
         return AzureChatOpenAI(**kwargs)
     if provider == "bedrock":
         import os as _os
-        # Collect debug info that will appear in error messages
-        debug_info = {
-            "model_id": model_name,
-            "assume_role_arn": Config.AWS_ASSUME_ROLE_ARN or "(not configured)",
-            "region": _os.getenv("AWS_REGION"),
-            "has_access_key_env": bool(_os.getenv("AWS_ACCESS_KEY_ID")),
-            "has_secret_key_env": bool(_os.getenv("AWS_SECRET_ACCESS_KEY")),
-            "has_bearer_token": bool(Config.AWS_BEARER_TOKEN_BEDROCK),
-        }
-        logger.info("[BUILD_LLM] Bedrock provider - debug_info: %s", debug_info)
+        logger.info(
+            "[BUILD_LLM] Bedrock provider - model_id: %s, assume_role_arn: %s, region: %s",
+            model_name,
+            Config.AWS_ASSUME_ROLE_ARN or "(not configured)",
+            _os.getenv("AWS_REGION"),
+        )
 
         try:
             bedrock_kwargs = get_bedrock_credentials_kwargs()
+            logger.info(
+                "[BUILD_LLM] Got Bedrock kwargs - keys: %s, has_explicit_creds: %s",
+                list(bedrock_kwargs.keys()),
+                bool(bedrock_kwargs.get("aws_access_key_id"))
+            )
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to get Bedrock credentials: {type(e).__name__}: {e}. Debug info: {debug_info}"
-            ) from e
-
-        # Add debug info to kwargs for visibility
-        debug_info["kwargs_keys"] = list(bedrock_kwargs.keys())
-        debug_info["has_explicit_creds"] = bool(bedrock_kwargs.get("aws_access_key_id"))
-        if bedrock_kwargs.get("aws_access_key_id"):
-            debug_info["access_key_prefix"] = bedrock_kwargs["aws_access_key_id"][:8] + "..."
-
-        logger.info("[BUILD_LLM] Creating ChatBedrock - debug_info: %s", debug_info)
+            logger.error("[BUILD_LLM] Failed to get Bedrock credentials: %s", str(e))
+            raise
 
         try:
             llm = ChatBedrock(model_id=model_name, **bedrock_kwargs)
-            logger.info("[BUILD_LLM] ChatBedrock created successfully")
+            logger.info("[BUILD_LLM] ChatBedrock created successfully with explicit credentials")
             return llm
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to create ChatBedrock: {type(e).__name__}: {e}. Debug info: {debug_info}"
-            ) from e
+            logger.error("[BUILD_LLM] Failed to create ChatBedrock: %s - %s", type(e).__name__, str(e))
+            raise
     if provider == "vertex":
         logger.info(
             "Vertex AI Config - model: %s, project: %s, location: %s",
