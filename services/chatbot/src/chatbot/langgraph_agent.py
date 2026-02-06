@@ -95,16 +95,27 @@ def _build_llm(api_key, model_name):
         return AzureChatOpenAI(**kwargs)
     if provider == "bedrock":
         logger.info(
-            "Bedrock Config - model_id: %s, assume_role_arn: %s",
+            "[BUILD_LLM] Bedrock provider - model_id: %s, assume_role_arn: %s",
             model_name, Config.AWS_ASSUME_ROLE_ARN or "(not configured)"
         )
         bedrock_kwargs = get_bedrock_credentials_kwargs()
+        # Log what we're passing to ChatBedrock (without secrets)
+        safe_kwargs = {k: v for k, v in bedrock_kwargs.items() if "secret" not in k.lower()}
+        if "aws_access_key_id" in bedrock_kwargs:
+            safe_kwargs["aws_access_key_id"] = bedrock_kwargs["aws_access_key_id"][:8] + "..."
+        if "aws_session_token" in bedrock_kwargs:
+            safe_kwargs["aws_session_token"] = "(set)"
         logger.info(
-            "Bedrock Credentials - region: %s, has_explicit_credentials: %s",
-            bedrock_kwargs.get("region_name", "(not set)"),
-            bool(bedrock_kwargs.get("aws_access_key_id"))
+            "[BUILD_LLM] Creating ChatBedrock with kwargs: %s",
+            safe_kwargs
         )
-        return ChatBedrock(model_id=model_name, **bedrock_kwargs)
+        try:
+            llm = ChatBedrock(model_id=model_name, **bedrock_kwargs)
+            logger.info("[BUILD_LLM] ChatBedrock created successfully")
+            return llm
+        except Exception as e:
+            logger.error("[BUILD_LLM] Failed to create ChatBedrock: %s - %s", type(e).__name__, str(e))
+            raise
     if provider == "vertex":
         logger.info(
             "Vertex AI Config - model: %s, project: %s, location: %s",
