@@ -276,6 +276,31 @@ def get_boto3_session() -> boto3.Session:
     return boto3.Session(region_name=region)
 
 
+def get_bedrock_client():
+    """
+    Create a boto3 bedrock-runtime client with proper credentials.
+
+    This handles assume role if configured, otherwise uses the default credential chain.
+    """
+    logger.info("[BEDROCK_CLIENT] Creating bedrock-runtime client")
+    session = get_boto3_session()
+
+    # Verify the session has credentials
+    creds = session.get_credentials()
+    if creds:
+        logger.info(
+            "[BEDROCK_CLIENT] Session has credentials - method: %s, access_key_prefix: %s",
+            getattr(creds, 'method', 'unknown'),
+            creds.access_key[:8] + "..." if creds.access_key else "(none)"
+        )
+    else:
+        logger.error("[BEDROCK_CLIENT] Session has NO credentials - boto3 will fail!")
+
+    client = session.client("bedrock-runtime")
+    logger.info("[BEDROCK_CLIENT] Client created successfully")
+    return client
+
+
 def get_bedrock_credentials_kwargs() -> dict:
     """
     Get kwargs to pass to ChatBedrock or BedrockEmbeddings for credentials.
@@ -283,40 +308,24 @@ def get_bedrock_credentials_kwargs() -> dict:
     Returns a dict that can be unpacked into the constructor.
     """
     logger.info("[BEDROCK_KWARGS] get_bedrock_credentials_kwargs called")
-    credentials = get_aws_credentials()
     region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
 
-    kwargs = {}
-
-    if region:
-        kwargs["region_name"] = region
-
-    if credentials:
-        kwargs["credentials_profile_name"] = None  # Disable profile lookup
-        kwargs["aws_access_key_id"] = credentials["access_key"]
-        kwargs["aws_secret_access_key"] = credentials["secret_key"]
-        if credentials.get("token"):
-            kwargs["aws_session_token"] = credentials["token"]
-        logger.info(
-            "[BEDROCK_KWARGS] Explicit credentials obtained - region: %s, has_session_token: %s, "
-            "credential_source: %s, access_key_prefix: %s",
-            region,
-            bool(credentials.get("token")),
-            "assume_role" if Config.AWS_ASSUME_ROLE_ARN else "static_or_default",
-            credentials["access_key"][:8] + "..." if credentials.get("access_key") else "(none)"
+    # Always create our own client to ensure proper credential handling
+    try:
+        client = get_bedrock_client()
+        logger.info("[BEDROCK_KWARGS] Using pre-configured bedrock client")
+        # Note: ChatBedrock uses 'client' parameter, not 'bedrock_client'
+        return {
+            "client": client,
+            "region_name": region,
+        }
+    except Exception as e:
+        logger.error(
+            "[BEDROCK_KWARGS] Failed to create bedrock client: %s - %s",
+            type(e).__name__, str(e)
         )
-    else:
-        logger.info(
-            "[BEDROCK_KWARGS] No explicit credentials, will use default chain - region: %s",
-            region
-        )
-
-    # Log final kwargs (without secrets)
-    safe_kwargs = {k: v for k, v in kwargs.items() if "secret" not in k.lower()}
-    if "aws_access_key_id" in kwargs:
-        safe_kwargs["aws_access_key_id"] = kwargs["aws_access_key_id"][:8] + "..."
-    if "aws_session_token" in kwargs:
-        safe_kwargs["aws_session_token"] = "(set)"
-    logger.info("[BEDROCK_KWARGS] Returning kwargs: %s", safe_kwargs)
-
-    return kwargs
+        raise RuntimeError(
+            f"Failed to create Bedrock client: {type(e).__name__}: {e}. "
+            f"AWS_ASSUME_ROLE_ARN={Config.AWS_ASSUME_ROLE_ARN or '(not set)'}, "
+            f"AWS_REGION={region}"
+        ) from e

@@ -1,9 +1,21 @@
+import logging
+import sys
+
 from quart import Blueprint, Quart, jsonify
 from quart_cors import cors
 
 from .chat_api import chat_bp
 from .config import Config
 from .extensions import init_mongo
+
+# Configure logging for all chatbot modules
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
+)
+# Ensure chatbot loggers are at INFO level
+logging.getLogger("chatbot").setLevel(logging.INFO)
 
 root_bp = Blueprint("root", __name__, url_prefix="/chatbot")
 session_api_key_map = {}
