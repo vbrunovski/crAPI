@@ -33,51 +33,121 @@ DEFAULT_MODELS = {
 
 
 def _get_default_model(provider: str) -> str:
-    return DEFAULT_MODELS.get(provider, "gpt-4o-mini")
+    default_model = DEFAULT_MODELS.get(provider, "gpt-4o-mini")
+    logger.debug(
+        "Getting default model for provider - provider: %s, default_model: %s",
+        provider, default_model
+    )
+    return default_model
 
 
 def _build_llm(api_key, model_name):
     provider = Config.LLM_PROVIDER
+    original_model_name = model_name
     model_name = model_name or _get_default_model(provider)
-    logger.info("Using LLM provider: %s, model: %s", provider, model_name)
+
+    # Log AI config derivation
+    logger.info(
+        "=== AI CONFIG DERIVATION === provider: %s, requested_model: %s, derived_model: %s, model_source: %s",
+        provider,
+        original_model_name or "(none)",
+        model_name,
+        "user_specified" if original_model_name else "default"
+    )
+    logger.info(
+        "AI Config Details - LLM_PROVIDER: %s, LLM_MODEL_NAME (env): %s, EMBEDDINGS_MODEL: %s",
+        Config.LLM_PROVIDER,
+        Config.LLM_MODEL_NAME or "(not set)",
+        Config.EMBEDDINGS_MODEL or "(not set)"
+    )
+
     if provider == "openai":
         kwargs = {"api_key": api_key, "model": model_name}
         if Config.OPENAI_BASE_URL:
             kwargs["base_url"] = Config.OPENAI_BASE_URL
-            logger.info("Using custom OpenAI base URL: %s", Config.OPENAI_BASE_URL)
+            logger.info(
+                "OpenAI Config - model: %s, base_url: %s, has_api_key: %s",
+                model_name, Config.OPENAI_BASE_URL, bool(api_key)
+            )
+        else:
+            logger.info(
+                "OpenAI Config - model: %s, base_url: (default), has_api_key: %s",
+                model_name, bool(api_key)
+            )
         return ChatOpenAI(**kwargs)
     if provider == "azure_openai":
+        deployment = Config.AZURE_OPENAI_CHAT_DEPLOYMENT or model_name
         kwargs = {
             "azure_endpoint": Config.AZURE_OPENAI_ENDPOINT,
             "api_version": Config.AZURE_OPENAI_API_VERSION,
-            "azure_deployment": Config.AZURE_OPENAI_CHAT_DEPLOYMENT or model_name,
+            "azure_deployment": deployment,
         }
         if Config.AZURE_AD_TOKEN:
             kwargs["azure_ad_token"] = Config.AZURE_AD_TOKEN
+            auth_method = "azure_ad_token"
         else:
             kwargs["api_key"] = Config.AZURE_OPENAI_API_KEY
+            auth_method = "api_key"
+        logger.info(
+            "Azure OpenAI Config - deployment: %s, endpoint: %s, api_version: %s, auth_method: %s",
+            deployment, Config.AZURE_OPENAI_ENDPOINT, Config.AZURE_OPENAI_API_VERSION, auth_method
+        )
         return AzureChatOpenAI(**kwargs)
     if provider == "bedrock":
+        logger.info(
+            "Bedrock Config - model_id: %s, assume_role_arn: %s",
+            model_name, Config.AWS_ASSUME_ROLE_ARN or "(not configured)"
+        )
         bedrock_kwargs = get_bedrock_credentials_kwargs()
+        logger.info(
+            "Bedrock Credentials - region: %s, has_explicit_credentials: %s",
+            bedrock_kwargs.get("region_name", "(not set)"),
+            bool(bedrock_kwargs.get("aws_access_key_id"))
+        )
         return ChatBedrock(model_id=model_name, **bedrock_kwargs)
     if provider == "vertex":
+        logger.info(
+            "Vertex AI Config - model: %s, project: %s, location: %s",
+            model_name, Config.VERTEX_PROJECT or "(not set)", Config.VERTEX_LOCATION or "(not set)"
+        )
         return ChatVertexAI(
             model_name=model_name,
             project=Config.VERTEX_PROJECT or None,
             location=Config.VERTEX_LOCATION or None,
         )
     if provider == "anthropic":
+        logger.info(
+            "Anthropic Config - model: %s, has_api_key: %s",
+            model_name, bool(api_key)
+        )
         return ChatAnthropic(api_key=api_key, model=model_name)
     if provider == "groq":
+        logger.info(
+            "Groq Config - model: %s, has_api_key: %s",
+            model_name, bool(Config.GROQ_API_KEY)
+        )
         return ChatGroq(api_key=Config.GROQ_API_KEY, model=model_name)
     if provider == "mistral":
+        logger.info(
+            "Mistral Config - model: %s, has_api_key: %s",
+            model_name, bool(Config.MISTRAL_API_KEY)
+        )
         return ChatMistralAI(api_key=Config.MISTRAL_API_KEY, model=model_name)
     if provider == "cohere":
+        logger.info(
+            "Cohere Config - model: %s, has_api_key: %s",
+            model_name, bool(Config.COHERE_API_KEY)
+        )
         return ChatCohere(api_key=Config.COHERE_API_KEY, model=model_name)
+    logger.error("Unsupported LLM provider: %s", provider)
     raise ValueError(f"Unsupported provider {provider}")
 
 
 async def build_langgraph_agent(api_key, model_name, user_jwt):
+    logger.info(
+        "Building LangGraph agent - has_api_key: %s, model_name: %s, has_user_jwt: %s",
+        bool(api_key), model_name or "(will use default)", bool(user_jwt)
+    )
     system_prompt = textwrap.dedent(
         """
 You are crAPI Assistant — an expert agent that helps users explore and test the Completely Ridiculous API (crAPI), a vulnerable-by-design application for learning and evaluating modern API security issues.
@@ -116,25 +186,48 @@ Use the tools only if you don't know the answer.
     """
     )
     llm = _build_llm(api_key, model_name)
+    logger.debug("LLM instance created successfully")
+
     toolkit = SQLDatabaseToolkit(db=postgresdb, llm=llm)
+    logger.debug("SQL Database toolkit created")
+
     mcp_client = get_mcp_client(user_jwt)
     mcp_tools = await mcp_client.get_tools()
+    logger.debug("MCP tools loaded: %d tools", len(mcp_tools))
+
     db_tools = toolkit.get_tools()
+    logger.debug("Database tools loaded: %d tools", len(db_tools))
+
     tools = mcp_tools + db_tools
     retriever_tool = get_retriever_tool(api_key, Config.LLM_PROVIDER, model_name)
     tools.append(retriever_tool)
+    logger.info(
+        "Agent tools prepared - mcp_tools: %d, db_tools: %d, retriever_tool: 1, total: %d",
+        len(mcp_tools), len(db_tools), len(tools)
+    )
+
     agent_node = create_agent(
         model=llm,
         tools=tools,
         system_prompt=system_prompt,
         middleware=[truncate_tool_messages],
     )
+    logger.info("LangGraph agent built successfully")
     return agent_node
 
 
 async def execute_langgraph_agent(
     api_key, model_name, messages, user_jwt, session_id=None
 ):
+    logger.info(
+        "Executing LangGraph agent - session_id: %s, model_name: %s, message_count: %d",
+        session_id, model_name or "(default)", len(messages)
+    )
     agent = await build_langgraph_agent(api_key, model_name, user_jwt)
+    logger.debug("Invoking agent with %d messages", len(messages))
     response = await agent.ainvoke({"messages": messages})
+    logger.info(
+        "Agent execution completed - session_id: %s, response_message_count: %d",
+        session_id, len(response.get("messages", []))
+    )
     return response

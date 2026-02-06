@@ -63,8 +63,12 @@ def _validate_provider_env(provider: str) -> str | None:
 async def init():
     session_id = await get_or_create_session_id()
     data = await request.get_json()
-    logger.debug("Initializing bot for session %s", session_id)
+    logger.info("Initializing bot for session %s", session_id)
     provider = Config.LLM_PROVIDER
+    logger.info(
+        "Init AI Config - provider: %s, model: %s, embeddings: %s",
+        provider, Config.LLM_MODEL_NAME or "(not set)", Config.EMBEDDINGS_MODEL or "(not set)"
+    )
     if provider == "openai":
         api_key = await get_api_key(session_id)
         if api_key:
@@ -107,9 +111,14 @@ async def model():
     session_id = await get_or_create_session_id()
     data = await request.get_json()
     model_name = Config.LLM_MODEL_NAME
+    model_source = "environment_default"
     if data and "model_name" in data and data["model_name"]:
         model_name = data["model_name"]
-    logger.debug("Setting model %s for session %s", model_name, session_id)
+        model_source = "user_specified"
+    logger.info(
+        "Model selection - session_id: %s, model_name: %s, model_source: %s, provider: %s",
+        session_id, model_name or "(not set)", model_source, Config.LLM_PROVIDER
+    )
     await store_model_name(session_id, model_name)
     return jsonify({"model_used": model_name}), 200
 
@@ -118,27 +127,52 @@ async def model():
 async def chat():
     session_id = await get_or_create_session_id()
     provider = Config.LLM_PROVIDER
+    logger.info(
+        "Chat request received - session_id: %s, provider: %s",
+        session_id, provider
+    )
+
     error = _validate_provider_env(provider)
     if error:
+        logger.error("Provider environment validation failed - provider: %s, error: %s", provider, error)
         return jsonify({"message": error}), 400
+
     provider_api_key = await get_api_key(session_id)
     model_name = await get_model_name(session_id)
     user_jwt = await get_user_jwt()
+
+    logger.info(
+        "=== CHAT AI CONFIG === session_id: %s, provider: %s, model_name: %s, has_api_key: %s, has_jwt: %s",
+        session_id, provider, model_name or "(will derive default)", bool(provider_api_key), bool(user_jwt)
+    )
+    logger.info(
+        "Environment AI Config - LLM_MODEL_NAME: %s, EMBEDDINGS_MODEL: %s, EMBEDDINGS_DIMENSIONS: %d",
+        Config.LLM_MODEL_NAME or "(not set)",
+        Config.EMBEDDINGS_MODEL or "(not set)",
+        Config.EMBEDDINGS_DIMENSIONS
+    )
+
     if provider in {"openai", "anthropic"} and not provider_api_key:
         message = (
             "Missing OpenAI API key. Please authenticate."
             if provider == "openai"
             else "Missing Anthropic API key. Please authenticate."
         )
+        logger.warning("API key missing for provider - session_id: %s, provider: %s", session_id, provider)
         return jsonify({"message": message}), 400
+
     data = await request.get_json()
     message = data.get("message", "").strip()
     id = data.get("id", uuid4().int & (1 << 63) - 1)
     if not message:
+        logger.warning("Empty message received - session_id: %s", session_id)
         return jsonify({"message": "Message is required", "id": id}), 400
+
+    logger.debug("Processing message - session_id: %s, message_length: %d", session_id, len(message))
     reply, response_id = await process_user_message(
         session_id, message, provider_api_key, model_name, user_jwt
     )
+    logger.info("Chat response sent - session_id: %s, response_id: %s", session_id, response_id)
     return jsonify({"id": response_id, "message": reply}), 200
 
 
