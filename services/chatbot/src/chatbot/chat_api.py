@@ -163,6 +163,10 @@ async def chat():
         return jsonify({"message": message}), 400
 
     data = await request.get_json()
+    logger.debug("Raw request data - type: %s, value: %r", type(data).__name__, data)
+    if not isinstance(data, dict):
+        logger.warning("Invalid request body - expected JSON object, got %s: %r", type(data).__name__, data)
+        return jsonify({"message": "Invalid request body - expected JSON object"}), 400
     message = data.get("message", "").strip()
     id = data.get("id", uuid4().int & (1 << 63) - 1)
     if not message:
