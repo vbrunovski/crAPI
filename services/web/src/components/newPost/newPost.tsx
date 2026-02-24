@@ -15,6 +15,7 @@
 
 import React from "react";
 import { Button, Form, Card, Input } from "antd";
+import "./newPost.css";
 import {
   POST_TITLE_REQUIRED,
   POST_DESC_REQUIRED,
@@ -35,15 +36,14 @@ const NewPost: React.FC<NewPostProps> = ({
   const postContent = urlParams.get("content");
 
   return (
-    <div className="container">
-      <Card title="New Post" bordered={false} className="form-card">
+    <div className="new-post-container">
+      <Card title="New Post" bordered={false} className="new-post-card">
         <Form
           name="new-post"
+          layout="vertical"
           initialValues={{
             remember: true,
           }}
-          labelCol={{ sm: { span: 8 } }}
-          wrapperCol={{ sm: { span: 16 } }}
           onFinish={onFinish}
         >
           <Form.Item
@@ -59,7 +59,7 @@ const NewPost: React.FC<NewPostProps> = ({
             initialValue={postContent}
             rules={[{ required: true, message: POST_DESC_REQUIRED }]}
           >
-            <Input.TextArea />
+            <Input.TextArea rows={6} placeholder="What's on your mind?" />
           </Form.Item>
           <Form.Item wrapperCol={{ sm: { span: 24 } }}>
             {hasErrored && <div className="error-message">{errorMessage}</div>}

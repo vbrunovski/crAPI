@@ -188,11 +188,13 @@ chatbot:
   name: crapi-chatbot
   image: crapi/crapi-chatbot
   port: 5002
+  mcpPort: 5500
   replicaCount: 1
   service:
     name: crapi-chatbot
     labels:
       app: crapi-chatbot
+    mcpNodePort: 30500
   config:
     name: crapi-chatbot-configmap
     labels:

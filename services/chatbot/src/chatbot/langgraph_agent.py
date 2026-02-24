@@ -2,10 +2,10 @@ import logging
 import textwrap
 
 from langchain.agents import create_agent
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_anthropic import ChatAnthropic
 from langchain_aws import ChatBedrock
 from langchain_cohere import ChatCohere
+from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_google_vertexai import ChatVertexAI
 from langchain_groq import ChatGroq
 from langchain_mistralai import ChatMistralAI
@@ -36,7 +36,8 @@ def _get_default_model(provider: str) -> str:
     default_model = DEFAULT_MODELS.get(provider, "gpt-4o-mini")
     logger.debug(
         "Getting default model for provider - provider: %s, default_model: %s",
-        provider, default_model
+        provider,
+        default_model,
     )
     return default_model
 
@@ -52,13 +53,13 @@ def _build_llm(api_key, model_name):
         provider,
         original_model_name or "(none)",
         model_name,
-        "user_specified" if original_model_name else "default"
+        "user_specified" if original_model_name else "default",
     )
     logger.info(
         "AI Config Details - LLM_PROVIDER: %s, LLM_MODEL_NAME (env): %s, EMBEDDINGS_MODEL: %s",
         Config.LLM_PROVIDER,
         Config.LLM_MODEL_NAME or "(not set)",
-        Config.EMBEDDINGS_MODEL or "(not set)"
+        Config.EMBEDDINGS_MODEL or "(not set)",
     )
 
     if provider == "openai":
@@ -67,12 +68,15 @@ def _build_llm(api_key, model_name):
             kwargs["base_url"] = Config.OPENAI_BASE_URL
             logger.info(
                 "OpenAI Config - model: %s, base_url: %s, has_api_key: %s",
-                model_name, Config.OPENAI_BASE_URL, bool(api_key)
+                model_name,
+                Config.OPENAI_BASE_URL,
+                bool(api_key),
             )
         else:
             logger.info(
                 "OpenAI Config - model: %s, base_url: (default), has_api_key: %s",
-                model_name, bool(api_key)
+                model_name,
+                bool(api_key),
             )
         return ChatOpenAI(**kwargs)
     if provider == "azure_openai":
@@ -90,11 +94,15 @@ def _build_llm(api_key, model_name):
             auth_method = "api_key"
         logger.info(
             "Azure OpenAI Config - deployment: %s, endpoint: %s, api_version: %s, auth_method: %s",
-            deployment, Config.AZURE_OPENAI_ENDPOINT, Config.AZURE_OPENAI_API_VERSION, auth_method
+            deployment,
+            Config.AZURE_OPENAI_ENDPOINT,
+            Config.AZURE_OPENAI_API_VERSION,
+            auth_method,
         )
         return AzureChatOpenAI(**kwargs)
     if provider == "bedrock":
         import os as _os
+
         logger.info(
             "[BUILD_LLM] Bedrock provider - model_id: %s, assume_role_arn: %s, region: %s",
             model_name,
@@ -107,7 +115,7 @@ def _build_llm(api_key, model_name):
             logger.info(
                 "[BUILD_LLM] Got Bedrock kwargs - keys: %s, has_explicit_creds: %s",
                 list(bedrock_kwargs.keys()),
-                bool(bedrock_kwargs.get("aws_access_key_id"))
+                bool(bedrock_kwargs.get("aws_access_key_id")),
             )
         except Exception as e:
             logger.error("[BUILD_LLM] Failed to get Bedrock credentials: %s", str(e))
@@ -115,15 +123,23 @@ def _build_llm(api_key, model_name):
 
         try:
             llm = ChatBedrock(model_id=model_name, **bedrock_kwargs)
-            logger.info("[BUILD_LLM] ChatBedrock created successfully with explicit credentials")
+            logger.info(
+                "[BUILD_LLM] ChatBedrock created successfully with explicit credentials"
+            )
             return llm
         except Exception as e:
-            logger.error("[BUILD_LLM] Failed to create ChatBedrock: %s - %s", type(e).__name__, str(e))
+            logger.error(
+                "[BUILD_LLM] Failed to create ChatBedrock: %s - %s",
+                type(e).__name__,
+                str(e),
+            )
             raise
     if provider == "vertex":
         logger.info(
             "Vertex AI Config - model: %s, project: %s, location: %s",
-            model_name, Config.VERTEX_PROJECT or "(not set)", Config.VERTEX_LOCATION or "(not set)"
+            model_name,
+            Config.VERTEX_PROJECT or "(not set)",
+            Config.VERTEX_LOCATION or "(not set)",
         )
         return ChatVertexAI(
             model_name=model_name,
@@ -132,26 +148,28 @@ def _build_llm(api_key, model_name):
         )
     if provider == "anthropic":
         logger.info(
-            "Anthropic Config - model: %s, has_api_key: %s",
-            model_name, bool(api_key)
+            "Anthropic Config - model: %s, has_api_key: %s", model_name, bool(api_key)
         )
         return ChatAnthropic(api_key=api_key, model=model_name)
     if provider == "groq":
         logger.info(
             "Groq Config - model: %s, has_api_key: %s",
-            model_name, bool(Config.GROQ_API_KEY)
+            model_name,
+            bool(Config.GROQ_API_KEY),
         )
         return ChatGroq(api_key=Config.GROQ_API_KEY, model=model_name)
     if provider == "mistral":
         logger.info(
             "Mistral Config - model: %s, has_api_key: %s",
-            model_name, bool(Config.MISTRAL_API_KEY)
+            model_name,
+            bool(Config.MISTRAL_API_KEY),
         )
         return ChatMistralAI(api_key=Config.MISTRAL_API_KEY, model=model_name)
     if provider == "cohere":
         logger.info(
             "Cohere Config - model: %s, has_api_key: %s",
-            model_name, bool(Config.COHERE_API_KEY)
+            model_name,
+            bool(Config.COHERE_API_KEY),
         )
         return ChatCohere(api_key=Config.COHERE_API_KEY, model=model_name)
     logger.error("Unsupported LLM provider: %s", provider)
@@ -161,7 +179,9 @@ def _build_llm(api_key, model_name):
 async def build_langgraph_agent(api_key, model_name, user_jwt):
     logger.info(
         "Building LangGraph agent - has_api_key: %s, model_name: %s, has_user_jwt: %s",
-        bool(api_key), model_name or "(will use default)", bool(user_jwt)
+        bool(api_key),
+        model_name or "(will use default)",
+        bool(user_jwt),
     )
     system_prompt = textwrap.dedent(
         """
@@ -218,7 +238,9 @@ Use the tools only if you don't know the answer.
     tools.append(retriever_tool)
     logger.info(
         "Agent tools prepared - mcp_tools: %d, db_tools: %d, retriever_tool: 1, total: %d",
-        len(mcp_tools), len(db_tools), len(tools)
+        len(mcp_tools),
+        len(db_tools),
+        len(tools),
     )
 
     agent_node = create_agent(
@@ -236,13 +258,16 @@ async def execute_langgraph_agent(
 ):
     logger.info(
         "Executing LangGraph agent - session_id: %s, model_name: %s, message_count: %d",
-        session_id, model_name or "(default)", len(messages)
+        session_id,
+        model_name or "(default)",
+        len(messages),
     )
     agent = await build_langgraph_agent(api_key, model_name, user_jwt)
     logger.debug("Invoking agent with %d messages", len(messages))
     response = await agent.ainvoke({"messages": messages})
     logger.info(
         "Agent execution completed - session_id: %s, response_message_count: %d",
-        session_id, len(response.get("messages", []))
+        session_id,
+        len(response.get("messages", [])),
     )
     return response

@@ -51,6 +51,7 @@ spec:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.chatbot.port }}
+            - containerPort: {{ .Values.chatbot.mcpPort }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.chatbot.config.name }}

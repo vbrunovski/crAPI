@@ -32,7 +32,7 @@ import (
 type Post struct {
 	ID        string     `gorm:"primary_key;auto_increment" json:"id"`
 	Title     string     `gorm:"size:255;not null;unique" json:"title"`
-	Content   string     `gorm:"size:255;not null;" json:"content"`
+	Content   string     `gorm:"size:2000;not null;" json:"content"`
 	Author    Author     `json:"author"`
 	Comments  []Comments `json:"comments"`
 	AuthorID  uint64     `sql:"type:int REFERENCES users(id)" json:"authorid"`
@@ -155,5 +155,66 @@ func FindAllPost(client *mongo.Client, offset int64, limit int64) (PostsResponse
 	if err = cur.Err(); err != nil {
 		log.Println("Error in cursor: ", err)
 	}
+	return postsResponse, err
+}
+
+// FindPostsByTitle filters posts by title with pagination
+func FindPostsByTitle(client *mongo.Client, title string, offset int64, limit int64) (PostsResponse, error) {
+	postList := []Post{}
+	postsResponse := PostsResponse{}
+
+	options := options.Find()
+	options.SetSort(bson.D{{Key: "_id", Value: -1}})
+	options.SetLimit(limit)
+	options.SetSkip(offset)
+
+	ctx := context.Background()
+	collection := client.Database("crapi").Collection("post")
+
+	filter := bson.M{
+		"title": bson.M{
+			"$regex":   title,
+			"$options": "i",
+		},
+	}
+
+	cur, err := collection.Find(ctx, filter, options)
+	if err != nil {
+		log.Println("Error in finding posts by title: ", err)
+		return postsResponse, err
+	}
+
+	for cur.Next(ctx) {
+		var elem Post
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Println("Error in decoding posts: ", err)
+			return postsResponse, err
+		}
+		postList = append(postList, elem)
+	}
+
+	postsResponse.Posts = postList
+
+	count, err1 := collection.CountDocuments(context.Background(), filter)
+	if err1 != nil {
+		log.Println("Error in counting posts: ", err1)
+		return postsResponse, err1
+	}
+
+	if offset-limit >= 0 {
+		tempOffset := offset - limit
+		postsResponse.PrevOffset = &tempOffset
+	}
+	if offset+limit < count {
+		tempOffset := offset + limit
+		postsResponse.NextOffset = &tempOffset
+	}
+
+	postsResponse.Total = len(postList)
+	if err = cur.Err(); err != nil {
+		log.Println("Error in cursor: ", err)
+	}
+
 	return postsResponse, err
 }

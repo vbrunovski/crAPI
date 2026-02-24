@@ -46,6 +46,8 @@ func (server *Server) InitializeRoutes() *mux.Router {
 	// Post Route
 	server.Router.HandleFunc("/community/api/v2/community/posts/recent", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(controller.GetPost, server.DB))).Methods("GET", "OPTIONS")
 
+	server.Router.HandleFunc("/community/api/v2/community/posts/search", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(controller.GetPostsByTitle, server.DB))).Methods("GET", "OPTIONS")
+
 	server.Router.HandleFunc("/community/api/v2/community/posts/{postID}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(controller.GetPostByID, server.DB))).Methods("GET", "OPTIONS")
 
 	server.Router.HandleFunc("/community/api/v2/community/posts", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(controller.AddNewPost, server.DB))).Methods("POST", "OPTIONS")

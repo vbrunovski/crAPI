@@ -18,6 +18,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5002
+        - containerPort: 5500
         envFrom:
             - configMapRef:
                 name: crapi-chatbot-configmap

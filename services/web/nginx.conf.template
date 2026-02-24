@@ -1,6 +1,12 @@
+log_format debug_log '$remote_addr - $remote_user [$time_local] '
+                     '"$request" $status $body_bytes_sent '
+                     '"$http_referer" "$http_user_agent" '
+                     'upstream: "$upstream_addr" '
+                     'request_body: "$request_body"';
 
 server {
   listen 443 ssl;
+  access_log /usr/share/nginx/html/debug/access.log debug_log;
   server_name _;
   ssl_certificate /app/certs/server.crt;
   ssl_certificate_key /app/certs/server.key;
@@ -87,6 +93,13 @@ server {
     try_files $uri $uri/ =404;
   }
 
+  location /debug/ {
+    alias /usr/share/nginx/html/debug/;
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+  }
+
   location /.well-known/jwks.json {
     proxy_pass ${HTTP_PROTOCOL}://${IDENTITY_SERVICE}/identity/api/auth/jwks.json;
   }
@@ -125,6 +138,7 @@ server {
 server {
   listen 80;
   server_name _;
+  access_log /usr/share/nginx/html/debug/access.log debug_log;
   client_max_body_size 50M;
   index index.html;
   root /usr/share/nginx/html;
@@ -206,6 +220,13 @@ server {
 
   location /static {
     try_files $uri $uri/ =404;
+  }
+
+  location /debug/ {
+    alias /usr/share/nginx/html/debug/;
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
   }
 
   location /.well-known/jwks.json {

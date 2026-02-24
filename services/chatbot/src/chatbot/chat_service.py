@@ -30,17 +30,25 @@ async def delete_chat_history(session_id):
 async def process_user_message(session_id, user_message, api_key, model_name, user_jwt):
     logger.info(
         "Processing user message - session_id: %s, model_name: %s, provider: %s, has_api_key: %s, has_jwt: %s",
-        session_id, model_name or "(default)", Config.LLM_PROVIDER, bool(api_key), bool(user_jwt)
+        session_id,
+        model_name or "(default)",
+        Config.LLM_PROVIDER,
+        bool(api_key),
+        bool(user_jwt),
     )
     logger.info(
         "=== AI CONFIG === provider: %s, model: %s, embeddings_model: %s",
         Config.LLM_PROVIDER,
         model_name or Config.LLM_MODEL_NAME or "(will derive default)",
-        Config.EMBEDDINGS_MODEL or "(will derive default)"
+        Config.EMBEDDINGS_MODEL or "(will derive default)",
     )
 
     history = await get_chat_history(session_id)
-    logger.debug("Retrieved chat history - session_id: %s, history_count: %d", session_id, len(history))
+    logger.debug(
+        "Retrieved chat history - session_id: %s, history_count: %d",
+        session_id,
+        len(history),
+    )
 
     # generate a unique numeric id for the message that is random but unique
     source_message_id = uuid4().int & (1 << 63) - 1
@@ -59,7 +67,9 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     history.append(
         {"id": response_message_id, "role": "assistant", "content": reply.content}
     )
-    logger.debug("Added assistant response to history - message_id: %s", response_message_id)
+    logger.debug(
+        "Added assistant response to history - message_id: %s", response_message_id
+    )
 
     add_to_chroma_collection(
         api_key,
@@ -75,6 +85,8 @@ async def process_user_message(session_id, user_message, api_key, model_name, us
     await update_chat_history(session_id, history)
     logger.info(
         "Message processing complete - session_id: %s, response_id: %s, history_count: %d",
-        session_id, response_message_id, len(history)
+        session_id,
+        response_message_id,
+        len(history),
     )
     return reply.content, response_message_id

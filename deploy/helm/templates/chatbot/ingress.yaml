@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.chatbot.service.name }}
+  name: {{ .Values.chatbot.service.name }}-mcp
   labels:
     release: {{ .Release.Name }}
     {{- with .Values.chatbot.service.labels }}
@@ -9,9 +9,11 @@ metadata:
     {{- end }}
 spec:
   ports:
-  - port: {{ .Values.chatbot.port }}
-    name: chatbot
-  - port: {{ .Values.chatbot.mcpPort }}
-    name: mcp
+  - name: mcp
+    port: {{ .Values.chatbot.mcpPort }}
+    nodePort: {{ .Values.chatbot.service.mcpNodePort }}
+    protocol: TCP
   selector:
     {{- toYaml .Values.chatbot.serviceSelectorLabels | nindent 4 }}
+  sessionAffinity: None
+  type: LoadBalancer

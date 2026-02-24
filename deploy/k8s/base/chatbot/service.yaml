@@ -7,6 +7,8 @@ metadata:
 spec:
   ports:
   - port: 5002
-    name: go
+    name: chatbot
+  - port: 5500
+    name: mcp
   selector:
     app: crapi-chatbot

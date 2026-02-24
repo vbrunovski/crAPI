@@ -35,6 +35,11 @@ COPY ./nginx.conf.template /etc/nginx/conf.d/default.conf.template
 COPY ./nginx.ssl.conf.template /etc/nginx/conf.d/default.ssl.conf.template
 RUN mkdir -p /app
 COPY ./certs /app/certs
+RUN mkdir -p /usr/share/nginx/html/debug && \
+    touch /usr/share/nginx/html/debug/access.log && \
+    chmod 755 /usr/share/nginx/html/debug && \
+    chmod 666 /usr/share/nginx/html/debug/access.log && \
+    chown -R nobody:nobody /usr/share/nginx/html/debug
 RUN echo "daemon off;" >> /usr/local/openresty/nginx/conf/nginx.conf
 EXPOSE 80
 EXPOSE 443

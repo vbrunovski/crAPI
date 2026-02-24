@@ -252,8 +252,9 @@ jobs:
           pip3 install virtualenv
           virtualenv venv
           source venv/bin/activate
-          pip3 install -r requirements.txt
-          pip3 install -r dev-requirements.txt
+          pip install --upgrade pip setuptools 
+          pip install -r requirements.txt
+          pip install -r dev-requirements.txt
           mkdir -p test-results
           source .env
           IS_TESTING=True python3 manage.py test --no-input --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner
