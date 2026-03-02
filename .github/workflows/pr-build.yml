@@ -252,7 +252,8 @@ jobs:
           pip3 install virtualenv
           virtualenv venv
           source venv/bin/activate
-          pip install --upgrade pip setuptools 
+          pip install --upgrade pip
+          pip install setuptools>=70.0.0
           pip install -r requirements.txt
           pip install -r dev-requirements.txt
           mkdir -p test-results
