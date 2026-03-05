@@ -131,6 +131,13 @@ services:
       - TLS_CERTIFICATE=certs/server.crt
       - TLS_KEY=certs/server.key
       - FILES_LIMIT=1000
+      # Gunicorn configuration for better performance under load
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}
+      - GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-120}
+      - GUNICORN_MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-1000}
+      - GUNICORN_MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-50}
+      # Database connection pooling (10 minutes)
+      - DB_CONN_MAX_AGE=${DB_CONN_MAX_AGE:-600}
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -148,8 +155,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: 128M
+          cpus: '1.0'
+          memory: 512M
 
   crapi-chatbot:
     container_name: crapi-chatbot

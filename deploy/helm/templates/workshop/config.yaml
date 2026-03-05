@@ -23,3 +23,10 @@ data:
     API_GATEWAY_URL: {{ if .Values.apiGatewayServiceInstall }}"https://{{ .Values.apiGatewayService.service.name }}"{{ else }}{{ .Values.apiGatewayServiceUrl }}{{ end }}
     TLS_ENABLED: {{ .Values.tlsEnabled | quote }}
     FILES_LIMIT: {{ .Values.workshop.config.filesLimit | quote }}
+    # Gunicorn configuration for better performance under load
+    GUNICORN_WORKERS: {{ .Values.workshop.config.gunicornWorkers | default "4" | quote }}
+    GUNICORN_TIMEOUT: {{ .Values.workshop.config.gunicornTimeout | default "120" | quote }}
+    GUNICORN_MAX_REQUESTS: {{ .Values.workshop.config.gunicornMaxRequests | default "1000" | quote }}
+    GUNICORN_MAX_REQUESTS_JITTER: {{ .Values.workshop.config.gunicornMaxRequestsJitter | default "50" | quote }}
+    # Database connection pooling
+    DB_CONN_MAX_AGE: {{ .Values.workshop.config.dbConnMaxAge | default "600" | quote }}

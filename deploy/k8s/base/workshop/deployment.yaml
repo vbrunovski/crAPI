@@ -35,10 +35,12 @@ spec:
             - configMapRef:
                 name: crapi-workshop-configmap
         resources:
-          limits:
-            cpu: "256m"
           requests:
-            cpu: 256m
+            cpu: "200m"
+            memory: "128Mi"
+          limits:
+            cpu: "1500m"
+            memory: "768Mi"
         readinessProbe:
           tcpSocket:
             port: 8000

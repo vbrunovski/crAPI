@@ -35,6 +35,12 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Starting Django server"
+# Calculate optimal worker count (2-4 x CPU cores, default to 4)
+WORKERS=${GUNICORN_WORKERS:-4}
+TIMEOUT=${GUNICORN_TIMEOUT:-120}
+MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-1000}
+MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-50}
+
 if [ "$TLS_ENABLED" = "true" ] || [ "$TLS_ENABLED" = "1" ]; then
   echo "TLS is ENABLED"
   # if $TLS_CERTIFICATE and $TLS_KEY are not set, use the default ones
@@ -46,10 +52,19 @@ if [ "$TLS_ENABLED" = "true" ] || [ "$TLS_ENABLED" = "1" ]; then
   fi
   echo "TLS_CERTIFICATE: $TLS_CERTIFICATE"
   echo "TLS_KEY: $TLS_KEY"
+  echo "Starting with $WORKERS workers, timeout=$TIMEOUT, max-requests=$MAX_REQUESTS"
   # python3 manage.py runserver_plus --cert-file $TLS_CERTIFICATE --key-file $TLS_KEY --noreload 0.0.0.0:${SERVER_PORT}
-  gunicorn --workers=1 --threads=20  --timeout 60 --bind 0.0.0.0:${SERVER_PORT} --certfile $TLS_CERTIFICATE --keyfile $TLS_KEY --log-level=debug crapi_site.wsgi
+  gunicorn --workers=$WORKERS --threads=10 --worker-class=gthread --timeout $TIMEOUT \
+    --max-requests $MAX_REQUESTS --max-requests-jitter $MAX_REQUESTS_JITTER \
+    --bind 0.0.0.0:${SERVER_PORT} --certfile $TLS_CERTIFICATE --keyfile $TLS_KEY \
+    --log-level=debug --access-logfile - --error-logfile - \
+    crapi_site.wsgi
 else
   echo "TLS is DISABLED"
+  echo "Starting with $WORKERS workers, timeout=$TIMEOUT, max-requests=$MAX_REQUESTS"
   # python3 manage.py runserver 0.0.0.0:${SERVER_PORT} --noreload
-  gunicorn --workers=1 --threads=20  --timeout 60 --bind 0.0.0.0:${SERVER_PORT} --log-level=debug crapi_site.wsgi
+  gunicorn --workers=$WORKERS --threads=10 --worker-class=gthread --timeout $TIMEOUT \
+    --max-requests $MAX_REQUESTS --max-requests-jitter $MAX_REQUESTS_JITTER \
+    --bind 0.0.0.0:${SERVER_PORT} --log-level=debug --access-logfile - --error-logfile - \
+    crapi_site.wsgi
 fi

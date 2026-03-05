@@ -175,6 +175,44 @@ workshop:
     mongoDbDriver: mongodb
     secretKey: crapi
     filesLimit: 1000
+    # Gunicorn configuration for better performance under load
+    gunicornWorkers: 4
+    gunicornTimeout: 120
+    gunicornMaxRequests: 1000
+    gunicornMaxRequestsJitter: 50
+    # Database connection pooling (600 seconds = 10 minutes)
+    dbConnMaxAge: 600
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "512Mi"
+    requests:
+      cpu: "500m"
+      memory: "256Mi"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 30
+        policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 2
+          periodSeconds: 15
+        selectPolicy: Max
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+        selectPolicy: Min
   deploymentLabels:
     app: crapi-workshop
   podLabels:

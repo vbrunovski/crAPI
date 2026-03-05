@@ -184,7 +184,13 @@ DATABASES = {
             "NAME": "test_crapi",
             "USER": get_env_value("DB_USER"),
         },
-        "CONN_MAX_AGE": 0,
+        # Enable persistent database connections (600 seconds = 10 minutes)
+        # This prevents creating a new connection for every request
+        "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", 600)),
+        # Add connection pool settings for better performance under load
+        "OPTIONS": {
+            "connect_timeout": 10,
+        },
     },
     "mongodb": {
         "ENGINE": "djongo",
