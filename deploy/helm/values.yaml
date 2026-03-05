@@ -133,6 +133,12 @@ identity:
     app: crapi-identity
   serviceSelectorLabels:
     app: crapi-identity
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
 
 community:
   name: crapi-community
@@ -157,6 +163,12 @@ community:
     app: crapi-community
   serviceSelectorLabels:
     app: crapi-community
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
 
 workshop:
   name: crapi-workshop
@@ -279,7 +291,6 @@ mailhog:
   replicaCount: 1
   minReadySeconds: 10
   progressDeadlineSeconds: 600
-  namespace: {{ .Release.Namespace }}
   smtpService:
     name: mailhog
     labels:
