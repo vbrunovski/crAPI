@@ -13,6 +13,8 @@ tlsEnabled: false
 jwtExpiration: 604800000
 logLevel: INFO
 
+chatbotLife: 1
+
 # Chatbot LLM Configuration
 chatbotLlmProvider: openai
 chatbotLlmModel: ""

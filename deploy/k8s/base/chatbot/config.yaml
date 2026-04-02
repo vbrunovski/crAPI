@@ -19,6 +19,7 @@ data:
   MONGO_DB_USER: "admin"
   MONGO_DB_PASSWORD: "crapisecretpassword"
   MONGO_DB_NAME: "crapi"
+  CHATBOT_LIFE: "1"
   CHATBOT_OPENAI_API_KEY: ""
   CHATBOT_OPENAI_BASE_URL: ""
   CHATBOT_LLM_PROVIDER: "openai"

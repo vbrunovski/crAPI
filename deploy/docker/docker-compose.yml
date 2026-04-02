@@ -181,6 +181,7 @@ services:
       - API_USER=admin@example.com
       - API_PASSWORD=Admin!123
       - OPENAPI_SPEC=/app/resources/crapi-openapi-spec.json
+      - CHATBOT_LIFE=${CHATBOT_LIFE:-1}
       - CHATBOT_LLM_PROVIDER=${CHATBOT_LLM_PROVIDER:-openai}
       - CHATBOT_LLM_MODEL=${CHATBOT_LLM_MODEL:-}
       - CHATBOT_EMBEDDINGS_MODEL=${CHATBOT_EMBEDDINGS_MODEL:-}

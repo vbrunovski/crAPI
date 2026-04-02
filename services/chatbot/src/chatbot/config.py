@@ -37,3 +37,4 @@ class Config:
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 100000))
     CHROMA_HOST = CHROMA_HOST
     CHROMA_PORT = CHROMA_PORT
+    CHATBOT_LIFE = int(os.getenv("CHATBOT_LIFE", "1"))

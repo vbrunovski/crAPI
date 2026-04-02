@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 from uuid import uuid4
 
 from quart import Blueprint, jsonify, request
@@ -199,6 +200,17 @@ async def chat():
         session_id,
         len(message),
     )
+
+    if not Config.CHATBOT_LIFE:
+        _busy_responses = [
+            "I'm currently processing a large number of requests. Please check back in a few moments.",
+            "Our systems are experiencing high load right now. Please try again shortly.",
+            "Your request is being queued for processing. Please retry in a minute or two.",
+            "The AI model is temporarily at capacity. Please try your question again soon.",
+            "Processing is taking longer than expected due to demand. Please try again in a bit.",
+        ]
+        return jsonify({"id": id, "message": random.choice(_busy_responses)}), 200
+
     try:
         reply, response_id = await process_user_message(
             session_id, message, provider_api_key, model_name, user_jwt
