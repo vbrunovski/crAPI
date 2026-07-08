@@ -1,0 +1,7 @@
+rules:
+  - id: test-rule
+    patterns:
+      - pattern: $X = $X
+    message: "Test rule"
+    languages: [python, javascript, java]
+    severity: WARNING
