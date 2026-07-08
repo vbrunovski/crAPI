@@ -1,15 +1,29 @@
 pipeline {
     agent any
+
     stages {
         stage('SAST - Semgrep') {
             steps {
-                // Это сработает, потому что теперь внутри Jenkins есть docker-клиент
-                sh 'docker run --rm -v "${WORKSPACE}:/src" returntocorp/semgrep semgrep --config=p/owasp-top-10 --output=/src/semgrep-report.json --format=json /src'
+                script {
+                    // Используем ${WORKSPACE} для корректного маппинга путей.
+                    // Добавлена подкоманда 'scan' и аргумент '--json' согласно актуальным требованиям Semgrep.
+                    sh '''
+                        docker run --rm -v "${WORKSPACE}:/src" returntocorp/semgrep \
+                        semgrep scan \
+                            --config=p/owasp-top-10 \
+                            --json \
+                            --output=/src/semgrep-report.json \
+                            /src
+                    '''
+                }
             }
         }
-        stage('Archive') {
+
+        stage('Archive Report') {
             steps {
+                // Путь к файлу остается прежним, так как мы сохранили его в воркспейс
                 archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
+                echo 'SAST report successfully archived.'
             }
         }
     }
