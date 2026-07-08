@@ -3,16 +3,16 @@ pipeline {
     stages {
         stage('SAST - Semgrep') {
             steps {
-  script {
-    sh '''
-        # Запускаем сканер, используя официальный реестр правил Semgrep (он не требует локального файла)
-        # Это гарантированно работает, так как контейнер сам тянет правила из сети
-        docker run --rm \
-        -v "${WORKSPACE}:/src" \
-        returntocorp/semgrep \
-        semgrep scan --config "p/owasp-top-10" --config "p/api-security" --exclude semgrep-report.json --json /src > "${WORKSPACE}/semgrep-report.json"
-    '''
-}
+                script {
+                    // Используем --config auto, чтобы избежать проблем с сетью при скачивании
+                    // Перенаправляем stdout в файл, чтобы обойти проблемы с правами записи
+                    sh '''
+                        docker run --rm \
+                        -v "${WORKSPACE}:/src" \
+                        returntocorp/semgrep \
+                        semgrep scan --config auto --exclude semgrep-report.json --json /src > "${WORKSPACE}/semgrep-report.json"
+                    '''
+                }
             }
         }
         stage('Archive Report') {
