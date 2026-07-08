@@ -1,19 +1,22 @@
 pipeline {
-    agent any // Запуск прямо на агенте (без docker-обертки)
+    agent {
+        docker {
+            image 'returntocorp/semgrep'
+            // Используем args для монтирования текущей директории с правильными правами
+            args '-u root -v "${WORKSPACE}:/src"' 
+        }
+    }
     
     stages {
         stage('SAST - Semgrep') {
             steps {
                 sh '''
-                    # Установка семантического анализатора
-                    python3 -m pip install semgrep
-                    
-                    echo "=== Semgrep SAST Scan Started ==="
+                    echo "=== Semgrep Scan Starting ==="
+                    # Semgrep по умолчанию сканирует текущую папку
                     semgrep --config=p/owasp-top-10 \
-                            --config=auto \
                             --output=semgrep-report.json \
-                            --format=json \
-                            .
+                            --format=json
+                    echo "=== Scan Finished ==="
                 '''
             }
         }
