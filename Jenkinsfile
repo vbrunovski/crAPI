@@ -2,8 +2,7 @@ pipeline {
     agent {
         docker {
             image 'returntocorp/semgrep'
-            // Используем -u root, чтобы избежать проблем с правами доступа к файлам в воркспейсе
-            args '-u root' 
+            args '-u root'
         }
     }
     
