@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'returntocorp/semgrep'
-            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+            args '--user root'
         }
     }
     
@@ -10,7 +10,7 @@ pipeline {
         stage('SAST - Semgrep') {
             steps {
                 sh '''
-                    echo "=== Running Semgrep SAST Scan ==="
+                    echo "=== Running Semgrep SAST ==="
                     semgrep --config=p/owasp-top-10 \
                             --config=auto \
                             --output=semgrep-report.json \
@@ -22,8 +22,8 @@ pipeline {
         
         stage('Archive Report') {
             steps {
-                archiveArtifacts artifacts: 'semgrep-report.json', fingerprint: true, allowEmptyArchive: true
-                echo 'SAST scan completed successfully!'
+                archiveArtifacts artifacts: 'semgrep-report.json', fingerprint: true
+                echo 'SAST completed!'
             }
         }
     }
