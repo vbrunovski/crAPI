@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'returntocorp/semgrep'
-            args '--user root'
+            args '-u root' // Можно сократить --user до -u
         }
     }
     
@@ -23,7 +23,7 @@ pipeline {
         
         stage('Archive Report') {
             steps {
-                archiveArtifacts artifacts: 'semgrep-report.json', fingerprint: true, allowEmptyArchive: true
+                archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
                 echo 'SAST report archived.'
             }
         }
