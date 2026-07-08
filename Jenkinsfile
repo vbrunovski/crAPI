@@ -2,13 +2,20 @@ pipeline {
     agent any
 
     stages {
+        stage('Prepare Permissions') {
+            steps {
+                // Делаем папку доступной для записи всем пользователям, 
+                // прежде чем запускать сканер
+                sh 'chmod -R 777 "${WORKSPACE}"'
+            }
+        }
         stage('SAST - Semgrep') {
             steps {
                 script {
-                    // Добавили флаг -u 1000:1000, чтобы контейнер писал файлы от имени пользователя jenkins
+                    // Убираем флаг -u, чтобы контейнер работал от root (он сам разберется),
+                    // раз мы уже открыли права на папку на хосте
                     sh '''
                         docker run --rm \
-                        -u $(id -u):$(id -g) \
                         -v "${WORKSPACE}:/src" \
                         returntocorp/semgrep \
                         semgrep scan \
@@ -20,11 +27,9 @@ pipeline {
                 }
             }
         }
-
         stage('Archive Report') {
             steps {
                 archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
-                echo 'SAST report successfully archived.'
             }
         }
     }
