@@ -5,10 +5,12 @@ pipeline {
         stage('SAST - Semgrep') {
             steps {
                 script {
-                    // Используем ${WORKSPACE} для корректного маппинга путей.
-                    // Добавлена подкоманда 'scan' и аргумент '--json' согласно актуальным требованиям Semgrep.
+                    // Добавили флаг -u 1000:1000, чтобы контейнер писал файлы от имени пользователя jenkins
                     sh '''
-                        docker run --rm -v "${WORKSPACE}:/src" returntocorp/semgrep \
+                        docker run --rm \
+                        -u $(id -u):$(id -g) \
+                        -v "${WORKSPACE}:/src" \
+                        returntocorp/semgrep \
                         semgrep scan \
                             --config=p/owasp-top-10 \
                             --json \
@@ -21,7 +23,6 @@ pipeline {
 
         stage('Archive Report') {
             steps {
-                // Путь к файлу остается прежним, так как мы сохранили его в воркспейс
                 archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
                 echo 'SAST report successfully archived.'
             }
