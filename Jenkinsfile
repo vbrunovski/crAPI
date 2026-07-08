@@ -1,11 +1,8 @@
 pipeline {
-    agent any // Запускаем на любом агенте
-
+    agent any
     stages {
-        stage('SAST - Semgrep') {
+        stage('SAST') {
             steps {
-                // Если нет Docker CLI, мы не вызываем docker
-                // Вызываем semgrep напрямую через shell
                 sh 'semgrep --config=p/owasp-top-10 --output=semgrep-report.json --format=json .'
             }
         }
