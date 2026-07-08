@@ -4,12 +4,15 @@ pipeline {
         stage('SAST - Semgrep') {
             steps {
                 script {
-                    // Используем конфиг из самого репозитория (он уже внутри /src)
                     sh '''
+                        echo "--- Скан запускается ---"
                         docker run --rm \
                         -v "${WORKSPACE}:/src" \
                         returntocorp/semgrep \
                         semgrep scan --config /src/semgrep.yaml --json --output /src/semgrep-report.json /src || true
+                        
+                        echo "--- Debug: Листинг папки /src внутри контейнера ---"
+                        docker run --rm -v "${WORKSPACE}:/src" returntocorp/semgrep ls -l /src
                     '''
                 }
             }
