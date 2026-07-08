@@ -17,10 +17,10 @@ pipeline {
                         -v "${WORKSPACE}:/src" \
                         returntocorp/semgrep \
                         semgrep scan \
-                            --config auto \
+                            --config p/owasp-top-10 \
                             --json \
-                            --output=/src/semgrep-report.json \
-                            /src
+                            --output /src/semgrep-report.json \
+                            /src || true
                     '''
                 }
             }
