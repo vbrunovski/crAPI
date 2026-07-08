@@ -1,30 +1,26 @@
 pipeline {
-    agent {
-        docker {
-            image 'returntocorp/semgrep'
-            args '-u root'
-        }
-    }
+    agent any
     
     stages {
         stage('SAST - Semgrep') {
             steps {
-                sh '''
-                    echo "=== Semgrep SAST Scan Started ==="
-                    semgrep --config=p/owasp-top-10 \
-                            --config=auto \
-                            --output=semgrep-report.json \
-                            --format=json \
-                            .
-                    echo "=== Scan Completed ==="
-                '''
+                script {
+                    def semgrep = docker.image('returntocorp/semgrep')
+                    semgrep.inside('-u root') {
+                        sh '''
+                            semgrep --config=p/owasp-top-10 \
+                                    --config=auto \
+                                    --output=semgrep-report.json \
+                                    --format=json \
+                                    .
+                        '''
+                    }
+                }
             }
         }
-        
-        stage('Archive Report') {
+        stage('Archive') {
             steps {
                 archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
-                echo 'SAST report archived.'
             }
         }
     }
