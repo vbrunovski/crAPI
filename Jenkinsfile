@@ -10,7 +10,7 @@ pipeline {
         docker run --rm \
         -v "${WORKSPACE}:/src" \
         returntocorp/semgrep \
-        semgrep scan --config auto --json /src > "${WORKSPACE}/semgrep-report.json" || true
+        semgrep scan --config "p/owasp-top-10" --config "p/api-security" --exclude semgrep-report.json --json /src > "${WORKSPACE}/semgrep-report.json"
     '''
 }
             }
