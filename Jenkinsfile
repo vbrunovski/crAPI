@@ -10,20 +10,21 @@ pipeline {
         stage('SAST - Semgrep') {
             steps {
                 sh '''
-                    echo "=== Running Semgrep SAST ==="
+                    echo "=== Semgrep SAST Scan Started ==="
                     semgrep --config=p/owasp-top-10 \
                             --config=auto \
                             --output=semgrep-report.json \
                             --format=json \
                             .
+                    echo "=== Scan Completed ==="
                 '''
             }
         }
         
         stage('Archive Report') {
             steps {
-                archiveArtifacts artifacts: 'semgrep-report.json', fingerprint: true
-                echo 'SAST completed!'
+                archiveArtifacts artifacts: 'semgrep-report.json', fingerprint: true, allowEmptyArchive: true
+                echo 'SAST report archived.'
             }
         }
     }
