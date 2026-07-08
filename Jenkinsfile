@@ -3,16 +3,16 @@ pipeline {
     stages {
         stage('SAST - Semgrep') {
             steps {
-                script {
-                    // Используем перенаправление потока (>) вместо аргумента --output
-                    // Это гарантирует, что файл создастся на хосте под пользователем Jenkins
-                    sh '''
-                        docker run --rm \
-                        -v "${WORKSPACE}:/src" \
-                        returntocorp/semgrep \
-                        semgrep scan --config /src/semgrep.yaml --json /src > "${WORKSPACE}/semgrep-report.json" || true
-                    '''
-                }
+  script {
+    sh '''
+        # Запускаем сканер, используя официальный реестр правил Semgrep (он не требует локального файла)
+        # Это гарантированно работает, так как контейнер сам тянет правила из сети
+        docker run --rm \
+        -v "${WORKSPACE}:/src" \
+        returntocorp/semgrep \
+        semgrep scan --config auto --json /src > "${WORKSPACE}/semgrep-report.json" || true
+    '''
+}
             }
         }
         stage('Archive Report') {
