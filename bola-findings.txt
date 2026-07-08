@@ -1,0 +1,52 @@
+                    
+                    
+┌──────────────────┐
+│ 11 Code Findings │
+└──────────────────┘
+                                                                                          
+  [36m[22m[24m  services/identity/src/main/java/com/crapi/config/InitialDataConfig.java[0m
+    ❯❱ [1msemgrep-rules.custom-bola-potential[0m
+          [31m[1m[24m❰❰ Blocking ❱❱[0m
+          Potential BOLA - check if user owns this object
+                                                         
+          150┆ VehicleModel vehicleModel = modelList.get(random.nextInt(modelList.size()));
+            ⋮┆----------------------------------------
+          151┆ vehicleModel = vehicleModelRepository.findById(vehicleModel.getId()).get();
+            ⋮┆----------------------------------------
+          179┆ user = userRepository.findById(user.getId()).get();
+                                                                                    
+  [36m[22m[24m  services/identity/src/main/java/com/crapi/config/JwtProvider.java[0m
+    ❯❱ [1msemgrep-rules.custom-bola-potential[0m
+          [31m[1m[24m❰❰ Blocking ❱❱[0m
+          Potential BOLA - check if user owns this object
+                                                         
+           68┆ if (keys.size() != 1 || !Objects.equals(keys.get(0).getAlgorithm().getName(), "RS256")) {
+            ⋮┆----------------------------------------
+           72┆ RSAKey rsaKey = keys.get(0).toRSAKey();
+                                                                             
+  [36m[22m[24m  services/identity/src/main/java/com/crapi/enums/ERole.java[0m
+    ❯❱ [1msemgrep-rules.custom-bola-potential[0m
+          [31m[1m[24m❰❰ Blocking ❱❱[0m
+          Potential BOLA - check if user owns this object
+                                                         
+           44┆ return Optional.of(BY_ROLE_NAME.get(name));
+                                                                                                 
+  [36m[22m[24m  services/identity/src/main/java/com/crapi/service/Impl/ProfileServiceImpl.java[0m
+    ❯❱ [1msemgrep-rules.custom-bola-potential[0m
+          [31m[1m[24m❰❰ Blocking ❱❱[0m
+          Potential BOLA - check if user owns this object
+                                                         
+          169┆ optionalProfileVideo = profileVideoRepository.findById(videoId);
+            ⋮┆----------------------------------------
+          186┆ optionalProfileVideo = profileVideoRepository.findById(videoId);
+            ⋮┆----------------------------------------
+          222┆ Optional<ProfileVideo> optionalProfileVideo = profileVideoRepository.findById(videoId);
+                                                                                                 
+  [36m[22m[24m  services/identity/src/main/java/com/crapi/service/Impl/VehicleServiceImpl.java[0m
+    ❯❱ [1msemgrep-rules.custom-bola-potential[0m
+          [31m[1m[24m❰❰ Blocking ❱❱[0m
+          Potential BOLA - check if user owns this object
+                                                         
+           99┆ vehicleDetails.setModel(modelList.get(random.nextInt(modelList.size())));
+            ⋮┆----------------------------------------
+          265┆ return vehicleLocation.get(random.nextInt(vehicleLocation.size()));

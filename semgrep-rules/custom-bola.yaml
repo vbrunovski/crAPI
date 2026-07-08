@@ -1,0 +1,11 @@
+rules:
+  - id: custom-bola-potential
+    patterns:
+      - pattern-either:
+          - pattern: $OBJ.get($ID)
+          - pattern: $REPO.findById($ID)
+          - pattern: $REPO.findOne($ID)
+      - pattern-not: $OBJ.get(currentUser.id)
+    message: "Potential BOLA - check if user owns this object"
+    languages: [java]
+    severity: WARNING
