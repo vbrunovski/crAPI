@@ -1,21 +1,26 @@
 pipeline {
     agent any
     stages {
-        stage('SAST - Semgrep') {
-            stage('SAST - Semgrep') {
-    steps {
-        script {
-            sh '''
-                # Запускаем сканер
-                docker run --rm -v "${WORKSPACE}:/src" returntocorp/semgrep \
-                semgrep scan --config /src/semgrep.yaml --json --output /src/semgrep-report.json /src || true
-                
-                # СРАЗУ меняем владельца и права, чтобы Jenkins мог прочитать файл
-                chmod 666 "${WORKSPACE}/semgrep-report.json"
-            '''
+        stage('Prepare Permissions') {
+            steps {
+                sh 'chmod -R 777 "${WORKSPACE}"'
+            }
         }
-    }
-}
+        stage('SAST - Semgrep') {
+            steps {
+                script {
+                    // Сканирование
+                    sh '''
+                        docker run --rm \
+                        -v "${WORKSPACE}:/src" \
+                        returntocorp/semgrep \
+                        semgrep scan --config /src/semgrep.yaml --json --output /src/semgrep-report.json /src || true
+                        
+                        # Даем права на файл, чтобы Jenkins мог его прочитать
+                        chmod 666 "${WORKSPACE}/semgrep-report.json"
+                    '''
+                }
+            }
         }
         stage('Archive Report') {
             steps {
