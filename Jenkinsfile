@@ -2,18 +2,17 @@ pipeline {
     agent any
     
     stages {
-        stage('SAST - Semgrep') {
+      stage('SAST - Semgrep') {
     steps {
         script {
             sh '''
-                echo "--- Проверка прав на файлы ---"
-                ls -l /var/jenkins_home/workspace/sast1/services/identity/src/main/java/com/crapi/controller/AuthController.java
-                
-                echo "--- Проверка через контейнер (кто я и что вижу) ---"
+                # Используем переменную ${WORKSPACE}, которая в Jenkins всегда указывает на правильный путь
+                # Пробуем смонтировать WORKSPACE как есть
                 docker run --rm \
                 -v "${WORKSPACE}:/src" \
+                -w "/src" \
                 returntocorp/semgrep \
-                sh -c "whoami && ls -R /src/services/identity | head -n 20"
+                semgrep scan --config auto --no-git-ignore --json services/identity > "${WORKSPACE}/semgrep-report.json" || true
             '''
         }
     }
