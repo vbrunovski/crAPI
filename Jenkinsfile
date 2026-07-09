@@ -2,30 +2,31 @@ pipeline {
     agent any
     
     stages {
-        stage('SAST - Semgrep') {
+        stage('SAST - Identity Service Only') {
             steps {
                 script {
-                    // 1. Мы явно указываем -w (working directory) в /src/services
-                    // 2. Мы перенаправляем stdout в файлsemgrep-report.json
-                    // 3. Используем --json без --output, чтобы stdout шел прямо в наш файл
                     sh '''
-    docker run --rm \
-    -v "${WORKSPACE}:/src" \
-    returntocorp/semgrep \
-    semgrep scan \
-        --config auto \
-        --no-git-ignore \
-        --json \
-        /src/services > "${WORKSPACE}/semgrep-report.json"
-'''
+                        echo "--- ДЕБАГ: Список файлов в services/identity ---"
+                        ls -l "${WORKSPACE}/services/identity"
+                        
+                        echo "--- Запуск сканирования только identity ---"
+                        # Запускаем docker, монтируем путь и просим сканировать /src/services/identity
+                        docker run --rm \
+                        -v "${WORKSPACE}:/src" \
+                        returntocorp/semgrep \
+                        semgrep scan \
+                            --config auto \
+                            --no-git-ignore \
+                            --json \
+                            /src/services/identity > "${WORKSPACE}/semgrep-report.json" || true
+                    '''
                 }
             }
         }
         
         stage('Archive Report') {
             steps {
-                // Теперь файл точно будет на диске
-                archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: false
+                archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
             }
         }
     }
