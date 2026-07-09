@@ -5,19 +5,19 @@ pipeline {
         stage('SAST - Semgrep') {
             steps {
                 script {
-                    // Используем --config auto (он сам подхватит все языки в проекте)
-                    // Указываем /src/services как точку входа для анализа
-                    // --no-git-ignore нужен, потому что мы в контейнере и git-index может быть недоступен
+                    // Мы используем -w /src/services, чтобы сделать эту папку рабочей директорией контейнера
+                    // Тогда `semgrep scan .` будет сканировать именно её
                     sh '''
                         docker run --rm \
                         -v "${WORKSPACE}:/src" \
+                        -w "/src/services" \
                         returntocorp/semgrep \
                         semgrep scan \
                             --config auto \
                             --no-git-ignore \
                             --exclude semgrep-report.json \
                             --json \
-                            /src/services > "${WORKSPACE}/semgrep-report.json" || true
+                            . > "${WORKSPACE}/semgrep-report.json" || true
                     '''
                 }
             }
