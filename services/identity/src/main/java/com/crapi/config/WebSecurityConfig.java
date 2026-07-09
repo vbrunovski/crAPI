@@ -95,7 +95,9 @@ public class WebSecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(handling -> handling.authenticationEntryPoint(jwtUnauthorizedHandler));
     http.authenticationProvider(authenticationProvider());
-    http.csrf().disable();
+    http.csrf(csrf -> csrf
+        .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
+    );
     http.cors(Customizer.withDefaults());
     return http.build();
   }
