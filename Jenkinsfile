@@ -3,25 +3,21 @@ pipeline {
     
     stages {
         stage('SAST - Semgrep') {
-            steps {
-                script {
-                    // Мы используем -w /src/services, чтобы сделать эту папку рабочей директорией контейнера
-                    // Тогда `semgrep scan .` будет сканировать именно её
-                    sh '''
-                        docker run --rm \
-                        -v "${WORKSPACE}:/src" \
-                        -w "/src/services" \
-                        returntocorp/semgrep \
-                        semgrep scan \
-                            --config auto \
-                            --no-git-ignore \
-                            --exclude semgrep-report.json \
-                            --json \
-                            . > "${WORKSPACE}/semgrep-report.json" || true
-                    '''
-                }
-            }
+    steps {
+        script {
+            sh '''
+                echo "--- Проверка прав на файлы ---"
+                ls -l /var/jenkins_home/workspace/sast1/services/identity/src/main/java/com/crapi/controller/AuthController.java
+                
+                echo "--- Проверка через контейнер (кто я и что вижу) ---"
+                docker run --rm \
+                -v "${WORKSPACE}:/src" \
+                returntocorp/semgrep \
+                sh -c "whoami && ls -R /src/services/identity | head -n 20"
+            '''
         }
+    }
+}
         
         stage('Archive Report') {
             steps {
