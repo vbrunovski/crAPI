@@ -3,26 +3,17 @@ pipeline {
     
     stages {
         stage('SAST - Identity Service Only') {
-            steps {
-                script {
-                    sh '''
-                        echo "--- ДЕБАГ: Список файлов в services/identity ---"
-                        ls -l "${WORKSPACE}/services/identity"
-                        
-                        echo "--- Запуск сканирования только identity ---"
-                        # Запускаем docker, монтируем путь и просим сканировать /src/services/identity
-                        docker run --rm \
-                        -v "${WORKSPACE}:/src" \
-                        returntocorp/semgrep \
-                        semgrep scan \
-                            --config auto \
-                            --no-git-ignore \
-                            --json \
-                            /src/services/identity > "${WORKSPACE}/semgrep-report.json" || true
-                    '''
-                }
-            }
+    steps {
+        script {
+            // Мы сканируем файлы текущей директории Jenkins и передаем их в контейнер через tar
+            // Это обходит все проблемы с маунтами
+            sh '''
+                echo "--- Сканирование через передачу архива ---"
+                tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"
+            '''
         }
+    }
+}
         
         stage('Archive Report') {
             steps {
