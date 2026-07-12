@@ -13,18 +13,15 @@ pipeline {
         stage('Deploy App Test Стенд') {
             steps {
                 script {
-                    echo "--- Запуск crAPI напрямую через docker run ---"
-                    // Создаем общую сеть, чтобы контейнеры видели друг друга
+                    echo "--- Развертывание контейнеров crAPI в изолированной сети ---"
                     sh 'docker network create crapi-net || true'
-                    
-                    // Поднимаем базу данных (опционально, но нужно для старта identity)
                     sh 'docker run -d --name crapi-db --network crapi-net -e POSTGRES_USER=crapi -e POSTGRES_PASSWORD=crapi postgres:15-alpine || true'
                     
-                    // Поднимаем основной web-интерфейс/gateway crAPI на порту 8080
-                    sh 'docker run -d --name crapi-web --network crapi-net -p 8080:8080 ntop/crapi-web:latest || true'
+                    // Меняем внешний порт на 8888, чтобы не конфликтовать с Jenkins (8080)
+                    sh 'docker run -d --name crapi-web --network crapi-net -p 8888:8888 ntop/crapi-web:latest || true'
                     
                     echo "--- Ожидание инициализации сервисов ---"
-                    sh 'sleep 30' 
+                    sh 'sleep 40' 
                 }
             }
         }
@@ -32,11 +29,12 @@ pipeline {
         stage('DAST Scan (Nuclei)') {
             steps {
                 script {
+                    echo "--- Запуск Nuclei против crAPI ---"
+                    // Запускаем Nuclei в той же Docker-сети (crapi-net) 
+                    // и указываем в качестве таргета имя контейнера 'crapi-web' и его внутренний порт
                     sh '''
-                    echo "--- Запуск Nuclei ---"
-                    # Сканируем через общую сеть docker хоста
-                    docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
-                        -target http://localhost:8080 \
+                    docker run --rm --network crapi-net -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
+                        -target http://crapi-web:8888 \
                         -severity medium,high,critical \
                         -o /output/nuclei_report.txt -v
                     '''
