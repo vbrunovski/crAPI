@@ -13,8 +13,11 @@ pipeline {
         stage('Deploy App') {
             steps {
                 script {
-                    // Используем универсальный контейнер для запуска docker-compose, чтобы не зависеть от окружения
-                    sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${WORKSPACE}:/app" -w /app docker/compose:latest -f deploy/docker-compose.yml up -d'
+                    echo "--- Развертывание контейнеров crAPI напрямую ---"
+                    // Читаем docker-compose.yml из репозитория и передаем его в стандартный docker compose хоста без маунтов директорий
+                    sh 'cat deploy/docker-compose.yml | docker compose -f - up -d'
+                    
+                    echo "--- Ожидание инициализации API сервисов ---"
                     sh 'sleep 40' 
                 }
             }
@@ -38,7 +41,8 @@ pipeline {
     post {
         always {
             echo 'Очистка ресурсов...'
-            sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${WORKSPACE}:/app" -w /app docker/compose:latest -f deploy/docker-compose.yml down'
+            // Удаляем контейнеры, передавая файл через пайплайн
+            sh 'cat deploy/docker-compose.yml | docker compose -f - down'
         }
     }
 }
