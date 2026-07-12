@@ -22,7 +22,7 @@ pipeline {
             echo "--- Запуск Nuclei ---"
             # Запускаем и перенаправляем stderr в stdout, чтобы видеть ошибки в консоли Jenkins
             docker run --rm -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
-                -target http://your-test-app-url:8080 \
+                -target http://localhost:8080 \
                 -severity medium,high,critical \
                 -o /output/nuclei_report.txt 2>&1
             
