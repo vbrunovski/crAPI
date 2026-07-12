@@ -16,20 +16,16 @@ pipeline {
         stage('DAST - API Scan') {
             steps {
                 script {
-                    // Запускаем Nuclei и сразу после этого меняем права на созданный файл
+                    // Убираем монтирование папок (-v) и флаг -o. 
+                    // Просто перенаправляем весь поток вывода контейнера в файл на хосте через '>'
                     sh '''
-                    docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
+                    docker run --rm --network host projectdiscovery/nuclei:latest \
                         -target http://localhost:8888 \
-                        -severity medium,high,critical \
-                        -o /output/nuclei_report.txt
-                    
-                    # Даем Jenkins полные права на чтение этого файла
-                    sudo chmod 666 "${WORKSPACE}/nuclei_report.txt" || chmod 666 "${WORKSPACE}/nuclei_report.txt" || true
+                        -severity medium,high,critical > "${WORKSPACE}/nuclei_report.txt"
                     '''
                 }
             }
         }
-        
         // 3. Публикация отчетов в интерфейс Jenkins
         stage('Archive Security Reports') {
             steps {
