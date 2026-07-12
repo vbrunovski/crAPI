@@ -22,7 +22,7 @@ pipeline {
                     // Указываем таргет, где поднялось приложение
                     sh '''
                     docker run --rm projectdiscovery/nuclei:latest \
-                        -target http://your-test-app-url:8080 \
+                        -target http://localhost:8080 \
                         -severity medium,high,critical \
                         -o nuclei_report.txt
                     '''
