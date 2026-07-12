@@ -2,7 +2,6 @@ pipeline {
     agent any
     
     stages {
-        // 1. Статическое сканирование кода
         stage('SAST - Identity Service') {
             steps {
                 script {
@@ -14,19 +13,15 @@ pipeline {
             }
         }
 
-        // 2. Поднятие инфраструктуры для DAST
         stage('Deploy App') {
             steps {
                 script {
-                    // Поднимаем crAPI в фоне. Путь к compose файлу должен быть верным
                     sh 'docker-compose -f deploy/docker-compose.yml up -d'
-                    // Важно: ждем, пока сервисы реально поднимутся
                     sh 'sleep 40' 
                 }
             }
         }
 
-        // 3. Динамическое сканирование работающего API
         stage('DAST Scan (Nuclei)') {
             steps {
                 script {
@@ -40,19 +35,19 @@ pipeline {
                 }
             }
         }
-
-        // 4. Очистка ресурсов
-        stage('Cleanup') {
-            always {
-                sh 'docker-compose -f deploy/docker-compose.yml down'
-            }
-        }
         
-        // 5. Сбор результатов
         stage('Archive Report') {
             steps {
                 archiveArtifacts artifacts: 'semgrep-report.json, nuclei_report.txt', allowEmptyArchive: true
             }
+        }
+    }
+    
+    // Вот здесь правильное место для блока post
+    post {
+        always {
+            echo 'Очистка ресурсов...'
+            sh 'docker-compose -f deploy/docker-compose.yml down'
         }
     }
 }
