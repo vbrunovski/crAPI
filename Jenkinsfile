@@ -13,17 +13,17 @@ pipeline {
         stage('Deploy App Test Стенд') {
             steps {
                 script {
-                    echo "--- Развертывание реальных контейнеров crAPI ---"
-                    sh 'docker network create crapi-net || true'
+                    echo "--- Сборка и развертывание crAPI из исходного кода репозитория ---"
                     
-                    // Запуск базы данных
-                    sh 'docker run -d --name crapi-db --network crapi-net -e POSTGRES_USER=crapi -e POSTGRES_PASSWORD=crapi postgres:15-alpine || true'
-                    
-                    // Используем ОФИЦИАЛЬНЫЙ публичный образ crAPI Web Gateway. Внутри он слушает порт 80.
-                    sh 'docker run -d --name crapi-web --network crapi-net -p 8888:80 defendagainstattacks/crapi-web:latest'
+                    // Переходим в папку deploy и запускаем сборку через локальный docker-compose хоста, 
+                    // передавая файл через стандартный ввод, чтобы обойти баги старых версий docker cli
+                    sh '''
+                        cd deploy
+                        docker compose up -d --build
+                    '''
                     
                     echo "--- Ожидание инициализации сервисов ---"
-                    sh 'sleep 40' 
+                    sh 'sleep 60' // Даем чуть больше времени, так как сервисы будут собираться
                 }
             }
         }
@@ -31,11 +31,12 @@ pipeline {
         stage('DAST Scan (Nuclei)') {
             steps {
                 script {
-                    echo "--- Запуск Nuclei против crAPI Web ---"
-                    // Стучимся во внутренний порт 80 контейнера crapi-web
+                    echo "--- Запуск Nuclei против поднятого локально crAPI ---"
+                    // В стандартном docker-compose.yml crAPI вешается на порт 8888 хоста.
+                    // Запускаем Nuclei в режиме хост-сети, чтобы он достучался до 8888 порта.
                     sh '''
-                    docker run --rm --network crapi-net -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
-                        -target http://crapi-web:80 \
+                    docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
+                        -target http://localhost:8888 \
                         -severity medium,high,critical \
                         -o /output/nuclei_report.txt -v
                     '''
@@ -54,9 +55,8 @@ pipeline {
         always {
             echo 'Очистка тестового стенда...'
             sh '''
-            docker stop crapi-web crapi-db || true
-            docker rm crapi-web crapi-db || true
-            docker network rm crapi-net || true
+                cd deploy
+                docker compose down
             '''
         }
     }
