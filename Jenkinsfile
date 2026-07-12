@@ -2,7 +2,8 @@ pipeline {
     agent any
     
     stages {
-        stage('SAST - Identity Service') {
+        // 1. Статический анализ кода (SAST)
+        stage('SAST - Code Scan') {
             steps {
                 script {
                     sh 'tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"'
@@ -10,54 +11,26 @@ pipeline {
             }
         }
 
-        stage('Deploy App Test Стенд') {
+        // 2. Динамический анализ уже поднятого стенда (DAST)
+        stage('DAST - API Scan') {
             steps {
                 script {
-                    echo "--- Сборка и развертывание crAPI из исходного кода репозитория ---"
-                    
-                    // Переходим в папку deploy и запускаем сборку через локальный docker-compose хоста, 
-                    // передавая файл через стандартный ввод, чтобы обойти баги старых версий docker cli
-                    sh '''
-                        cd deploy
-                        docker compose up -d --build
-                    '''
-                    
-                    echo "--- Ожидание инициализации сервисов ---"
-                    sh 'sleep 60' // Даем чуть больше времени, так как сервисы будут собираться
-                }
-            }
-        }
-
-        stage('DAST Scan (Nuclei)') {
-            steps {
-                script {
-                    echo "--- Запуск Nuclei против поднятого локально crAPI ---"
-                    // В стандартном docker-compose.yml crAPI вешается на порт 8888 хоста.
-                    // Запускаем Nuclei в режиме хост-сети, чтобы он достучался до 8888 порта.
+                    // Просто натравливаем Nuclei на уже работающий на хосте порт 8888
                     sh '''
                     docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
                         -target http://localhost:8888 \
                         -severity medium,high,critical \
-                        -o /output/nuclei_report.txt -v
+                        -o /output/nuclei_report.txt
                     '''
                 }
             }
         }
         
-        stage('Archive Report') {
+        // 3. Публикация отчетов в интерфейс Jenkins
+        stage('Archive Security Reports') {
             steps {
                 archiveArtifacts artifacts: 'semgrep-report.json, nuclei_report.txt', allowEmptyArchive: true
             }
-        }
-    }
-    
-    post {
-        always {
-            echo 'Очистка тестового стенда...'
-            sh '''
-                cd deploy
-                docker compose down
-            '''
         }
     }
 }
