@@ -32,7 +32,7 @@ pipeline {
         
         stage('Archive Report') {
             steps {
-                archiveArtifacts artifacts: 'semgrep-report.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'semgrep-report.json, nuclei_report.txt', allowEmptyArchive: true
             }
         }
     }
