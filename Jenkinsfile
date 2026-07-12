@@ -5,10 +5,7 @@ pipeline {
         stage('SAST - Identity Service') {
             steps {
                 script {
-                    sh '''
-                        echo "--- Сканирование через передачу архива ---"
-                        tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"
-                    '''
+                    sh 'tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"'
                 }
             }
         }
@@ -16,7 +13,8 @@ pipeline {
         stage('Deploy App') {
             steps {
                 script {
-                    sh 'docker compose -f deploy/docker-compose.yml up -d'
+                    // Используем универсальный контейнер для запуска docker-compose, чтобы не зависеть от окружения
+                    sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${WORKSPACE}:/app" -w /app docker/compose:latest -f deploy/docker-compose.yml up -d'
                     sh 'sleep 40' 
                 }
             }
@@ -25,13 +23,7 @@ pipeline {
         stage('DAST Scan (Nuclei)') {
             steps {
                 script {
-                    sh '''
-                    echo "--- Запуск Nuclei ---"
-                    docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
-                        -target http://localhost:8080 \
-                        -severity medium,high,critical \
-                        -o /output/nuclei_report.txt -v
-                    '''
+                    sh 'docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest -target http://localhost:8080 -severity medium,high,critical -o /output/nuclei_report.txt -v'
                 }
             }
         }
@@ -43,11 +35,10 @@ pipeline {
         }
     }
     
-    // Вот здесь правильное место для блока post
     post {
         always {
             echo 'Очистка ресурсов...'
-            sh 'docker compose -f deploy/docker-compose.yml down'
+            sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${WORKSPACE}:/app" -w /app docker/compose:latest -f deploy/docker-compose.yml down'
         }
     }
 }
