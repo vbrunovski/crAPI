@@ -18,13 +18,15 @@ pipeline {
         stage('DAST Scan (Nuclei)') {
             steps {
                 script {
-                    // Используем docker для запуска Nuclei
-                    // Указываем таргет, где поднялось приложение
                     sh '''
-                    docker run --rm projectdiscovery/nuclei:latest \
-                        -target http://localhost:8080 \
+                    echo "--- Запуск Nuclei ---"
+                    docker run --rm -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
+                        -target http://your-test-app-url:8080 \
                         -severity medium,high,critical \
-                        -o nuclei_report.txt
+                        -o /output/nuclei_report.txt
+                    
+                    echo "--- Проверка наличия файла ---"
+                    ls -la "${WORKSPACE}/nuclei_report.txt" || echo "ФАЙЛ НЕ СОЗДАН!"
                     '''
                 }
             }
