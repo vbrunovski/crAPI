@@ -19,23 +19,10 @@ pipeline {
     steps {
         script {
             sh '''
-            echo "--- Запуск Nuclei ---"
-            # Запускаем и перенаправляем stderr в stdout, чтобы видеть ошибки в консоли Jenkins
-            docker run --rm -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
+            docker run --rm --network host -v "${WORKSPACE}:/output" projectdiscovery/nuclei:latest \
                 -target http://localhost:8080 \
                 -severity medium,high,critical \
-                -o /output/nuclei_report.txt 2>&1
-            
-            echo "--- Проверка наличия файла ---"
-            # Обязательно используем кавычки вокруг переменной с пробелом
-            if [ -f "${WORKSPACE}/nuclei_report.txt" ]; then
-                echo "Файл успешно создан!"
-                ls -la "${WORKSPACE}/nuclei_report.txt"
-            else
-                echo "ФАЙЛ НЕ СОЗДАН!"
-                # Выведем содержимое папки, чтобы увидеть, где он мог оказаться
-                ls -la "${WORKSPACE}"
-            fi
+                -o /output/nuclei_report.txt
             '''
         }
     }
