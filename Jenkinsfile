@@ -16,7 +16,7 @@ pipeline {
         stage('Deploy App') {
             steps {
                 script {
-                    sh 'docker-compose -f deploy/docker-compose.yml up -d'
+                    sh 'docker compose -f deploy/docker-compose.yml up -d'
                     sh 'sleep 40' 
                 }
             }
@@ -47,7 +47,7 @@ pipeline {
     post {
         always {
             echo 'Очистка ресурсов...'
-            sh 'docker-compose -f deploy/docker-compose.yml down'
+            sh 'docker compose -f deploy/docker-compose.yml down'
         }
     }
 }
