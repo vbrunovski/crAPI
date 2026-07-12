@@ -1,0 +1,54 @@
+AUTH_METHOD;TIMESTAMP;ACCOUNT_UID;ACCOUNT_NAME;ACCOUNT_EMAIL;ACCOUNT_ORGANIZATION_UID;ACCOUNT_ORGANIZATION_NAME;ACCOUNT_TAGS;FINDING_UID;PROVIDER;CHECK_ID;CHECK_TITLE;CHECK_TYPE;STATUS;STATUS_EXTENDED;MUTED;SERVICE_NAME;SUBSERVICE_NAME;SEVERITY;RESOURCE_TYPE;RESOURCE_UID;RESOURCE_NAME;RESOURCE_DETAILS;RESOURCE_TAGS;PARTITION;REGION;DESCRIPTION;RISK;RELATED_URL;REMEDIATION_RECOMMENDATION_TEXT;REMEDIATION_RECOMMENDATION_URL;REMEDIATION_CODE_NATIVEIAC;REMEDIATION_CODE_TERRAFORM;REMEDIATION_CODE_CLI;REMEDIATION_CODE_OTHER;COMPLIANCE;CATEGORIES;DEPENDS_ON;RELATED_TO;NOTES;PROWLER_VERSION;ADDITIONAL_URLS;ACCOUNT_OU_UID;ACCOUNT_OU_NAME
+profile: None;2026-07-10 21:26:29.483257;195304366889;;;;;;prowler-aws-account_maintain_current_contact_details-195304366889-eu-north-1-195304366889;aws;account_maintain_current_contact_details;AWS account contact information is current;Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices;MANUAL;Login to the AWS Console. Choose your account name on the top right of the window -> My Account -> Contact Information.;False;account;;medium;Other;arn:aws:iam::195304366889:root;195304366889;;;aws;eu-north-1;**AWS account contact information** is current for the **primary contact** and the **alternate contacts** for `security`, `billing`, and `operations`, with accurate email addresses and phone numbers.;"Outdated or single-person contacts delay **security notifications**, slow **incident response**, and complicate **account recovery**.
+
+AWS may throttle services during abuse mitigation, reducing **availability**. Missed alerts enable ongoing misuse, risking **data exfiltration** and unauthorized changes (**integrity**).";;"Adopt:
+- **Primary** and **alternate contacts** for `security`, `billing`, `operations`
+- Shared, monitored aliases and SMS-capable phone numbers (non-personal)
+- Centralized management across accounts with periodic reviews
+- **Least privilege** for who can modify contact data
+- Regular reachability tests and documented ownership";https://hub.prowler.com/check/account_maintain_current_contact_details;;"```hcl
+# Set the Security alternate contact for the AWS account
+resource ""aws_account_alternate_contact"" ""<example_resource_name>"" {
+  alternate_contact_type = ""SECURITY""  # Critical: ensures AWS can reach your security team
+  email_address          = ""<SECURITY_EMAIL>""  # Critical: contact destination
+  name                   = ""<SECURITY_CONTACT_NAME>""
+  phone_number           = ""<SECURITY_PHONE>""
+  title                  = ""Security""
+}
+```";"aws account put-alternate-contact --alternate-contact-type=SECURITY --email-address=<SECURITY_EMAIL> --name=""<SECURITY_CONTACT_NAME>"" --phone-number=""<SECURITY_PHONE>"" --title=""Security""";"1. Sign in to the AWS Management Console
+2. Open Billing and Cost Management, then click your account name > Account
+3. Under Contact information, click Edit, update details, then Update
+4. Under Alternate contacts, click Edit
+5. Enter Security contact name, email, and phone (use a team alias), then Update
+6. Repeat for Billing and Operations if needed";CIS-1.4: 1.1 | CIS-1.5: 1.1 | KISA-ISMS-P-2023: 2.10.2 | C5-2025: IAM-03.01AS, IAM-06.06B, SSO-05.06B, SIM-01.03B, INQ-02.01B | CIS-2.0: 1.1 | KISA-ISMS-P-2023-korean: 2.10.2 | AWS-Well-Architected-Framework-Security-Pillar: SEC03-BP03, SEC10-BP01 | CIS-5.0: 1.1 | CSA-CCM-4.0: SEF-08 | AWS-Account-Security-Onboarding: Billing, emergency, security contacts | CIS-3.0: 1.1 | ENS-RD2022: op.ext.7.aws.am.1 | CIS-6.0: 2.1 | ISO27001-2022: A.5.5 | CIS-4.0.1: 1.1 | NIS2: 2.2.3, 3.5.3.a, 5.1.7.b;;;;;5.22.0;https://repost.aws/knowledge-center/update-phone-number | https://support.stax.io/docs/accounts/update-aws-account-contact-details | https://maartenbruntink.nl/blog/2022/09/26/aws-account-hygiene-101-mass-updating-alternate-account-contacts/ | https://docs.aws.amazon.com/security-ir/latest/userguide/update-account-contact-info.html | https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-primary.html | https://repost.aws/knowledge-center/add-update-billing-contact | https://aws.amazon.com/blogs/security/update-the-alternate-security-contact-across-your-aws-accounts-for-timely-security-notifications/ | https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_update_contacts.html | https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-alternate.html;;
+profile: None;2026-07-10 21:26:29.483257;195304366889;;;;;;prowler-aws-account_security_contact_information_is_registered-195304366889-eu-north-1-195304366889;aws;account_security_contact_information_is_registered;AWS account has security alternate contact registered;Software and Configuration Checks/AWS Security Best Practices | Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices;MANUAL;Login to the AWS Console. Choose your account name on the top right of the window -> My Account -> Alternate Contacts -> Security Section.;False;account;;medium;Other;arn:aws:iam::195304366889:root;195304366889;;;aws;eu-north-1;Account settings contain a **Security alternate contact** in Alternate Contacts (name, `EmailAddress`, `PhoneNumber`) for targeted AWS security notifications.;"Missing or outdated **security contact** can delay or prevent AWS advisories from reaching responders, increasing risk to:
+- Confidentiality: data exfiltration from undetected compromise
+- Integrity: unauthorized changes persist longer
+- Availability: resource abuse (e.g., cryptomining) and outages";;"Define and maintain a **Security alternate contact**:
+- Use a monitored alias (e.g., `security@domain`) and team phone
+- Apply to every account (prefer Org-wide automation)
+- Review after org/personnel changes and test delivery
+- Document ownership and escalation paths
+Align with **incident response** and **least privilege** principles.";https://hub.prowler.com/check/account_security_contact_information_is_registered;;"```hcl
+# Set the SECURITY alternate contact for the current AWS account
+resource ""aws_account_alternate_contact"" ""<example_resource_name>"" {
+  alternate_contact_type = ""SECURITY""  # Critical: sets Security contact type
+  email_address          = ""security@example.com""  # Contact email
+  name                   = ""Security Team""         # Contact name
+  phone_number           = ""+1-555-0100""          # Contact phone
+}
+```";aws account put-alternate-contact --alternate-contact-type SECURITY --email-address <EMAIL_ADDRESS> --name <CONTACT_NAME> --phone-number <PHONE_NUMBER>;"1. Sign in to the AWS Management Console as the root user or an admin with account:PutAlternateContact
+2. Click your account name (top-right) and select My Account (or Account)
+3. Scroll to Alternate Contacts and click Edit in the Security section
+4. Enter Security Email, Name, and Phone Number
+5. Click Update (or Save changes)";CIS-1.4: 1.2 | CIS-1.5: 1.2 | AWS-Foundational-Security-Best-Practices: Account.1 | KISA-ISMS-P-2023: 2.10.2 | C5-2025: OIS-06.01B, SSO-05.06B, SIM-01.03B | CIS-2.0: 1.2 | KISA-ISMS-P-2023-korean: 2.10.2 | AWS-Well-Architected-Framework-Security-Pillar: SEC03-BP03, SEC10-BP01 | CIS-5.0: 1.2 | CSA-CCM-4.0: SEF-08 | PCI-4.0: A1.2.3.1 | AWS-Account-Security-Onboarding: Billing, emergency, security contacts | CIS-3.0: 1.2 | ENS-RD2022: op.ext.7.aws.am.1 | CIS-6.0: 2.2 | ISO27001-2022: A.5.5 | CIS-4.0.1: 1.2 | NIS2: 1.1.1.a, 1.2.3, 2.2.1, 3.1.2.d, 3.5.3.a, 5.1.7.b;;;;;5.22.0;https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact | https://support.icompaas.com/support/solutions/articles/62000234161-1-2-ensure-security-contact-information-is-registered-manual- | https://www.plerion.com/cloud-knowledge-base/ensure-security-contact-information-is-registered | https://repost.aws/articles/ARDFbpt-bvQ8iuErnqVVcCXQ/managing-aws-organization-alternate-contacts-via-csv;;
+profile: None;2026-07-10 21:26:29.483257;195304366889;;;;;;prowler-aws-account_security_questions_are_registered_in_the_aws_account-195304366889-eu-north-1-195304366889;aws;account_security_questions_are_registered_in_the_aws_account;[DEPRECATED] AWS root user has security challenge questions configured;Software and Configuration Checks/AWS Security Best Practices;MANUAL;Login to the AWS Console as root. Choose your account name on the top right of the window -> My Account -> Configure Security Challenge Questions.;False;account;;medium;Other;arn:aws:iam::195304366889:root;195304366889;;;aws;eu-north-1;[DEPRECATED] **AWS account root** configuration may include legacy **security challenge questions** for support identity verification. This evaluates whether those questions are set on the account. *New configuration is discontinued by AWS and remaining support for this feature is time-limited.*;Absence of these questions can limit support-assisted recovery if root credentials or MFA are lost, reducing **availability** and slowing **incident response**. Reliance on KBA also weakens **confidentiality** due to **social engineering**. Treat this as a recovery gap and adopt stronger, phishing-resistant factors.;;"Favor stronger recovery instead of KBA:
+- Enforce **MFA for root** and minimize root use
+- Keep **alternate contacts** and root email current and protected
+- Establish a tightly controlled **break-glass role**, applying least privilege and separation of duties
+- Document and test recovery procedures; monitor root activity";https://hub.prowler.com/check/account_security_questions_are_registered_in_the_aws_account;;;;"1. Sign in to the AWS Management Console
+2. Navigate to your AWS account settings page at https://console.aws.amazon.com/billing/home?#/account/
+3. Scroll down to Configure Security Challenge Questions section and click the Edit link
+4. Select three different questions made available by Amazon and provide appropriate answers
+5. Store the answers in a secure but accessible location
+6. Click the Update button to save the changes";CIS-1.4: 1.3 | CIS-1.5: 1.3 | KISA-ISMS-P-2023: 2.5.1, 2.5.3, 2.10.2 | CIS-2.0: 1.3 | KISA-ISMS-P-2023-korean: 2.5.1, 2.5.3, 2.10.2 | AWS-Well-Architected-Framework-Security-Pillar: SEC03-BP03, SEC10-BP01 | CIS-3.0: 1.3 | ENS-RD2022: op.ext.7.aws.am.1 | CIS-4.0.1: 1.3;;;;;5.22.0;https://www.trendmicro.com/trendaivisiononecloudriskmanagement/knowledge-base/aws/IAM/security-challenge-questions.html;;

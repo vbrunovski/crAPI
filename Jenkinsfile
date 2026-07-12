@@ -3,17 +3,32 @@ pipeline {
     
     stages {
         stage('SAST - Identity Service Only') {
-    steps {
-        script {
-            // Мы сканируем файлы текущей директории Jenkins и передаем их в контейнер через tar
-            // Это обходит все проблемы с маунтами
-            sh '''
-                echo "--- Сканирование через передачу архива ---"
-                tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"
-            '''
+            steps {
+                script {
+                    // Мы сканируем файлы текущей директории Jenkins и передаем их в контейнер через tar
+                    // Это обходит все проблемы с маунтами
+                    sh '''
+                        echo "--- Сканирование через передачу архива ---"
+                        tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"
+                    '''
+                }
+            }
         }
-    }
-}
+
+        stage('DAST Scan (Nuclei)') {
+            steps {
+                script {
+                    // Используем docker для запуска Nuclei
+                    // Указываем таргет, где поднялось приложение
+                    sh '''
+                    docker run --rm projectdiscovery/nuclei:latest \
+                        -target http://your-test-app-url:8080 \
+                        -severity medium,high,critical \
+                        -o nuclei_report.txt
+                    '''
+                }
+            }
+        }
         
         stage('Archive Report') {
             steps {
