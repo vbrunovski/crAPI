@@ -1,6 +1,6 @@
 rules:
-  - id: ban-md5-for-passwords
-    languages: [go, javascript, python, java] # укажите нужные языки
-    message: "Внимание! Использование MD5 запрещено политикой безопасности компании. Используйте bcrypt/argon2."
+  - id: java-use-of-md5
+    languages: [java]
+    message: "Внимание! Обнаружено использование небезопасного алгоритма хэширования MD5. Рекомендуется использовать SHA-256 или bcrypt."
     severity: ERROR
-    pattern: md5(...) # Semgrep найдет любой вызов функции md5 с любыми аргументами
+    pattern: MessageDigest.getInstance("MD5")
