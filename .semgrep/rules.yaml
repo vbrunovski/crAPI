@@ -1,7 +1,6 @@
 rules:
-  - id: java-command-injection
+  - id: spring-csrf-disabled
     languages: [java]
-    message: "КРИТИЧЕСКАЯ УЯЗВИМОСТЬ: Обнаружен вызов выполнения системных команд через Runtime.exec(). Это может привести к удаленному выполнению кода (RCE), если аргументы контролируются пользователем."
-    severity: ERROR
-    patterns:
-      - pattern: Runtime.getRuntime().exec(...)
+    message: "Внимание! Обнаружено отключение защиты CSRF (.csrf().disable()). Убедитесь, что это безопасно для вашего типа авторизации."
+    severity: WARNING
+    pattern: $ANY.csrf().disable()
