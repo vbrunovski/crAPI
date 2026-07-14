@@ -3,11 +3,12 @@ pipeline {
     
     stages {
     // 1. Статический анализ кода (SAST)
+// 1. Статический анализ кода (SAST)
         stage('SAST - Code Scan') {
             steps {
                 script {
-                    // Монтируем текущий воркспейс в контейнер и запускаем проверку из него
-                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity --no--error > "${WORKSPACE}/semgrep-report.json"'
+                    // Исправили двойной дефис в --no-error
+                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity --no-error > "${WORKSPACE}/semgrep-report.json"'
                 }
             }
         }
