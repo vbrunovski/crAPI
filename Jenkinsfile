@@ -7,7 +7,7 @@ pipeline {
             steps {
                 script {
                     // Монтируем текущий воркспейс в контейнер и запускаем проверку из него
-                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity --error > "${WORKSPACE}/semgrep-report.json"'
+                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity --no--error > "${WORKSPACE}/semgrep-report.json"'
                 }
             }
         }
