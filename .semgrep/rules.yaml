@@ -1,6 +1,6 @@
 rules:
-  - id: spring-csrf-disabled
+  - id: detect-bash-command-class
     languages: [java]
-    message: "Внимание! Обнаружено отключение защиты CSRF (.csrf().disable()). Убедитесь, что это безопасно для вашего типа авторизации."
+    message: "Найден класс BashCommand!"
     severity: WARNING
-    pattern: $ANY.csrf().disable()
+    pattern: class BashCommand { ... }
