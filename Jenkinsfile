@@ -6,7 +6,8 @@ pipeline {
         stage('SAST - Code Scan') {
             steps {
                 script {
-                    sh 'tar -cf - services/identity | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config auto --no-git-ignore --json services/identity" > "${WORKSPACE}/semgrep-report.json"'
+                    // Архивируем и код, и ваши правила из папки .semgrep
+                    sh 'tar -cf - services/identity .semgrep | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config .semgrep --json services/identity" > "${WORKSPACE}/semgrep-report.json"'
                 }
             }
         }

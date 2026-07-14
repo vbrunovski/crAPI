@@ -1,0 +1,6 @@
+rules:
+  - id: ban-md5-for-passwords
+    languages: [go, javascript, python, java] # укажите нужные языки
+    message: "Внимание! Использование MD5 запрещено политикой безопасности компании. Используйте bcrypt/argon2."
+    severity: ERROR
+    pattern: md5(...) # Semgrep найдет любой вызов функции md5 с любыми аргументами
