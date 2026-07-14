@@ -1,6 +1,7 @@
 rules:
-  - id: java-use-of-md5
+  - id: java-command-injection
     languages: [java]
-    message: "Внимание! Обнаружено использование небезопасного алгоритма хэширования MD5. Рекомендуется использовать SHA-256 или bcrypt."
+    message: "КРИТИЧЕСКАЯ УЯЗВИМОСТЬ: Обнаружен вызов выполнения системных команд через Runtime.exec(). Это может привести к удаленному выполнению кода (RCE), если аргументы контролируются пользователем."
     severity: ERROR
-    pattern: MessageDigest.getInstance("MD5")
+    patterns:
+      - pattern: Runtime.getRuntime().exec(...)
