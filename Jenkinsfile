@@ -2,12 +2,12 @@ pipeline {
     agent any
     
     stages {
-        // 1. Статический анализ кода (SAST)
+    // 1. Статический анализ кода (SAST)
         stage('SAST - Code Scan') {
             steps {
                 script {
-                    // Архивируем и код, и ваши правила из папки .semgrep
-                    sh 'tar -cf - services/identity .semgrep | docker run --rm -i -v /src returntocorp/semgrep sh -c "tar -xf - && semgrep scan --config .semgrep --json services/identity" > "${WORKSPACE}/semgrep-report.json"'
+                    // Монтируем текущий воркспейс в контейнер и запускаем проверку из него
+                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity > "${WORKSPACE}/semgrep-report.json"'
                 }
             }
         }
