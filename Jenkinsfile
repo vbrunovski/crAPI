@@ -6,13 +6,12 @@ pipeline {
         stage('SAST - Code Scan') {
             steps {
                 script {
-                    // Добавили || true в самый конец. Теперь этот шаг ВСЕГДА будет зеленым
-                    sh 'docker run --rm -v "${WORKSPACE}:/src" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity > "${WORKSPACE}/semgrep-report.json" || true'
+                    // Обернули путь к воркспейсу в экранированные кавычки \"${WORKSPACE}\"
+                    sh 'docker run --rm -v \"${WORKSPACE}:/src\" -w /src returntocorp/semgrep semgrep scan --config .semgrep --json services/identity > "${WORKSPACE}/semgrep-report.json" || true'
                 }
             }
         }
 
-        // 2. Динамический анализ уже поднятого стенда (DAST)
         // 2. Динамический анализ уже поднятого стенда (DAST)
         stage('DAST - API Scan') {
             steps {
