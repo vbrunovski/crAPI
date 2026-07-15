@@ -29,19 +29,20 @@ pipeline {
             }
         }
 
-        // 3. Анализ сторонних зависимостей (SCA)
+       // 3. Анализ сторонних зависимостей (SCA)
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
-                    // Запускаем рекурсивное сканирование зависимостей (--scanners vuln).
-                    // Выводим отчет в формате JSON в корень воркспейса.
-                    // --exit-code 0 гарантирует, что пайплайн не упадет при нахождении уязвимостей.
+                    // 1. Монтируем папку .trivy-cache, чтобы сохранить базу локально на будущее.
+                    // 2. Добавляем --timeout 20m, чтобы дать сканеру время выкачать базу на медленном линке.
                     sh '''
                     docker run --rm \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v "${WORKSPACE}":/apps \
+                        -v "${WORKSPACE}/.trivy-cache":/root/.cache/trivy \
                         aquasec/trivy:latest fs \
                         --scanners vuln \
+                        --timeout 20m \
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
                         --format json \
