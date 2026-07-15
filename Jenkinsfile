@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-       // 3. Анализ сторонних зависимостей (SCA)
+      // 3. Анализ сторонних зависимостей (SCA)
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
@@ -42,12 +42,13 @@ pipeline {
                         -w /workspace \
                         aquasec/trivy:latest fs \
                         --scanners vuln \
+                        --vuln-type os,library \
                         --timeout 20m \
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
                         --format json \
                         -o trivy-report.json \
-                        .
+                        /workspace
                     '''
                 }
             }
