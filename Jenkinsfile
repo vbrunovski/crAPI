@@ -29,25 +29,25 @@ pipeline {
             }
         }
 
-       /// 3. Анализ сторонних зависимостей (SCA)
+       // 3. Анализ сторонних зависимостей (SCA)
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
-                    // Используем стабильное и быстрое зеркало базы на Amazon ECR (public.ecr.aws)
                     sh '''
                     docker run --rm \
                         -e TRIVY_DB_REPOSITORY="public.ecr.aws/aquasecurity/trivy-db" \
                         -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v "${WORKSPACE}":/apps \
+                        -v "${WORKSPACE}":/workspace \
                         -v "${WORKSPACE}/.trivy-cache":/root/.cache/trivy \
+                        -w /workspace \
                         aquasec/trivy:latest fs \
                         --scanners vuln \
                         --timeout 20m \
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
                         --format json \
-                        -o /apps/trivy-report.json \
-                        /apps
+                        -o trivy-report.json \
+                        .
                     '''
                 }
             }
