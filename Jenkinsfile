@@ -28,8 +28,16 @@ pipeline {
 
         stage('SCA Scan (Trivy)') {
             steps {
-                // Сканируем только зависимости в локальной директории (fs - filesystem)
-                sh 'trivy fs --exit-code 1 --severity HIGH,CRITICAL .'
+                // Запускаем Trivy через Docker, монтируя текущую папку проекта в контейнер
+                sh '''
+                    docker run --rm \
+                    -v /var/run/docker.sock:/var/run/docker.sock \
+                    -v $WORKSPACE:/apps \
+                    aquasec/trivy:latest fs \
+                    --exit-code 1 \
+                    --severity HIGH,CRITICAL \
+                    /apps
+                '''
             }
         }
 
