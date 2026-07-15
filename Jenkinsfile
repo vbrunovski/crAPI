@@ -33,22 +33,23 @@ pipeline {
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
+                    // Упаковываем все файлы воркспейса, передаем в контейнер Trivy,
+                    // распаковываем внутри папки /workspace и запускаем сканирование.
+                    // Отчет выгружаем обратно на хост через 'cat' или вывод в stdout, перенаправленный в файл.
                     sh '''
-                    docker run --rm \
+                    tar -cf - . | docker run --rm -i \
                         -e TRIVY_DB_REPOSITORY="public.ecr.aws/aquasecurity/trivy-db" \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v "${WORKSPACE}":/workspace \
                         -v "${WORKSPACE}/.trivy-cache":/root/.cache/trivy \
-                        -w /workspace \
-                        aquasec/trivy:latest fs \
-                        --scanners vuln \
-                        --vuln-type os,library \
-                        --timeout 20m \
-                        --exit-code 0 \
-                        --severity HIGH,CRITICAL \
-                        --format json \
-                        -o trivy-report.json \
-                        /workspace
+                        aquasec/trivy:latest sh -c "
+                            mkdir -p /workspace && \
+                            tar -xf - -C /workspace && \
+                            trivy fs \
+                                --scanners vuln \
+                                --exit-code 0 \
+                                --severity HIGH,CRITICAL \
+                                --format json \
+                                /workspace
+                        " > "${WORKSPACE}/trivy-report.json"
                     '''
                 }
             }
