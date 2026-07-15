@@ -25,6 +25,14 @@ pipeline {
                 }
             }
         }
+
+        stage('SCA Scan (Trivy)') {
+            steps {
+                // Сканируем только зависимости в локальной директории (fs - filesystem)
+                sh 'trivy fs --exit-code 1 --severity HIGH,CRITICAL .'
+            }
+        }
+
         // 3. Публикация отчетов в интерфейс Jenkins
         stage('Archive Security Reports') {
             steps {
