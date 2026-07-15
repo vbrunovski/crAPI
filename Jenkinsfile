@@ -33,10 +33,11 @@ pipeline {
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
-                    // 1. Монтируем папку .trivy-cache, чтобы сохранить базу локально на будущее.
-                    // 2. Добавляем --timeout 20m, чтобы дать сканеру время выкачать базу на медленном линке.
+                    // Перенаправляем загрузку базы на стабильный реестр GitHub (ghcr.io)
+                    // через переменную окружения TRIVY_DB_REPOSITORY.
                     sh '''
                     docker run --rm \
+                        -e TRIVY_DB_REPOSITORY="ghcr.io/aquasec/trivy-db" \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v "${WORKSPACE}":/apps \
                         -v "${WORKSPACE}/.trivy-cache":/root/.cache/trivy \
