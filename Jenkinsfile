@@ -29,15 +29,14 @@ pipeline {
             }
         }
 
-       // 3. Анализ сторонних зависимостей (SCA)
+       /// 3. Анализ сторонних зависимостей (SCA)
         stage('SCA Scan (Trivy)') {
             steps {
                 script {
-                    // Перенаправляем загрузку базы на стабильный реестр GitHub (ghcr.io)
-                    // через переменную окружения TRIVY_DB_REPOSITORY.
+                    // Используем стабильное и быстрое зеркало базы на Amazon ECR (public.ecr.aws)
                     sh '''
                     docker run --rm \
-                        -e TRIVY_DB_REPOSITORY="ghcr.io/aquasec/trivy-db" \
+                        -e TRIVY_DB_REPOSITORY="public.ecr.aws/aquasecurity/trivy-db" \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v "${WORKSPACE}":/apps \
                         -v "${WORKSPACE}/.trivy-cache":/root/.cache/trivy \
